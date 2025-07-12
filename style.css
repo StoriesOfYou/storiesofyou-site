@@ -1,0 +1,96 @@
+body {
+  font-family: 'EB Garamond', serif;
+  background-color: #fdfaf6;
+  color: #3a2e2e;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+header {
+  background-color: #e9ded3;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+header p {
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+}
+
+.cta-button {
+  background-color: #8d6748;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+section {
+  padding: 2rem 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #c8b6a6;
+  padding-bottom: 0.5rem;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.step h3 {
+  margin: 0.5rem 0;
+  font-size: 1.3rem;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+ul li::before {
+  content: "\2713";
+  color: #6c4f3d;
+  font-weight: bold;
+  display: inline-block;
+  width: 1.5em;
+}
+
+iframe {
+  border: 1px solid #c8b6a6;
+  border-radius: 6px;
+}
+
+footer {
+  background-color: #e9ded3;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #5e4c4c;
+  border-top: 1px solid #c8b6a6;
+}
+
+@media (min-width: 768px) {
+  .steps {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .step {
+    flex: 1;
+    padding: 0 1rem;
+  }
+}
