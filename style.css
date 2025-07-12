@@ -33,6 +33,26 @@ header p {
   font-weight: bold;
 }
 
+nav ul {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  padding: 1rem;
+  margin: 0;
+  background-color: #f2e8dd;
+  border-bottom: 1px solid #c8b6a6;
+}
+
+nav ul li {
+  margin: 0 1rem;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #5e4c4c;
+  font-weight: 600;
+}
+
 section {
   padding: 2rem 1rem;
   max-width: 800px;
@@ -75,6 +95,14 @@ iframe {
   border-radius: 6px;
 }
 
+blockquote {
+  background-color: #f5f0eb;
+  border-left: 4px solid #c8b6a6;
+  margin: 1rem 0;
+  padding: 1rem;
+  font-style: italic;
+}
+
 footer {
   background-color: #e9ded3;
   text-align: center;
@@ -82,6 +110,12 @@ footer {
   font-size: 0.9rem;
   color: #5e4c4c;
   border-top: 1px solid #c8b6a6;
+}
+
+footer a {
+  color: #5e4c4c;
+  margin: 0 0.5rem;
+  text-decoration: none;
 }
 
 @media (min-width: 768px) {
