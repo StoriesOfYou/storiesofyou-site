@@ -30,7 +30,6 @@
     .bg-warm-mid{background-color:var(--warm-mid)}
     .video-viewport{position:relative;width:100%;padding-bottom:56.25%;overflow:hidden;border-radius:.75rem;box-shadow:0 10px 25px rgba(0,0,0,.10);--crop:120%}
     .video-viewport iframe{position:absolute;top:50%;left:50%;width:100%;height:var(--crop);transform:translate(-50%,-50%);border:0}
-    /* Added for S3 <video> */
     .video-viewport video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0;display:block}
     .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
     .reveal.visible{opacity:1;transform:none}
@@ -63,18 +62,17 @@
 
       <div class="mt-8 max-w-3xl mx-auto reveal">
         <div class="video-viewport">
-          <!-- Replaced YouTube iframe with S3-hosted video -->
+          <!-- CloudFront video: autoplay muted, no loop, user can unmute/restart -->
           <video
             id="introVideo"
-            controls
+            autoplay
+            muted
             playsinline
+            controls
             preload="metadata"
             poster="og-image.jpg"
           >
-            <!-- Replace the src below with your actual S3 URL -->
-            <source src="https://YOUR_S3_BUCKET.s3.amazonaws.com/your-video.mp4" type="video/mp4">
-            <!-- Optional alternate format for broader compatibility -->
-            <!-- <source src="https://YOUR_S3_BUCKET.s3.amazonaws.com/your-video.webm" type="video/webm"> -->
+            <source src="https://d4al2emvsw1mr.cloudfront.net/StoriesOfYouTest2.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
         </div>
