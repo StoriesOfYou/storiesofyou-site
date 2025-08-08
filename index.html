@@ -1,22 +1,10 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Stories of You</title>
   <meta name="description" content="Your voice, your story — preserved forever. Capture your memories in your own words with Stories of You." />
-
-  <!-- Favicons & Social -->
-  <link rel="icon" href="favicon.ico">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Stories of You">
-  <meta property="og:description" content="Your voice, your story — preserved forever.">
-  <meta property="og:image" content="og-image.jpg">
-  <meta property="og:url" content="https://storiesofyou.ai">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Stories of You">
-  <meta name="twitter:description" content="Your voice, your story — preserved forever.">
-  <meta name="twitter:image" content="og-image.jpg">
-
   <link rel="icon" href="favicon.ico" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Stories of You" />
@@ -30,201 +18,158 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root{
-@@ -27,43 +24,25 @@
+      --brand-navy:#0f2c4c;
+      --brand-orange:#e09a1b;
+      --brand-charcoal:#3d3528;
       --warm-light:#faf3e7;
       --warm-mid:#e0cba7;
     }
-
-    /* Sticky header (logo only) */
     .site-header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.82);backdrop-filter:saturate(140%) blur(10px);box-shadow:0 6px 16px rgba(0,0,0,.06)}
-
-    /* Hero background */
     .hero-bg{background:radial-gradient(1200px 500px at 50% -200px,#fff7e9 0%,#fce8c8 50%,#e0cba7 100%)}
-
-    /* Section backgrounds */
     .bg-warm-light{background-color:var(--warm-light)}
     .bg-warm-mid{background-color:var(--warm-mid)}
-
-    /* Video crop wrapper */
-    .video-viewport{position:relative;width:100%;padding-bottom:56.25%;overflow:hidden;border-radius:.75rem;box-shadow:0 10px 25px rgba(0,0,0,.10);--crop:116%}
-    .video-viewport iframe{position:absolute;top:50%;left:50%;width:100%;height:var(--crop);transform:translate(-50%,-50%) scale(1);border:0;animation:zoomIn 3s ease-out forwards}
-
-    /* Cinematic zoom */
-    @keyframes zoomIn{0%{transform:translate(-50%,-50%) scale(1)}100%{transform:translate(-50%,-50%) scale(1.05)}}
-    @media (prefers-reduced-motion: reduce){.video-viewport iframe{animation:none}}
-
-    /* Scroll-in */
     .video-viewport{position:relative;width:100%;padding-bottom:56.25%;overflow:hidden;border-radius:.75rem;box-shadow:0 10px 25px rgba(0,0,0,.10);--crop:120%}
     .video-viewport iframe{position:absolute;top:50%;left:50%;width:100%;height:var(--crop);transform:translate(-50%,-50%);border:0}
     .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
     .reveal.visible{opacity:1;transform:none}
-
-    /* Buttons */
     .btn-primary{background-color:var(--brand-charcoal);color:#fff}
     .btn-primary:hover{background-color:#5a4d3a}
     .btn-secondary{background:#fff;color:var(--brand-charcoal);border:2px solid var(--brand-charcoal)}
     .btn-secondary:hover{background:#f7f2eb}
-
-    /* Icon helpers */
     .icon{width:52px;height:52px;display:inline-block;color:var(--brand-navy)}
     .icon-accent{color:var(--brand-orange)}
   </style>
 </head>
 <body class="bg-white text-gray-800 font-sans">
 
-  <!-- Header (logo only) -->
   <!-- Header -->
   <header class="site-header">
     <div class="max-w-7xl mx-auto px-6 py-3 flex items-center">
       <img src="logo.png" alt="Stories of You logo" class="h-8 w-auto rounded-sm" />
-@@ -73,30 +52,23 @@
+    </div>
+  </header>
+
   <!-- Hero -->
   <section class="hero-bg">
     <div class="mx-auto max-w-7xl px-6 py-14 text-center">
-      <!-- Logo above headline -->
       <img src="logo.png" alt="Stories of You" class="h-12 w-auto mx-auto mb-4" />
-
-      <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight drop-shadow-sm">
-        Your voice, your story — preserved forever.
-      </h1>
       <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight">Your voice, your story — preserved forever.</h1>
       <p class="mt-5 text-lg text-gray-900/80 max-w-2xl mx-auto">
         Stories of You makes it easy to record and share your memories in your own voice,
         creating a legacy your loved ones can treasure for generations.
       </p>
 
-      <!-- Video -->
       <div class="mt-8 max-w-3xl mx-auto reveal">
         <div class="video-viewport">
           <iframe
-            src="https://www.youtube.com/embed/XvyvZOhDJPk?rel=0&modestbranding=1"
             src="https://www.youtube.com/embed/XvyvZOhDJPk?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3"
             title="Stories of You explainer video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen>
-          </iframe>
             allowfullscreen></iframe>
         </div>
       </div>
 
-      <!-- Single CTA -->
       <div class="mt-8 flex items-center justify-center">
         <button id="openRecorder" class="btn-primary px-8 py-4 text-lg rounded-xl shadow transition">
           Record a Story (beta)
-@@ -109,38 +81,24 @@
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
   <section class="bg-warm-light py-16">
     <div class="max-w-6xl mx-auto px-6 text-center">
       <h2 class="text-3xl font-bold mb-10 reveal">How It Works</h2>
-
       <div class="grid md:grid-cols-3 gap-8">
-        <!-- Record -->
         <div class="reveal">
           <span class="icon">
-            <!-- Mic (brand navy) -->
-            <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full">
-              <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 1 1-10 0H5a7 7 0 0 0 14 0h-2ZM11 19h2v3h-2v-3Z"/>
-            </svg>
             <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 1 1-10 0H5a7 7 0 0 0 14 0h-2ZM11 19h2v3h-2v-3Z"/></svg>
           </span>
           <h3 class="text-xl font-semibold mt-2">Record</h3>
           <p class="text-gray-700">Answer a simple prompt and record your voice right from your phone or computer.</p>
         </div>
-
-        <!-- Review -->
         <div class="reveal">
           <span class="icon icon-accent">
-            <!-- Sparkle -->
-            <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full">
-              <path d="M12 2l1.8 5.4L19 9l-5.2 1.6L12 16l-1.8-5.4L5 9l5.2-1.6L12 2Zm7 9 1 3-3 1 3 1-1 3 2-2 3 1-2-2 2-2-3 1-2-2Z"/>
-            </svg>
             <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full"><path d="M12 2l1.8 5.4L19 9l-5.2 1.6L12 16l-1.8-5.4L5 9l5.2-1.6L12 2Zm7 9 1 3-3 1 3 1-1 3 2-2 3 1-2-2 2-2-3 1-2-2Z"/></svg>
           </span>
           <h3 class="text-xl font-semibold mt-2">Review</h3>
           <p class="text-gray-700">Listen back and make sure it’s exactly how you want it before you submit.</p>
         </div>
-
-        <!-- Share (gift/keepsake) -->
         <div class="reveal">
-          <span class="icon" style="color:var(--brand-navy)">
-            <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full">
-              <path d="M20 7h-2.2a3 3 0 1 0-5.8-1c0 .34.07.67.2 1H11.8a3 3 0 1 0-5.8-1 3 3 0 0 0 .2 1H4a1 1 0 0 0-1 1v3h18V8a1 1 0 0 0-1-1Zm-8-2a1 1 0 1 1 2 0 1 1 0 0 1-2 0ZM8 5a1 1 0 1 1 2 0 1 1 0 0 1-2 0ZM3 12v7a2 2 0 0 0 2 2h5v-9H3Zm11 0v9h5a2 2 0 0 0 2-2v-7h-7Z"/>
-            </svg>
           <span class="icon">
             <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full"><path d="M20 7h-2.2a3 3 0 1 0-5.8-1c0 .34.07.67.2 1H11.8a3 3 0 1 0-5.8-1 3 3 0 0 0 .2 1H4a1 1 0 0 0-1 1v3h18V8a1 1 0 0 0-1-1Zm-8-2a1 1 0 1 1 2 0 1 1 0 0 1-2 0ZM8 5a1 1 0 1 1 2 0 1 1 0 0 1-2 0ZM3 12v7a2 2 0 0 0 2 2h5v-9H3Zm11 0v9h5a2 2 0 0 0 2-2v-7h-7Z"/></svg>
           </span>
           <h3 class="text-xl font-semibold mt-2">Share</h3>
           <p class="text-gray-700">Your story is preserved and can be shared with loved ones — forever.</p>
-@@ -149,22 +107,19 @@
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- Anticipated Testimonials -->
   <!-- Testimonials -->
   <section class="bg-white py-16">
     <div class="max-w-6xl mx-auto px-6">
       <h2 class="text-3xl font-bold text-center mb-10 reveal" style="color:var(--brand-navy)">What People Will Say</h2>
-
       <div class="grid md:grid-cols-3 gap-6">
         <figure class="reveal rounded-xl border border-black/5 shadow-sm p-6 bg-warm-light">
           <blockquote class="text-gray-800 italic">“I didn’t realize how much I missed my dad’s laugh until I heard it here. Best gift we’ve given our kids.”</blockquote>
           <figcaption class="mt-4 text-sm text-gray-600">— Sarah M., daughter</figcaption>
         </figure>
-
         <figure class="reveal rounded-xl border border-black/5 shadow-sm p-6 bg-warm-light">
           <blockquote class="text-gray-800 italic">“It took five minutes, and now my grandkids will always know my voice and our family stories.”</blockquote>
           <figcaption class="mt-4 text-sm text-gray-600">— Robert T., grandfather</figcaption>
         </figure>
-
         <figure class="reveal rounded-xl border border-black/5 shadow-sm p-6 bg-warm-light">
           <blockquote class="text-gray-800 italic">“My mom hates being on camera, but this made it easy. She just talked — and it was beautiful.”</blockquote>
           <figcaption class="mt-4 text-sm text-gray-600">— Jason L., son</figcaption>
-@@ -173,18 +128,7 @@
+        </figure>
+      </div>
     </div>
   </section>
 
-  <!-- Why It Matters -->
-  <section class="bg-white py-10">
-    <div class="max-w-4xl mx-auto px-6 text-center">
-      <h2 class="text-3xl font-bold mb-6 reveal" style="color:var(--brand-navy)">Why It Matters</h2>
-      <p class="text-lg text-gray-700 mb-6 reveal">
-        Memories fade over time, but the sound of your voice brings them back to life. Whether it’s for your children,
-        grandchildren, or future generations, your words carry the emotion, warmth, and personality that no photograph can capture.
-      </p>
-    </div>
-  </section>
-
-  <!-- Call to Action -->
   <!-- CTA -->
   <section class="bg-warm-mid py-16">
     <div class="max-w-4xl mx-auto text-center px-6">
       <h2 class="text-3xl font-bold text-gray-900 reveal">Ready to tell your story?</h2>
-@@ -195,7 +139,7 @@
+      <p class="mt-4 text-lg text-gray-800 reveal">It takes just a few minutes to record something that will last forever.</p>
+      <button id="openRecorderBottom" class="btn-secondary mt-8 px-8 py-4 text-lg rounded-xl shadow transition reveal">
+        Record a Story (beta)
+      </button>
     </div>
   </section>
 
-  <!-- Footer with logo -->
   <!-- Footer -->
   <footer class="bg-gray-900 text-gray-300 py-8">
     <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
       <div class="flex items-center gap-3">
-@@ -206,7 +150,7 @@
+        <img src="logo.png" alt="Stories of You logo" class="h-7 w-auto rounded-sm" />
+        <span class="text-sm tracking-wide">© <span id="year"></span> Stories of You. All rights reserved.</span>
+      </div>
+      <a href="#" class="text-sm hover:text-white opacity-80">Privacy</a>
     </div>
   </footer>
 
-  <!-- ========== RECORDER MODAL ========== -->
   <!-- Recorder Modal -->
   <div id="recModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[60]">
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
       <div class="flex items-center justify-between p-4 border-b">
-@@ -216,7 +160,6 @@
+        <div class="flex items-center gap-2">
+          <img src="logo.png" alt="Stories of You" class="h-6 w-auto" />
+          <span class="text-sm font-semibold" style="color:var(--brand-navy)">Record Your Story</span>
         </div>
         <button id="recClose" class="text-gray-400 hover:text-gray-600 text-2xl leading-none" aria-label="Close">&times;</button>
       </div>
-
       <div class="p-5 space-y-4">
         <!-- Identity -->
         <div class="grid md:grid-cols-2 gap-3">
-@@ -230,6 +173,7 @@
+          <div>
+            <label class="block text-sm text-gray-600">Your name <span class="text-red-600">*</span></label>
+            <input id="recName" type="text" class="w-full border rounded-md px-3 py-2" required />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-600">Email <span class="text-red-600">*</span></label>
+            <input id="recEmail" type="email" class="w-full border rounded-md px-3 py-2" required />
           </div>
         </div>
 
@@ -232,7 +177,10 @@
         <label class="block text-sm text-gray-600">Choose a prompt (optional)</label>
         <select id="recPrompt" class="w-full border rounded-md px-3 py-2">
           <option value="">— Pick a prompt —</option>
-@@ -240,11 +184,23 @@
+          <option>Tell me about your first job.</option>
+          <option>What was your childhood home like?</option>
+          <option>How did you meet your partner or spouse?</option>
+          <option>What’s a favorite vacation memory?</option>
           <option>What’s something you’ve never told anyone before?</option>
         </select>
 
@@ -256,7 +204,8 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <canvas id="recMeter" width="140" height="14" class="rounded bg-gray-100"></canvas>
-@@ -253,13 +209,15 @@
+            <span id="recStatus" class="text-sm text-gray-600">Ready</span>
+          </div>
           <span id="recTimer" class="text-sm font-mono text-gray-700">00:00</span>
         </div>
 
@@ -272,57 +221,36 @@
         <div id="playbackWrap" class="hidden space-y-2">
           <audio id="recAudio" controls class="w-full"></audio>
           <div class="flex items-center gap-3">
-@@ -273,7 +231,6 @@
+            <button id="btnRerecord" class="btn-secondary px-4 py-2 rounded-lg">Re-record</button>
+            <button id="btnUpload"   class="btn-primary px-4 py-2 rounded-lg">Use This</button>
+          </div>
+        </div>
+
+        <div id="uploadMsg" class="text-sm text-gray-600 hidden"></div>
+      </div>
     </div>
   </div>
 
-  <!-- ========== SCRIPTS ========== -->
   <script>
     // Footer year
     document.getElementById("year").textContent = new Date().getFullYear();
-@@ -285,230 +242,217 @@
+
+    // Scroll-in animations
+    const revealEls=document.querySelectorAll('.reveal');
+    const io=new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }});
     },{threshold:.15});
     revealEls.forEach(el=>io.observe(el));
 
-    // Open recorder (top + bottom buttons)
     // Open recorder
     const recModal = document.getElementById('recModal');
     ['openRecorder','openRecorderBottom'].forEach(id=>{
-      const el = document.getElementById(id);
-      if (el) el.addEventListener('click', ()=> recModal.classList.remove('hidden'));
       const el=document.getElementById(id); if(el){el.addEventListener('click',()=>recModal.classList.remove('hidden'));}
     });
   </script>
 
-  <!-- Recorder logic -->
   <script>
   (function(){
-    // --- Elements
-    const recModal = document.getElementById('recModal');
-    const closeRec = document.getElementById('recClose');
-    const nameEl   = document.getElementById('recName');
-    const emailEl  = document.getElementById('recEmail');
-    const promptEl = document.getElementById('recPrompt');
-    const consentEl= document.getElementById('recConsent');
-    const meterCv  = document.getElementById('recMeter');
-    const mtx      = meterCv.getContext('2d');
-    const statusEl = document.getElementById('recStatus');
-    const timerEl  = document.getElementById('recTimer');
-    const btnRecord= document.getElementById('btnRecord');
-    const btnPause = document.getElementById('btnPause');
-    const btnResume= document.getElementById('btnResume');
-    const btnStop  = document.getElementById('btnStop');
-    const pbWrap   = document.getElementById('playbackWrap');
-    const audioEl  = document.getElementById('recAudio');
-    const btnRerec = document.getElementById('btnRerecord');
-    const btnUpload= document.getElementById('btnUpload');
-    const uploadMsg= document.getElementById('uploadMsg');
-
-    // <<< Replace with your real webhook URL >>>
-    const WEBHOOK = "https://YOUR_N8N_HOST/webhook/storiesofyou-recorder";
-
-    // --- State
-    let mediaStream, mediaRecorder, chunks = [];
     const recModal=document.getElementById('recModal');
     const closeRec=document.getElementById('recClose');
     const nameEl=document.getElementById('recName');
@@ -394,11 +322,9 @@
       });
     }
 
-    // --- Open/close
     // --- Modal reset/close
     closeRec.addEventListener('click', resetAndClose);
     function resetAndClose(){
-      stopAll();
       try{
         if(mediaRecorder && mediaRecorder.state!=='inactive') mediaRecorder.stop();
         if(mediaStream) mediaStream.getTracks().forEach(t=>t.stop());
@@ -407,63 +333,32 @@
         if(timerInt) clearInterval(timerInt);
       }catch(e){}
       recModal.classList.add('hidden');
-      statusEl.textContent = 'Ready';
-      timerEl.textContent = '00:00';
       statusEl.textContent='Ready';
       timerEl.textContent='00:00';
       pbWrap.classList.add('hidden');
       btnRecord.classList.remove('hidden');
-      btnPause.classList.add('hidden');
-      btnResume.classList.add('hidden');
-      btnStop.classList.add('hidden');
-      uploadMsg.classList.add('hidden');
-      chunks = []; blob = null;
-      if (audioEl) audioEl.src = '';
       btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
       uploadMsg.classList.add('hidden'); uploadMsg.textContent='';
       chunks=[]; blob=null; if(audioEl) audioEl.src='';
       [nameEl,emailEl,promptEl].forEach(i=>{ if(i) i.value=''; });
-      if (consentEl) consentEl.checked=false;
       if(consentEl) consentEl.checked=false;
       photoInput.value=''; photoFile=null; photoPreviewWrap.classList.add('hidden');
     }
 
-    // --- Recording setup
     // --- Recording
     async function startRecording(){
-      try {
       try{
         mimeType = MediaRecorder.isTypeSupported('audio/mp4;codecs=aac') ? 'audio/mp4'
-                 : MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm'
-                 : '';
-
-        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(mediaStream, mimeType ? { mimeType } : undefined);
-        chunks = [];
                  : MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm' : '';
         mediaStream = await navigator.mediaDevices.getUserMedia({audio:true});
         mediaRecorder = new MediaRecorder(mediaStream, mimeType ? {mimeType} : undefined);
         chunks=[];
 
-        // Meter
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         // meter
         audioCtx = new (window.AudioContext||window.webkitAudioContext)();
         const src = audioCtx.createMediaStreamSource(mediaStream);
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 2048;
         analyser = audioCtx.createAnalyser(); analyser.fftSize=2048;
         dataArray = new Uint8Array(analyser.frequencyBinCount);
-        src.connect(analyser);
-        drawMeter();
-
-        mediaRecorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
-        mediaRecorder.onstart = () => {
-          statusEl.textContent = 'Recording…';
-          startTimer();
-          btnRecord.classList.add('hidden');
-          btnPause.classList.remove('hidden');
-          btnStop.classList.remove('hidden');
         src.connect(analyser); drawMeter();
 
         mediaRecorder.ondataavailable=e=>{ if(e.data.size) chunks.push(e.data); };
@@ -471,13 +366,6 @@
           statusEl.textContent='Recording…'; startTimer();
           btnRecord.classList.add('hidden'); btnPause.classList.remove('hidden'); btnStop.classList.remove('hidden');
         };
-        mediaRecorder.onpause = () => { statusEl.textContent = 'Paused'; stopTimer(); };
-        mediaRecorder.onresume = () => { statusEl.textContent = 'Recording…'; startTimer(true); };
-        mediaRecorder.onstop = () => {
-          stopMeter();
-          stopTimer();
-          blob = new Blob(chunks, { type: mimeType || 'audio/webm' });
-          audioEl.src = URL.createObjectURL(blob);
         mediaRecorder.onpause =()=>{ statusEl.textContent='Paused'; stopTimer(); };
         mediaRecorder.onresume=()=>{ statusEl.textContent='Recording…'; startTimer(true); };
         mediaRecorder.onstop  =()=>{
@@ -485,19 +373,13 @@
           blob=new Blob(chunks,{type:mimeType||'audio/webm'});
           audioEl.src=URL.createObjectURL(blob);
           pbWrap.classList.remove('hidden');
-          btnPause.classList.add('hidden');
-          btnResume.classList.add('hidden');
-          btnStop.classList.add('hidden');
-          statusEl.textContent = 'Review your recording';
           btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
           statusEl.textContent='Review your recording';
         };
 
         mediaRecorder.start();
-      } catch(err){
       }catch(err){
         console.error(err);
-        statusEl.textContent = 'Microphone access blocked. Please allow mic.';
         statusEl.textContent='Microphone access blocked. Please allow mic.';
       }
     }
@@ -505,112 +387,40 @@
     function resumeRecording(){ if(mediaRecorder && mediaRecorder.state==='paused'){ mediaRecorder.resume(); btnResume.classList.add('hidden'); btnPause.classList.remove('hidden'); } }
     function stopRecording(){ if(mediaRecorder && (mediaRecorder.state==='recording'||mediaRecorder.state==='paused')){ mediaRecorder.stop(); mediaStream.getTracks().forEach(t=>t.stop()); } }
 
-    function pauseRecording(){
-      if (!mediaRecorder) return;
-      if (mediaRecorder.state === 'recording') {
-        mediaRecorder.pause();
-        btnPause.classList.add('hidden');
-        btnResume.classList.remove('hidden');
-      }
-    }
-    function resumeRecording(){
-      if (!mediaRecorder) return;
-      if (mediaRecorder.state === 'paused') {
-        mediaRecorder.resume();
-        btnResume.classList.add('hidden');
-        btnPause.classList.remove('hidden');
-      }
-    }
-    function stopRecording(){
-      if (mediaRecorder && (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused')) {
-        mediaRecorder.stop();
-        mediaStream.getTracks().forEach(t => t.stop());
-      }
-    }
-
-    function stopAll(){
-      try {
-        stopMeter();
-        stopTimer();
-        if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-        if (audioCtx) audioCtx.close();
-      } catch(e){}
-    }
-
-    // --- Meter drawing
     function drawMeter(){
       function frame(){
         analyser.getByteTimeDomainData(dataArray);
-        let peak = 0;
-        for (let i=0;i<dataArray.length;i++){
-          const v = Math.abs(dataArray[i]-128)/128;
-          if (v>peak) peak=v;
-        }
-        const pct = Math.min(1, peak*2);
         let peak=0; for(let i=0;i<dataArray.length;i++){ const v=Math.abs(dataArray[i]-128)/128; if(v>peak) peak=v; }
         const pct=Math.min(1,peak*2);
         mtx.clearRect(0,0,meterCv.width,meterCv.height);
-        mtx.fillStyle = '#e7e3db';
-        mtx.fillRect(0,0,meterCv.width,meterCv.height);
-        mtx.fillStyle = pct>0.8 ? '#d9534f' : '#3d3528';
-        mtx.fillRect(0,0, Math.max(6, Math.floor(meterCv.width*pct)), meterCv.height);
-        meterAnim = requestAnimationFrame(frame);
         mtx.fillStyle='#e7e3db'; mtx.fillRect(0,0,meterCv.width,meterCv.height);
         mtx.fillStyle=pct>0.8?'#d9534f':'#3d3528';
         mtx.fillRect(0,0,Math.max(6,Math.floor(meterCv.width*pct)),meterCv.height);
         meterAnim=requestAnimationFrame(frame);
       }
-      meterAnim = requestAnimationFrame(frame);
-    }
-    function stopMeter(){ if (meterAnim) cancelAnimationFrame(meterAnim); }
-
-    // --- Timer
-    function startTimer(){
-      startTime = Date.now();
-      timerInt = setInterval(()=>{
-        const s = Math.floor((Date.now()-startTime)/1000);
-        const mm = String(Math.floor(s/60)).padStart(2,'0');
-        const ss = String(s%60).padStart(2,'0');
-        timerEl.textContent = `${mm}:${ss}`;
-      }, 250);
       meterAnim=requestAnimationFrame(frame);
     }
-    function stopTimer(){ if (timerInt) clearInterval(timerInt); }
     function stopMeter(){ if(meterAnim) cancelAnimationFrame(meterAnim); }
     function startTimer(){ startTime=Date.now(); timerInt=setInterval(()=>{ const s=Math.floor((Date.now()-startTime)/1000); const mm=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); timerEl.textContent=`${mm}:${ss}`; },250); }
     function stopTimer(){ if(timerInt) clearInterval(timerInt); }
 
-    // --- Validation
     function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
     function canUpload(){
-      if (!nameEl.value.trim())  { uploadMsg.textContent = "Please enter your name."; return false; }
-      if (!isValidEmail(emailEl.value.trim())) { uploadMsg.textContent = "Please enter a valid email."; return false; }
-      if (consentEl && !consentEl.checked) { uploadMsg.textContent = "Please accept the consent box."; return false; }
       if(!nameEl.value.trim()){ uploadMsg.textContent="Please enter your name."; uploadMsg.classList.remove('hidden'); return false; }
       if(!isValidEmail(emailEl.value.trim())){ uploadMsg.textContent="Please enter a valid email."; uploadMsg.classList.remove('hidden'); return false; }
       if(consentEl && !consentEl.checked){ uploadMsg.textContent="Please accept the consent box."; uploadMsg.classList.remove('hidden'); return false; }
       return true;
     }
 
-    // --- Upload (to webhook; backend stores to S3)
     async function uploadBlob(){
-      if (!blob) return;
-      uploadMsg.classList.remove('hidden');
-
-      if (!canUpload()){ return; }
-      uploadMsg.textContent = 'Uploading…';
       if(!blob) return;
       if(!canUpload()) return;
       uploadMsg.classList.remove('hidden'); uploadMsg.textContent='Uploading…';
 
-      const fileExt = mimeType === 'audio/mp4' ? 'm4a' : 'webm';
       const fileExt = mimeType==='audio/mp4' ? 'm4a' : 'webm';
       const filename = `soyou_${Date.now()}.${fileExt}`;
       const form = new FormData();
       form.append('file', blob, filename);
-      form.append('mime', mimeType || 'audio/webm');
-      form.append('prompt', promptEl.value || '');
       form.append('mime', mimeType||'audio/webm');
       form.append('prompt', promptEl.value||'');
       form.append('name', nameEl.value.trim());
@@ -624,30 +434,16 @@
       }
 
       try{
-        const res = await fetch(WEBHOOK, { method:'POST', body: form });
-        if (!res.ok) throw new Error('Upload failed');
-        uploadMsg.textContent = 'Uploaded! Thank you.';
-        setTimeout(()=>{ resetAndClose(); }, 900);
         const res = await fetch(WEBHOOK,{method:'POST',body:form});
         if(!res.ok) throw new Error('Upload failed');
         uploadMsg.textContent='Uploaded! Thank you.';
         setTimeout(()=>resetAndClose(),900);
       }catch(e){
         console.error(e);
-        uploadMsg.textContent = 'Upload failed. Please try again.';
         uploadMsg.textContent='Upload failed. Please try again.';
       }
     }
 
-    // --- Wire up controls
-    btnRecord.addEventListener('click', startRecording);
-    btnPause .addEventListener('click', pauseRecording);
-    btnResume.addEventListener('click', resumeRecording);
-    btnStop  .addEventListener('click', stopRecording);
-    btnRerec.addEventListener('click', ()=>{
-      pbWrap.classList.add('hidden'); statusEl.textContent = 'Ready';
-      timerEl.textContent = '00:00'; chunks=[]; blob=null; audioEl.src='';
-      btnRecord.classList.remove('hidden');
     btnRecord.addEventListener('click',startRecording);
     btnPause .addEventListener('click',pauseRecording);
     btnResume.addEventListener('click',resumeRecording);
@@ -656,8 +452,8 @@
       pbWrap.classList.add('hidden'); statusEl.textContent='Ready'; timerEl.textContent='00:00';
       chunks=[]; blob=null; audioEl.src=''; btnRecord.classList.remove('hidden');
     });
-    btnUpload.addEventListener('click', uploadBlob);
     btnUpload.addEventListener('click',uploadBlob);
   })();
   </script>
 </body>
+</html>
