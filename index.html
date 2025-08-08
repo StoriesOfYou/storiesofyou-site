@@ -17,43 +17,67 @@
   <meta name="twitter:image" content="og-image.jpg" />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root{
-      --brand-navy:#0f2c4c;
-      --brand-orange:#e09a1b;
-      --brand-charcoal:#3d3528;
-      --warm-light:#faf3e7;
-      --warm-mid:#e0cba7;
+    :root {
+      --brand-navy: #0f2c4c;
+      --brand-orange: #e09a1b;
+      --brand-charcoal: #3d3528;
+      --warm-light: #faf3e7;
+      --warm-mid: #e0cba7;
     }
-    .site-header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.82);backdrop-filter:saturate(140%) blur(10px);box-shadow:0 6px 16px rgba(0,0,0,.06)}
-    .hero-bg{background:radial-gradient(1200px 500px at 50% -200px,#fff7e9 0%,#fce8c8 50%,#e0cba7 100%)}
-    .bg-warm-light{background-color:var(--warm-light)}
-    .bg-warm-mid{background-color:var(--warm-mid)}
-
-    /* --- Self-hosted video (CloudFront) --- */
-    .video-viewport{
-      position:relative;
-      width:100%;
-      aspect-ratio:16/9;
-      overflow:hidden;
-      border-radius:.75rem;
-      box-shadow:0 10px 25px rgba(0,0,0,.10);
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: saturate(140%) blur(10px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
     }
-    .video-viewport video{
-      position:absolute; inset:0;
-      width:100%; height:100%;
-      object-fit:cover;         /* fills neatly, no letterbox */
-      object-position:center;
-      border:0;
+    .hero-bg {
+      background: radial-gradient(1200px 500px at 50% -200px, #fff7e9 0%, #fce8c8 50%, #e0cba7 100%);
     }
-
-    .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
-    .reveal.visible{opacity:1;transform:none}
-    .btn-primary{background-color:var(--brand-charcoal);color:#fff}
-    .btn-primary:hover{background-color:#5a4d3a}
-    .btn-secondary{background:#fff;color:var(--brand-charcoal);border:2px solid var(--brand-charcoal)}
-    .btn-secondary:hover{background:#f7f2eb}
-    .icon{width:52px;height:52px;display:inline-block;color:var(--brand-navy)}
-    .icon-accent{color:var(--brand-orange)}
+    .bg-warm-light { background-color: var(--warm-light); }
+    .bg-warm-mid { background-color: var(--warm-mid); }
+    .video-viewport {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      border-radius: .75rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,.10);
+    }
+    .video-viewport video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      border: 0;
+    }
+    .reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    .btn-primary {
+      background-color: var(--brand-charcoal);
+      color: #fff;
+      font-weight: 600;
+      padding: .75rem 2rem;
+      border-radius: .75rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: background-color 0.2s;
+    }
+    .btn-primary:hover { background-color: #5a4d3a; }
+    .btn-secondary {
+      background: #fff;
+      color: var(--brand-charcoal);
+      border: 2px solid var(--brand-charcoal);
+      font-weight: 600;
+      padding: .75rem 2rem;
+      border-radius: .75rem;
+      transition: background-color 0.2s;
+    }
+    .btn-secondary:hover { background: #f7f2eb; }
+    .icon { width: 52px; height: 52px; display: inline-block; color: var(--brand-navy); }
+    .icon-accent { color: var(--brand-orange); }
   </style>
 </head>
 <body class="bg-white text-gray-800 font-sans">
@@ -79,8 +103,9 @@
         <div class="video-viewport">
           <video
             id="heroVideo"
+            autoplay
+            muted
             playsinline
-            controls
             preload="metadata"
             poster="https://d4al2emvsw1mr.cloudfront.net/poster.jpg">
             <source src="https://d4al2emvsw1mr.cloudfront.net/StoriesOfYouTest2.mp4" type="video/mp4">
@@ -90,9 +115,7 @@
       </div>
 
       <div class="mt-8 flex items-center justify-center">
-        <button id="openRecorder" class="btn-primary px-8 py-4 text-lg rounded-xl shadow transition">
-          Record a Story (beta)
-        </button>
+        <button id="openRecorder" class="btn-primary">Record a Story (beta)</button>
       </div>
     </div>
   </section>
@@ -104,21 +127,21 @@
       <div class="grid md:grid-cols-3 gap-8">
         <div class="reveal">
           <span class="icon">
-            <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 1 1-10 0H5a7 7 0 0 0 14 0h-2ZM11 19h2v3h-2v-3Z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 1 1-10 0H5a7 7 0 0 0 14 0h-2ZM11 19h2v3h-2v-3Z"/></svg>
           </span>
           <h3 class="text-xl font-semibold mt-2">Record</h3>
           <p class="text-gray-700">Answer a simple prompt and record your voice right from your phone or computer.</p>
         </div>
         <div class="reveal">
           <span class="icon icon-accent">
-            <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full"><path d="M12 2l1.8 5.4L19 9l-5.2 1.6L12 16l-1.8-5.4L5 9l5.2-1.6L12 2Zm7 9 1 3-3 1 3 1-1 3 2-2 3 1-2-2 2-2-3 1-2-2Z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 5.4L19 9l-5.2 1.6L12 16l-1.8-5.4L5 9l5.2-1.6L12 2Zm7 9 1 3-3 1 3 1-1 3 2-2 3 1-2-2 2-2-3 1-2-2Z"/></svg>
           </span>
           <h3 class="text-xl font-semibold mt-2">Review</h3>
           <p class="text-gray-700">Listen back and make sure it’s exactly how you want it before you submit.</p>
         </div>
         <div class="reveal">
           <span class="icon">
-            <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full"><path d="M20 7h-2.2a3 3 0 1 0-5.8-1c0 .34.07.67.2 1H11.8a3 3 0 1 0-5.8-1 3 3 0 0 0 .2 1H4a1 1 0 0 0-1 1v3h18V8a1 1 0 0 0-1-1Zm-8-2a1 1 0 1 1 2 0 1 1 0 0 1-2 0ZM8 5a1 1 0 1 1 2 0 1 1 0 0 1-2 0ZM3 12v7a2 2 0 0 0 2 2h5v-9H3Zm11 0v9h5 a2 2 0 0 0 2-2v-7h-7Z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 7h-2.2a3 3 0 1 0-5.8-1c0 .34.07.67.2 1H11.8a3 3 0 1 0-5.8-1 3 3 0 0 0 .2 1H4a1 1 0 0 0-1 1v3h18V8a1 1 0 0 0-1-1Zm-8-2a1 1 0 1 1 2 0 1 1 0 0 1-2 0ZM8 5a1 1 0 1 1 2 0 1 1 0 0 1-2 0ZM3 12v7a2 2 0 0 0 2 2h5v-9H3Zm11 0v9h5a2 2 0 0 0 2-2v-7h-7Z"/></svg>
           </span>
           <h3 class="text-xl font-semibold mt-2">Share</h3>
           <p class="text-gray-700">Your story is preserved and can be shared with loved ones — forever.</p>
@@ -132,9 +155,7 @@
     <div class="max-w-4xl mx-auto text-center px-6">
       <h2 class="text-3xl font-bold text-gray-900 reveal">Ready to tell your story?</h2>
       <p class="mt-4 text-lg text-gray-800 reveal">It takes just a few minutes to record something that will last forever.</p>
-      <button id="openRecorderBottom" class="btn-secondary mt-8 px-8 py-4 text-lg rounded-xl shadow transition reveal">
-        Record a Story (beta)
-      </button>
+      <button id="openRecorderBottom" class="btn-secondary mt-8">Record a Story (beta)</button>
     </div>
   </section>
 
@@ -149,29 +170,35 @@
     </div>
   </footer>
 
-  <!-- Recorder Modal (unchanged) -->
-  <!-- ... your modal + scripts exactly as before ... -->
+  <!-- Recorder Modal -->
+  <div id="recModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-lg w-full p-6">
+      <h3 class="text-xl font-bold mb-4">Record Your Story</h3>
+      <iframe src="https://tally.so/embed/wM6r5l?alignLeft=1&hideTitle=1&transparentBackground=1"
+              width="100%" height="500" frameborder="0" title="Record a Story"></iframe>
+      <button id="closeRecorder" class="mt-4 btn-secondary">Close</button>
+    </div>
+  </div>
 
   <script>
-    // Footer year
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // Scroll-in animations
-    const revealEls=document.querySelectorAll('.reveal');
-    const io=new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }});
-    },{threshold:.15});
-    revealEls.forEach(el=>io.observe(el));
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: .15 });
+    revealEls.forEach(el => io.observe(el));
 
-    // Open recorder
     const recModal = document.getElementById('recModal');
-    ['openRecorder','openRecorderBottom'].forEach(id=>{
-      const el=document.getElementById(id); if(el){el.addEventListener('click',()=>recModal.classList.remove('hidden'));}
-    });
+    document.getElementById('openRecorder').addEventListener('click', () => recModal.classList.remove('hidden'));
+    document.getElementById('openRecorderBottom').addEventListener('click', () => recModal.classList.remove('hidden'));
+    document.getElementById('closeRecorder').addEventListener('click', () => recModal.classList.add('hidden'));
   </script>
-
-  <!-- keep your recorder JS here (unchanged) -->
 
 </body>
 </html>
-
