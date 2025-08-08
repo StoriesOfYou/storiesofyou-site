@@ -30,6 +30,8 @@
     .bg-warm-mid{background-color:var(--warm-mid)}
     .video-viewport{position:relative;width:100%;padding-bottom:56.25%;overflow:hidden;border-radius:.75rem;box-shadow:0 10px 25px rgba(0,0,0,.10);--crop:120%}
     .video-viewport iframe{position:absolute;top:50%;left:50%;width:100%;height:var(--crop);transform:translate(-50%,-50%);border:0}
+    /* Added for S3 <video> */
+    .video-viewport video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0;display:block}
     .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
     .reveal.visible{opacity:1;transform:none}
     .btn-primary{background-color:var(--brand-charcoal);color:#fff}
@@ -61,11 +63,20 @@
 
       <div class="mt-8 max-w-3xl mx-auto reveal">
         <div class="video-viewport">
-          <iframe
-            src="https://www.youtube.com/embed/XvyvZOhDJPk?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3"
-            title="Stories of You explainer video"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen></iframe>
+          <!-- Replaced YouTube iframe with S3-hosted video -->
+          <video
+            id="introVideo"
+            controls
+            playsinline
+            preload="metadata"
+            poster="og-image.jpg"
+          >
+            <!-- Replace the src below with your actual S3 URL -->
+            <source src="https://YOUR_S3_BUCKET.s3.amazonaws.com/your-video.mp4" type="video/mp4">
+            <!-- Optional alternate format for broader compatibility -->
+            <!-- <source src="https://YOUR_S3_BUCKET.s3.amazonaws.com/your-video.webm" type="video/webm"> -->
+            Your browser does not support the video tag.
+          </video>
         </div>
       </div>
 
@@ -448,7 +459,7 @@
     btnPause .addEventListener('click',pauseRecording);
     btnResume.addEventListener('click',resumeRecording);
     btnStop  .addEventListener('click',stopRecording);
-    document.getElementById('btnRerecord').addEventListener('click',()=>{
+    btnRerec.addEventListener('click',()=>{
       pbWrap.classList.add('hidden'); statusEl.textContent='Ready'; timerEl.textContent='00:00';
       chunks=[]; blob=null; audioEl.src=''; btnRecord.classList.remove('hidden');
     });
