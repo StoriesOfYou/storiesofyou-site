@@ -20,34 +20,44 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* --- Brand palette --- */
+    :root {
+      --brand-navy: #0f2c4c;   /* matches logo text */
+      --brand-orange: #e09a1b; /* matches waveform */
+      --brand-charcoal: #3d3528;
+      --warm-light: #faf3e7;
+      --warm-mid: #e0cba7;
+    }
+
+    /* --- Header --- */
+    .site-header {
+      position: sticky; top: 0; z-index: 40;
+      background: rgba(255,255,255,.82);
+      backdrop-filter: saturate(140%) blur(10px);
+      box-shadow: 0 6px 16px rgba(0,0,0,.06);
+    }
+
     /* --- Hero background (warm tan gradient) --- */
     .hero-bg {
       background: radial-gradient(1200px 500px at 50% -200px, #fff7e9 0%, #fce8c8 50%, #e0cba7 100%);
     }
 
-    /* --- Section background colors --- */
-    .bg-warm-light { background-color: #faf3e7; } /* light warm beige */
-    .bg-warm-mid { background-color: #e0cba7; } /* mid-tone tan */
+    /* --- Sections --- */
+    .bg-warm-light { background-color: var(--warm-light); }
+    .bg-warm-mid { background-color: var(--warm-mid); }
 
     /* --- Cropped YouTube wrapper to hide top/bottom bars --- */
     .video-viewport {
-      position: relative;
-      width: 100%;
-      padding-bottom: 56.25%; /* base 16:9 */
-      overflow: hidden;
-      border-radius: 0.75rem;
+      position: relative; width: 100%; padding-bottom: 56.25%; /* 16:9 */
+      overflow: hidden; border-radius: 0.75rem;
       box-shadow: 0 10px 25px rgba(0,0,0,.10);
       --crop: 116%;
     }
     .video-viewport iframe {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 100%;
-      height: var(--crop);
+      position: absolute; top: 50%; left: 50%;
+      width: 100%; height: var(--crop);
       transform: translate(-50%, -50%) scale(1);
-      border: 0;
-      animation: zoomIn 3s ease-out forwards;
+      border: 0; animation: zoomIn 3s ease-out forwards;
     }
 
     /* --- Cinematic zoom-in (once) --- */
@@ -63,38 +73,43 @@
     .reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
     .reveal.visible { opacity: 1; transform: none; }
 
-    /* --- Warm charcoal button style --- */
+    /* --- Buttons --- */
     .btn-primary {
-      background-color: #3d3528;
-      color: #fff;
+      background-color: var(--brand-charcoal); color: #fff;
     }
-    .btn-primary:hover {
-      background-color: #5a4d3a;
-    }
+    .btn-primary:hover { background-color: #5a4d3a; }
     .btn-secondary {
-      background-color: #fff;
-      color: #3d3528;
-      border: 2px solid #3d3528;
+      background-color: #fff; color: var(--brand-charcoal); border: 2px solid var(--brand-charcoal);
     }
-    .btn-secondary:hover {
-      background-color: #f7f2eb;
-    }
+    .btn-secondary:hover { background-color: #f7f2eb; }
+
+    /* --- Utility --- */
+    .icon { width: 52px; height: 52px; display: inline-block; color: var(--brand-navy); }
+    .icon-accent { color: var(--brand-orange); }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body class="bg-white text-gray-800 font-sans">
+
+  <!-- Sticky Header with Logo -->
+  <header class="site-header">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-3">
+      <img src="logo.png" alt="Stories of You logo" class="h-8 w-auto rounded-sm" />
+      <span class="font-semibold text-lg tracking-wide" style="color:var(--brand-navy)">Stories of You</span>
+    </div>
+  </header>
 
   <!-- Hero Section -->
   <section class="hero-bg">
-    <div class="mx-auto max-w-7xl px-6 py-16 text-center">
+    <div class="mx-auto max-w-7xl px-6 py-14 text-center">
       <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight drop-shadow-sm">
         Your voice, your story — preserved forever.
       </h1>
-      <p class="mt-6 text-lg text-gray-900/80 max-w-2xl mx-auto">
+      <p class="mt-5 text-lg text-gray-900/80 max-w-2xl mx-auto">
         Stories of You makes it easy to record and share your memories in your own voice,
         creating a legacy your loved ones can treasure for generations.
       </p>
 
-      <!-- Video Embed -->
+      <!-- Video -->
       <div class="mt-8 max-w-3xl mx-auto reveal">
         <div class="video-viewport">
           <iframe
@@ -116,22 +131,50 @@
   <section class="bg-warm-light py-16">
     <div class="max-w-6xl mx-auto px-6 text-center">
       <h2 class="text-3xl font-bold mb-10 reveal">How It Works</h2>
+
       <div class="grid md:grid-cols-3 gap-8">
+        <!-- Record -->
         <div class="reveal">
-          <div class="text-amber-800 text-5xl mb-4">🎙️</div>
-          <h3 class="text-xl font-semibold mb-2">Record</h3>
+          <span class="icon">
+            <!-- Mic SVG (brand navy) -->
+            <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full">
+              <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 1 1-10 0H5a7 7 0 0 0 14 0h-2ZM11 19h2v3h-2v-3Z"/>
+            </svg>
+          </span>
+          <h3 class="text-xl font-semibold mt-2">Record</h3>
           <p class="text-gray-700">Answer a simple prompt and record your voice right from your phone or computer.</p>
         </div>
+
+        <!-- Review -->
         <div class="reveal">
-          <div class="text-amber-800 text-5xl mb-4">✨</div>
-          <h3 class="text-xl font-semibold mb-2">Review</h3>
+          <span class="icon icon-accent">
+            <!-- Sparkle SVG (accent orange) -->
+            <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full">
+              <path d="M12 2l1.8 5.4L19 9l-5.2 1.6L12 16l-1.8-5.4L5 9l5.2-1.6L12 2Zm7 9 1 3-3 1 3 1-1 3 2-2 3 1-2-2 2-2-3 1-2-2Z"/>
+            </svg>
+          </span>
+          <h3 class="text-xl font-semibold mt-2">Review</h3>
           <p class="text-gray-700">Listen back and make sure it’s exactly how you want it before you submit.</p>
         </div>
+
+        <!-- Share -->
         <div class="reveal">
-          <div class="text-amber-800 text-5xl mb-4">📬</div>
-          <h3 class="text-xl font-semibold mb-2">Share</h3>
+          <span class="icon" style="color:var(--brand-navy)">
+            <!-- Share SVG (brand navy) -->
+            <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full">
+              <path d="M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 0 6c.5 0 .98-.12 1.4-.33l-6.1 3.49a3 3 0 1 0 0 3.66l6.1 3.49A3 3 0 1 0 18 16a3 3 0 0 0-1.6.46l-6.1-3.49a3.03 3.03 0 0 0 0-1.94l6.1-3.49C17.02 7.88 17.5 8 18 8Z"/>
+            </svg>
+          </span>
+          <h3 class="text-xl font-semibold mt-2">Share</h3>
           <p class="text-gray-700">Your story is preserved and can be shared with loved ones — forever.</p>
         </div>
+      </div>
+
+      <!-- Secondary CTA -->
+      <div class="mt-10 reveal">
+        <button id="openForm2" class="btn-secondary px-6 py-3 rounded-lg shadow transition">
+          Start Recording
+        </button>
       </div>
     </div>
   </section>
@@ -139,7 +182,7 @@
   <!-- Why It Matters -->
   <section class="bg-white py-16">
     <div class="max-w-4xl mx-auto px-6 text-center">
-      <h2 class="text-3xl font-bold mb-6 reveal">Why It Matters</h2>
+      <h2 class="text-3xl font-bold mb-6 reveal" style="color:var(--brand-navy)">Why It Matters</h2>
       <p class="text-lg text-gray-700 mb-6 reveal">
         Memories fade over time, but the sound of your voice brings them back to life. Whether it’s for your children,
         grandchildren, or future generations, your words carry the emotion, warmth, and personality that no photograph can capture.
@@ -152,15 +195,21 @@
     <div class="max-w-4xl mx-auto text-center px-6">
       <h2 class="text-3xl font-bold text-gray-900 reveal">Ready to tell your story?</h2>
       <p class="mt-4 text-lg text-gray-800 reveal">It takes just a few minutes to record something that will last forever.</p>
-      <button id="openForm2" class="btn-secondary mt-8 px-8 py-4 text-lg rounded-xl shadow transition reveal">
+      <button id="openForm3" class="btn-secondary mt-8 px-8 py-4 text-lg rounded-xl shadow transition reveal">
         Start Recording
       </button>
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="bg-gray-900 text-gray-400 py-8 text-center text-sm">
-    &copy; <span id="year"></span> Stories of You. All rights reserved.
+  <!-- Footer with logo -->
+  <footer class="bg-gray-900 text-gray-300 py-8">
+    <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="logo.png" alt="Stories of You logo" class="h-7 w-auto rounded-sm" />
+        <span class="text-sm tracking-wide">© <span id="year"></span> Stories of You. All rights reserved.</span>
+      </div>
+      <a href="#" class="text-sm hover:text-white opacity-80">Privacy</a>
+    </div>
   </footer>
 
   <!-- Modal -->
@@ -183,8 +232,11 @@
 
     // Modal logic
     const modal = document.getElementById("formModal");
-    document.getElementById("openForm").addEventListener("click", () => modal.classList.remove("hidden"));
-    document.getElementById("openForm2").addEventListener("click", () => modal.classList.remove("hidden"));
+    const openers = ["openForm","openForm2","openForm3"];
+    openers.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("click", () => modal.classList.remove("hidden"));
+    });
     document.getElementById("closeForm").addEventListener("click", () => modal.classList.add("hidden"));
 
     // Scroll-in animations
