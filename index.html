@@ -28,8 +28,33 @@
     .hero-bg{background:radial-gradient(1200px 500px at 50% -200px,#fff7e9 0%,#fce8c8 50%,#e0cba7 100%)}
     .bg-warm-light{background-color:var(--warm-light)}
     .bg-warm-mid{background-color:var(--warm-mid)}
-    .video-viewport{position:relative;width:100%;padding-bottom:56.25%;overflow:hidden;border-radius:.75rem;box-shadow:0 10px 25px rgba(0,0,0,.10);--crop:120%}
-    .video-viewport iframe{position:absolute;top:50%;left:50%;width:100%;height:var(--crop);transform:translate(-50%,-50%);border:0}
+
+    /* --- YouTube embed (updated to crop out letterbox bars) --- */
+    .video-viewport{
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;        /* keeps container 16:9 */
+      overflow: hidden;
+      border-radius: .75rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,.10);
+
+      /* Tweak these if needed */
+      --zoom: 1.12;                 /* 1.00 = no zoom; increase slightly to crop bars */
+      --y-bias: 0%;                 /* nudge up/down: negative = up, positive = down */
+    }
+    .video-viewport iframe{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      transform-origin: center;
+      transform:
+        translate(-50%, calc(-50% + var(--y-bias)))
+        scale(var(--zoom));
+    }
+
     .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
     .reveal.visible{opacity:1;transform:none}
     .btn-primary{background-color:var(--brand-charcoal);color:#fff}
