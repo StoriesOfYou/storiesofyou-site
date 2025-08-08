@@ -20,20 +20,65 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* --- Hero background (warm gradient) --- */
+    /* --- Hero background (warm tan gradient) --- */
     .hero-bg {
-      background: radial-gradient(1200px 500px at 50% -200px, #ffeed2 0%, #e9d7ff 50%, #463282 100%);
+      background: radial-gradient(1200px 500px at 50% -200px, #fff7e9 0%, #fce8c8 50%, #e0cba7 100%);
     }
-    /* --- Responsive 16:9 wrapper for the video --- */
-    .ratio-16x9 { position: relative; width: 100%; padding-bottom: 56.25%; }
-    .ratio-16x9 > iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    /* --- Section background colors --- */
+    .bg-warm-light { background-color: #faf3e7; } /* light warm beige */
+    .bg-warm-mid { background-color: #e0cba7; } /* mid-tone tan */
+
+    /* --- Cropped YouTube wrapper to hide top/bottom bars --- */
+    .video-viewport {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; /* base 16:9 */
+      overflow: hidden;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,.10);
+      --crop: 116%;
+    }
+    .video-viewport iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: var(--crop);
+      transform: translate(-50%, -50%) scale(1);
+      border: 0;
+      animation: zoomIn 3s ease-out forwards;
+    }
+
+    /* --- Cinematic zoom-in (once) --- */
+    @keyframes zoomIn {
+      0% { transform: translate(-50%, -50%) scale(1); }
+      100% { transform: translate(-50%, -50%) scale(1.05); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .video-viewport iframe { animation: none; }
+    }
 
     /* --- Scroll-in animations --- */
     .reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
     .reveal.visible { opacity: 1; transform: none; }
 
-    /* Minor polish */
-    .shadow-soft { box-shadow: 0 10px 25px rgba(0,0,0,.10); }
+    /* --- Warm charcoal button style --- */
+    .btn-primary {
+      background-color: #3d3528;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background-color: #5a4d3a;
+    }
+    .btn-secondary {
+      background-color: #fff;
+      color: #3d3528;
+      border: 2px solid #3d3528;
+    }
+    .btn-secondary:hover {
+      background-color: #f7f2eb;
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
@@ -44,48 +89,48 @@
       <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight drop-shadow-sm">
         Your voice, your story — preserved forever.
       </h1>
-      <p class="mt-6 text-lg text-gray-100/90 md:text-gray-50 max-w-2xl mx-auto">
+      <p class="mt-6 text-lg text-gray-900/80 max-w-2xl mx-auto">
         Stories of You makes it easy to record and share your memories in your own voice,
         creating a legacy your loved ones can treasure for generations.
       </p>
 
       <!-- Video Embed -->
-      <div class="mt-8 max-w-3xl mx-auto rounded-xl overflow-hidden shadow-soft ratio-16x9 reveal">
-        <iframe
-          src="https://www.youtube.com/embed/XvyvZOhDJPk"
-          title="Stories of You explainer video"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen>
-        </iframe>
+      <div class="mt-8 max-w-3xl mx-auto reveal">
+        <div class="video-viewport">
+          <iframe
+            src="https://www.youtube.com/embed/XvyvZOhDJPk?rel=0&modestbranding=1"
+            title="Stories of You explainer video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+          </iframe>
+        </div>
       </div>
 
-      <button id="openForm"
-        class="mt-8 px-8 py-4 bg-indigo-600 text-white text-lg rounded-xl shadow hover:bg-indigo-500 transition">
+      <button id="openForm" class="btn-primary mt-8 px-8 py-4 text-lg rounded-xl shadow transition">
         Start Recording
       </button>
     </div>
   </section>
 
   <!-- How It Works -->
-  <section class="bg-gray-100 py-16">
+  <section class="bg-warm-light py-16">
     <div class="max-w-6xl mx-auto px-6 text-center">
       <h2 class="text-3xl font-bold mb-10 reveal">How It Works</h2>
       <div class="grid md:grid-cols-3 gap-8">
         <div class="reveal">
-          <div class="text-indigo-600 text-5xl mb-4">🎙️</div>
+          <div class="text-amber-800 text-5xl mb-4">🎙️</div>
           <h3 class="text-xl font-semibold mb-2">Record</h3>
-          <p class="text-gray-600">Answer a simple prompt and record your voice right from your phone or computer.</p>
+          <p class="text-gray-700">Answer a simple prompt and record your voice right from your phone or computer.</p>
         </div>
         <div class="reveal">
-          <div class="text-indigo-600 text-5xl mb-4">✨</div>
+          <div class="text-amber-800 text-5xl mb-4">✨</div>
           <h3 class="text-xl font-semibold mb-2">Review</h3>
-          <p class="text-gray-600">Listen back and make sure it’s exactly how you want it before you submit.</p>
+          <p class="text-gray-700">Listen back and make sure it’s exactly how you want it before you submit.</p>
         </div>
         <div class="reveal">
-          <div class="text-indigo-600 text-5xl mb-4">📬</div>
+          <div class="text-amber-800 text-5xl mb-4">📬</div>
           <h3 class="text-xl font-semibold mb-2">Share</h3>
-          <p class="text-gray-600">Your story is preserved and can be shared with loved ones — forever.</p>
+          <p class="text-gray-700">Your story is preserved and can be shared with loved ones — forever.</p>
         </div>
       </div>
     </div>
@@ -95,7 +140,7 @@
   <section class="bg-white py-16">
     <div class="max-w-4xl mx-auto px-6 text-center">
       <h2 class="text-3xl font-bold mb-6 reveal">Why It Matters</h2>
-      <p class="text-lg text-gray-600 mb-6 reveal">
+      <p class="text-lg text-gray-700 mb-6 reveal">
         Memories fade over time, but the sound of your voice brings them back to life. Whether it’s for your children,
         grandchildren, or future generations, your words carry the emotion, warmth, and personality that no photograph can capture.
       </p>
@@ -103,12 +148,11 @@
   </section>
 
   <!-- Call to Action -->
-  <section class="bg-indigo-600 py-16">
+  <section class="bg-warm-mid py-16">
     <div class="max-w-4xl mx-auto text-center px-6">
-      <h2 class="text-3xl font-bold text-white reveal">Ready to tell your story?</h2>
-      <p class="mt-4 text-lg text-indigo-100 reveal">It takes just a few minutes to record something that will last forever.</p>
-      <button id="openForm2"
-        class="mt-8 px-8 py-4 bg-white text-indigo-600 text-lg rounded-xl shadow hover:bg-gray-100 transition reveal">
+      <h2 class="text-3xl font-bold text-gray-900 reveal">Ready to tell your story?</h2>
+      <p class="mt-4 text-lg text-gray-800 reveal">It takes just a few minutes to record something that will last forever.</p>
+      <button id="openForm2" class="btn-secondary mt-8 px-8 py-4 text-lg rounded-xl shadow transition reveal">
         Start Recording
       </button>
     </div>
