@@ -20,87 +20,62 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* --- Brand palette --- */
-    :root {
-      --brand-navy: #0f2c4c;   /* matches logo text */
-      --brand-orange: #e09a1b; /* matches waveform */
-      --brand-charcoal: #3d3528;
-      --warm-light: #faf3e7;
-      --warm-mid: #e0cba7;
+    :root{
+      --brand-navy:#0f2c4c;
+      --brand-orange:#e09a1b;
+      --brand-charcoal:#3d3528;
+      --warm-light:#faf3e7;
+      --warm-mid:#e0cba7;
     }
 
-    /* --- Header --- */
-    .site-header {
-      position: sticky; top: 0; z-index: 40;
-      background: rgba(255,255,255,.82);
-      backdrop-filter: saturate(140%) blur(10px);
-      box-shadow: 0 6px 16px rgba(0,0,0,.06);
-    }
+    /* Sticky header (logo only) */
+    .site-header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.82);backdrop-filter:saturate(140%) blur(10px);box-shadow:0 6px 16px rgba(0,0,0,.06)}
 
-    /* --- Hero background (warm tan gradient) --- */
-    .hero-bg {
-      background: radial-gradient(1200px 500px at 50% -200px, #fff7e9 0%, #fce8c8 50%, #e0cba7 100%);
-    }
+    /* Hero background */
+    .hero-bg{background:radial-gradient(1200px 500px at 50% -200px,#fff7e9 0%,#fce8c8 50%,#e0cba7 100%)}
 
-    /* --- Sections --- */
-    .bg-warm-light { background-color: var(--warm-light); }
-    .bg-warm-mid { background-color: var(--warm-mid); }
+    /* Section backgrounds */
+    .bg-warm-light{background-color:var(--warm-light)}
+    .bg-warm-mid{background-color:var(--warm-mid)}
 
-    /* --- Cropped YouTube wrapper to hide top/bottom bars --- */
-    .video-viewport {
-      position: relative; width: 100%; padding-bottom: 56.25%; /* 16:9 */
-      overflow: hidden; border-radius: 0.75rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,.10);
-      --crop: 116%;
-    }
-    .video-viewport iframe {
-      position: absolute; top: 50%; left: 50%;
-      width: 100%; height: var(--crop);
-      transform: translate(-50%, -50%) scale(1);
-      border: 0; animation: zoomIn 3s ease-out forwards;
-    }
+    /* Video crop wrapper */
+    .video-viewport{position:relative;width:100%;padding-bottom:56.25%;overflow:hidden;border-radius:.75rem;box-shadow:0 10px 25px rgba(0,0,0,.10);--crop:116%}
+    .video-viewport iframe{position:absolute;top:50%;left:50%;width:100%;height:var(--crop);transform:translate(-50%,-50%) scale(1);border:0;animation:zoomIn 3s ease-out forwards}
 
-    /* --- Cinematic zoom-in (once) --- */
-    @keyframes zoomIn {
-      0% { transform: translate(-50%, -50%) scale(1); }
-      100% { transform: translate(-50%, -50%) scale(1.05); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .video-viewport iframe { animation: none; }
-    }
+    /* Cinematic zoom */
+    @keyframes zoomIn{0%{transform:translate(-50%,-50%) scale(1)}100%{transform:translate(-50%,-50%) scale(1.05)}}
+    @media (prefers-reduced-motion: reduce){.video-viewport iframe{animation:none}}
 
-    /* --- Scroll-in animations --- */
-    .reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
-    .reveal.visible { opacity: 1; transform: none; }
+    /* Scroll-in */
+    .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
+    .reveal.visible{opacity:1;transform:none}
 
-    /* --- Buttons --- */
-    .btn-primary {
-      background-color: var(--brand-charcoal); color: #fff;
-    }
-    .btn-primary:hover { background-color: #5a4d3a; }
-    .btn-secondary {
-      background-color: #fff; color: var(--brand-charcoal); border: 2px solid var(--brand-charcoal);
-    }
-    .btn-secondary:hover { background-color: #f7f2eb; }
+    /* Buttons */
+    .btn-primary{background-color:var(--brand-charcoal);color:#fff}
+    .btn-primary:hover{background-color:#5a4d3a}
+    .btn-secondary{background:#fff;color:var(--brand-charcoal);border:2px solid var(--brand-charcoal)}
+    .btn-secondary:hover{background:#f7f2eb}
 
-    /* --- Utility --- */
-    .icon { width: 52px; height: 52px; display: inline-block; color: var(--brand-navy); }
-    .icon-accent { color: var(--brand-orange); }
+    /* Icon helpers */
+    .icon{width:52px;height:52px;display:inline-block;color:var(--brand-navy)}
+    .icon-accent{color:var(--brand-orange)}
   </style>
 </head>
 <body class="bg-white text-gray-800 font-sans">
 
-  <!-- Sticky Header with Logo -->
+  <!-- Header (logo only) -->
   <header class="site-header">
-    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-3">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center">
       <img src="logo.png" alt="Stories of You logo" class="h-8 w-auto rounded-sm" />
-      <span class="font-semibold text-lg tracking-wide" style="color:var(--brand-navy)">Stories of You</span>
     </div>
   </header>
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <section class="hero-bg">
     <div class="mx-auto max-w-7xl px-6 py-14 text-center">
+      <!-- Logo above headline -->
+      <img src="logo.png" alt="Stories of You" class="h-12 w-auto mx-auto mb-4" />
+
       <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight drop-shadow-sm">
         Your voice, your story — preserved forever.
       </h1>
@@ -136,7 +111,7 @@
         <!-- Record -->
         <div class="reveal">
           <span class="icon">
-            <!-- Mic SVG (brand navy) -->
+            <!-- Mic (brand navy) -->
             <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full">
               <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 1 1-10 0H5a7 7 0 0 0 14 0h-2ZM11 19h2v3h-2v-3Z"/>
             </svg>
@@ -148,7 +123,7 @@
         <!-- Review -->
         <div class="reveal">
           <span class="icon icon-accent">
-            <!-- Sparkle SVG (accent orange) -->
+            <!-- Sparkle (accent orange) -->
             <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full">
               <path d="M12 2l1.8 5.4L19 9l-5.2 1.6L12 16l-1.8-5.4L5 9l5.2-1.6L12 2Zm7 9 1 3-3 1 3 1-1 3 2-2 3 1-2-2 2-2-3 1-2-2Z"/>
             </svg>
@@ -157,12 +132,12 @@
           <p class="text-gray-700">Listen back and make sure it’s exactly how you want it before you submit.</p>
         </div>
 
-        <!-- Share -->
+        <!-- Share (gift/keepsake) -->
         <div class="reveal">
           <span class="icon" style="color:var(--brand-navy)">
-            <!-- Share SVG (brand navy) -->
+            <!-- Gift box (keepsake) -->
             <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full">
-              <path d="M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 0 6c.5 0 .98-.12 1.4-.33l-6.1 3.49a3 3 0 1 0 0 3.66l6.1 3.49A3 3 0 1 0 18 16a3 3 0 0 0-1.6.46l-6.1-3.49a3.03 3.03 0 0 0 0-1.94l6.1-3.49C17.02 7.88 17.5 8 18 8Z"/>
+              <path d="M20 7h-2.2a3 3 0 1 0-5.8-1c0 .34.07.67.2 1H11.8a3 3 0 1 0-5.8-1 3 3 0 0 0 .2 1H4a1 1 0 0 0-1 1v3h18V8a1 1 0 0 0-1-1Zm-8-2a1 1 0 1 1 2 0 1 1 0 0 1-2 0ZM8 5a1 1 0 1 1 2 0 1 1 0 0 1-2 0ZM3 12v7a2 2 0 0 0 2 2h5v-9H3Zm11 0v9h5a2 2 0 0 0 2-2v-7h-7Z"/>
             </svg>
           </span>
           <h3 class="text-xl font-semibold mt-2">Share</h3>
@@ -179,8 +154,35 @@
     </div>
   </section>
 
-  <!-- Why It Matters -->
+  <!-- Anticipated Testimonials -->
   <section class="bg-white py-16">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-10 reveal" style="color:var(--brand-navy)">What People Will Say</h2>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- Card 1 -->
+        <figure class="reveal rounded-xl border border-black/5 shadow-sm p-6 bg-warm-light">
+          <blockquote class="text-gray-800 italic">“I didn’t realize how much I missed my dad’s laugh until I heard it here. Best gift we’ve given our kids.”</blockquote>
+          <figcaption class="mt-4 text-sm text-gray-600">— Sarah M., daughter</figcaption>
+        </figure>
+
+        <!-- Card 2 -->
+        <figure class="reveal rounded-xl border border-black/5 shadow-sm p-6 bg-warm-light">
+          <blockquote class="text-gray-800 italic">“It took five minutes, and now my grandkids will always know my voice and our family stories.”</blockquote>
+          <figcaption class="mt-4 text-sm text-gray-600">— Robert T., grandfather</figcaption>
+        </figure>
+
+        <!-- Card 3 -->
+        <figure class="reveal rounded-xl border border-black/5 shadow-sm p-6 bg-warm-light">
+          <blockquote class="text-gray-800 italic">“My mom hates being on camera, but this made it easy. She just talked — and it was beautiful.”</blockquote>
+          <figcaption class="mt-4 text-sm text-gray-600">— Jason L., son</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why It Matters -->
+  <section class="bg-white py-10">
     <div class="max-w-4xl mx-auto px-6 text-center">
       <h2 class="text-3xl font-bold mb-6 reveal" style="color:var(--brand-navy)">Why It Matters</h2>
       <p class="text-lg text-gray-700 mb-6 reveal">
@@ -232,24 +234,17 @@
 
     // Modal logic
     const modal = document.getElementById("formModal");
-    const openers = ["openForm","openForm2","openForm3"];
-    openers.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener("click", () => modal.classList.remove("hidden"));
+    ["openForm","openForm2","openForm3"].forEach(id=>{
+      const el=document.getElementById(id); if(el){el.addEventListener("click",()=>modal.classList.remove("hidden"));}
     });
-    document.getElementById("closeForm").addEventListener("click", () => modal.classList.add("hidden"));
+    document.getElementById("closeForm").addEventListener("click",()=>modal.classList.add("hidden"));
 
     // Scroll-in animations
-    const revealEls = document.querySelectorAll('.reveal');
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          io.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.15 });
-    revealEls.forEach(el => io.observe(el));
+    const revealEls=document.querySelectorAll('.reveal');
+    const io=new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }});
+    },{threshold:.15});
+    revealEls.forEach(el=>io.observe(el));
   </script>
 </body>
 </html>
