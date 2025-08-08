@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Stories of You</title>
   <meta name="description" content="Your voice, your story — preserved forever. Capture your memories in your own words with Stories of You." />
@@ -94,17 +96,14 @@
       <!-- Video -->
       <div class="mt-8 max-w-3xl mx-auto reveal">
         <div class="video-viewport">
-          <video
-            id="heroVideo"
-            autoplay
-            muted
-            playsinline
-            preload="metadata"
-            controls
-            poster="https://d4al2emvsw1mr.cloudfront.net/poster.jpg">
-            <source src="https://d4al2emvsw1mr.cloudfront.net/StoriesOfYouTest2.mp4" type="video/mp4">
-            Sorry, your browser doesn’t support HTML5 video.
-          </video>
+          <iframe
+            src="https://www.youtube.com/embed/XvyvZOhDJPk?rel=0&modestbranding=1"
+            src="https://www.youtube.com/embed/XvyvZOhDJPk?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3"
+            title="Stories of You explainer video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+          </iframe>
+            allowfullscreen></iframe>
         </div>
       </div>
 
@@ -112,7 +111,7 @@
       <div class="mt-8 flex items-center justify-center">
         <button id="openRecorder" class="btn-primary px-8 py-4 text-lg rounded-xl shadow transition">
           Record a Story (beta)
-@@ -109,38 +81,24 @@ <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight drop-
+@@ -109,38 +81,24 @@
   <section class="bg-warm-light py-16">
     <div class="max-w-6xl mx-auto px-6 text-center">
       <h2 class="text-3xl font-bold mb-10 reveal">How It Works</h2>
@@ -155,7 +154,7 @@
           </span>
           <h3 class="text-xl font-semibold mt-2">Share</h3>
           <p class="text-gray-700">Your story is preserved and can be shared with loved ones — forever.</p>
-@@ -149,22 +107,19 @@ <h3 class="text-xl font-semibold mt-2">Share</h3>
+@@ -149,22 +107,19 @@
     </div>
   </section>
 
@@ -179,7 +178,7 @@
         <figure class="reveal rounded-xl border border-black/5 shadow-sm p-6 bg-warm-light">
           <blockquote class="text-gray-800 italic">“My mom hates being on camera, but this made it easy. She just talked — and it was beautiful.”</blockquote>
           <figcaption class="mt-4 text-sm text-gray-600">— Jason L., son</figcaption>
-@@ -173,18 +128,7 @@ <h2 class="text-3xl font-bold text-center mb-10 reveal" style="color:var(--brand
+@@ -173,18 +128,7 @@
     </div>
   </section>
 
@@ -199,7 +198,7 @@
   <section class="bg-warm-mid py-16">
     <div class="max-w-4xl mx-auto text-center px-6">
       <h2 class="text-3xl font-bold text-gray-900 reveal">Ready to tell your story?</h2>
-@@ -195,7 +139,7 @@ <h2 class="text-3xl font-bold text-gray-900 reveal">Ready to tell your story?</h
+@@ -195,7 +139,7 @@
     </div>
   </section>
 
@@ -208,7 +207,7 @@
   <footer class="bg-gray-900 text-gray-300 py-8">
     <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
       <div class="flex items-center gap-3">
-@@ -206,7 +150,7 @@ <h2 class="text-3xl font-bold text-gray-900 reveal">Ready to tell your story?</h
+@@ -206,7 +150,7 @@
     </div>
   </footer>
 
@@ -217,7 +216,7 @@
   <div id="recModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[60]">
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
       <div class="flex items-center justify-between p-4 border-b">
-@@ -216,7 +160,6 @@ <h2 class="text-3xl font-bold text-gray-900 reveal">Ready to tell your story?</h
+@@ -216,7 +160,6 @@
         </div>
         <button id="recClose" class="text-gray-400 hover:text-gray-600 text-2xl leading-none" aria-label="Close">&times;</button>
       </div>
@@ -225,7 +224,7 @@
       <div class="p-5 space-y-4">
         <!-- Identity -->
         <div class="grid md:grid-cols-2 gap-3">
-@@ -230,6 +173,7 @@ <h2 class="text-3xl font-bold text-gray-900 reveal">Ready to tell your story?</h
+@@ -230,6 +173,7 @@
           </div>
         </div>
 
@@ -233,7 +232,7 @@
         <label class="block text-sm text-gray-600">Choose a prompt (optional)</label>
         <select id="recPrompt" class="w-full border rounded-md px-3 py-2">
           <option value="">— Pick a prompt —</option>
-@@ -240,11 +184,23 @@ <h2 class="text-3xl font-bold text-gray-900 reveal">Ready to tell your story?</h
+@@ -240,11 +184,23 @@
           <option>What’s something you’ve never told anyone before?</option>
         </select>
 
@@ -257,7 +256,7 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <canvas id="recMeter" width="140" height="14" class="rounded bg-gray-100"></canvas>
-@@ -253,13 +209,15 @@ <h2 class="text-3xl font-bold text-gray-900 reveal">Ready to tell your story?</h
+@@ -253,13 +209,15 @@
           <span id="recTimer" class="text-sm font-mono text-gray-700">00:00</span>
         </div>
 
@@ -273,7 +272,7 @@
         <div id="playbackWrap" class="hidden space-y-2">
           <audio id="recAudio" controls class="w-full"></audio>
           <div class="flex items-center gap-3">
-@@ -273,7 +231,6 @@ <h2 class="text-3xl font-bold text-gray-900 reveal">Ready to tell your story?</h
+@@ -273,7 +231,6 @@
     </div>
   </div>
 
@@ -281,7 +280,7 @@
   <script>
     // Footer year
     document.getElementById("year").textContent = new Date().getFullYear();
-@@ -285,230 +242,217 @@ <h2 class="text-3xl font-bold text-gray-900 reveal">Ready to tell your story?</h
+@@ -285,230 +242,217 @@
     },{threshold:.15});
     revealEls.forEach(el=>io.observe(el));
 
