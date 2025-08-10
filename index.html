@@ -29,7 +29,6 @@
     .bg-warm-light{background-color:var(--warm-light)}
     .bg-warm-mid{background-color:var(--warm-mid)}
     .video-viewport{position:relative;width:100%;padding-bottom:56.25%;overflow:hidden;border-radius:.75rem;box-shadow:0 10px 25px rgba(0,0,0,.10);--crop:120%}
-    .video-viewport iframe{position:absolute;top:50%;left:50%;width:100%;height:var(--crop);transform:translate(-50%,-50%);border:0}
     .video-viewport video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0;display:block}
     .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
     .reveal.visible{opacity:1;transform:none}
@@ -41,7 +40,6 @@
     .icon-accent{color:var(--brand-orange)}
   </style>
 </head>
-<link rel="icon" href="favicon.ico" type="image/x-icon">
 <body class="bg-white text-gray-800 font-sans">
 
   <!-- Header -->
@@ -63,7 +61,6 @@
 
       <div class="mt-8 max-w-3xl mx-auto reveal">
         <div class="video-viewport">
-          <!-- CloudFront video -->
           <video
             id="introVideo"
             autoplay
@@ -261,13 +258,15 @@
 
   <script>
   (function(){
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    // Configuration
-    const INVOKE_URL = "https://6117txq5ok.execute-api.us-east-2.amazonaws.com";
-    // TODO: replace with your n8n endpoint that stores metadata:
-    const METADATA_WEBHOOK = "https://YOUR_N8N_HOST/webhook/storiesofyou-recorder";
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // =========================================================================
+    // CONFIG
+    // =========================================================================
+    const INVOKE_URL = "https://6117txq5ok.execute-api.us-east-2.amazonaws.com"; // your API Gateway base
+    const METADATA_WEBHOOK = ""; // e.g. "https://YOUR_N8N_HOST/webhook/storiesofyou-submit"; leave blank to skip
 
+    // =========================================================================
+    // DOM
+    // =========================================================================
     const recModal=document.getElementById('recModal');
     const closeRec=document.getElementById('recClose');
     const nameEl=document.getElementById('recName');
@@ -292,28 +291,52 @@
     const btnUpload=document.getElementById('btnUpload');
     const uploadMsg=document.getElementById('uploadMsg');
 
+    // =========================================================================
+    // State
+    // =========================================================================
     let mediaStream, mediaRecorder, chunks=[];
     let audioCtx, analyser, dataArray, meterAnim;
     let startTime, timerInt, blob, mimeType;
     let photoFile=null; // processed (possibly resized) photo Blob
 
-    // --- Helpers for presign + upload ---
+    // =========================================================================
+    // Helpers: presign & upload
+    // =========================================================================
     async function getPresign(ext, type){
       const qs = new URLSearchParams({ ext, type });
-      const res = await fetch(`${INVOKE_URL}/presign?${qs.toString()}`, { method:'GET' });
-      if(!res.ok) throw new Error('Failed to get presign URL');
+      const url = `${INVOKE_URL}/presign?${qs.toString()}`;
+      const res = await fetch(url, { method:'GET' });
+      if(!res.ok){
+        const t = await res.text().catch(()=>res.statusText);
+        throw new Error(`Failed to get presign (${res.status}): ${t}`);
+      }
       return res.json(); // { id, key, method:"POST", url, fields:{...} }
     }
+
     async function s3FormUpload(presign, file){
       const fd = new FormData();
-      Object.entries(presign.fields).forEach(([k,v])=>fd.append(k,v));
+      // include all returned fields exactly
+      for(const [k,v] of Object.entries(presign.fields||{})){
+        fd.append(k, v);
+      }
+      // ensure key exists
+      if(!('key' in (presign.fields||{})) && presign.key){
+        fd.append('key', presign.key);
+      }
+      // file LAST
       fd.append('file', file);
+
       const res = await fetch(presign.url, { method:'POST', body:fd });
-      if(!res.ok) throw new Error('S3 upload failed');
+      if(!res.ok){
+        const txt = await res.text().catch(()=>res.statusText);
+        throw new Error(`S3 upload failed (${res.status}): ${txt}`);
+      }
       return presign.key;
     }
 
-    // --- Photo handling
+    // =========================================================================
+    // Photo handling
+    // =========================================================================
     photoInput.addEventListener('change', async (e)=>{
       const f = e.target.files && e.target.files[0];
       if(!f){ photoFile=null; photoPreviewWrap.classList.add('hidden'); return; }
@@ -352,7 +375,9 @@
       });
     }
 
-    // --- Modal reset/close
+    // =========================================================================
+    // Modal reset/close
+    // =========================================================================
     closeRec.addEventListener('click', resetAndClose);
     function resetAndClose(){
       try{
@@ -375,7 +400,9 @@
       photoInput.value=''; photoFile=null; photoPreviewWrap.classList.add('hidden');
     }
 
-    // --- Recording
+    // =========================================================================
+    // Recording
+    // =========================================================================
     async function startRecording(){
       try{
         mimeType = MediaRecorder.isTypeSupported('audio/mp4;codecs=aac') ? 'audio/mp4'
@@ -442,59 +469,78 @@
       return true;
     }
 
-    // --- Upload flow (presign -> S3 -> metadata) ---
+    // =========================================================================
+    // Upload flow (presign -> S3 -> metadata)
+    // =========================================================================
     async function uploadBlob(){
       if(!blob) return;
       if(!canUpload()) return;
       uploadMsg.classList.remove('hidden'); uploadMsg.textContent='Preparing upload…';
 
       // Figure out extension & type for presign
-      const fileExt = mimeType==='audio/mp4' ? 'm4a' : 'webm';
       const audioType = mimeType || 'audio/webm';
-      const filename = `soyou_${Date.now()}.${fileExt}`;
+      const audioExt  = (audioType==='audio/mp4') ? 'm4a' : 'webm';
+      const audioFile = new File([blob], `story.${audioExt}`, { type: audioType });
 
       try{
         // 1) Get presign for audio
-        const presignAudio = await getPresign(fileExt, audioType);
-        uploadMsg.textContent='Uploading audio…';
-        const audioKey = await s3FormUpload(presignAudio, new File([blob], filename, {type: audioType}));
+        uploadMsg.textContent='Requesting upload slot (audio)…';
+        const presignAudio = await getPresign(audioExt, audioType);
 
-        // 2) Photo (optional)
+        // 2) Upload audio to S3
+        uploadMsg.textContent='Uploading audio…';
+        const audioKey = await s3FormUpload(presignAudio, audioFile);
+
+        // 3) Photo (optional) — presign and upload separately
         let photoKey = null;
         if(photoFile){
-          const pExt = (photoFile.type==='image/png') ? 'png' :
-                       (photoFile.type==='image/webp') ? 'webp' : 'jpg';
-          const presignPhoto = await getPresign(pExt, photoFile.type);
+          const pType = photoFile.type || 'image/jpeg';
+          const pExt = pType.endsWith('png') ? 'png' : pType.endsWith('webp') ? 'webp' : 'jpg';
+          uploadMsg.textContent='Requesting upload slot (photo)…';
+          const presignPhoto = await getPresign(pExt, pType);
+
           uploadMsg.textContent='Uploading photo…';
           photoKey = await s3FormUpload(presignPhoto, photoFile);
         }
 
-        // 3) Send metadata to n8n
-        uploadMsg.textContent='Saving metadata…';
-        const meta = {
-          name: nameEl.value.trim(),
-          email: emailEl.value.trim(),
-          prompt: promptEl.value || '',
-          audio_key: presignAudio.key,
-          photo_key: photoKey,
-          recorded_at: new Date().toISOString(),
-          user_agent: navigator.userAgent
-        };
-        const res = await fetch(METADATA_WEBHOOK, {
-          method:'POST',
-          headers:{ 'content-type':'application/json' },
-          body: JSON.stringify(meta)
-        });
-        if(!res.ok) throw new Error('Metadata submit failed');
+        // 4) Send metadata (optional; non‑blocking)
+        if(METADATA_WEBHOOK){
+          uploadMsg.textContent='Saving metadata…';
+          const meta = {
+            name: nameEl.value.trim(),
+            email: emailEl.value.trim(),
+            prompt: promptEl.value || '',
+            audio_key: audioKey,
+            photo_key: photoKey,
+            recorded_at: new Date().toISOString(),
+            user_agent: navigator.userAgent
+          };
+          try{
+            const res = await fetch(METADATA_WEBHOOK, {
+              method:'POST',
+              headers:{ 'content-type':'application/json' },
+              body: JSON.stringify(meta)
+            });
+            if(!res.ok){
+              const t = await res.text().catch(()=>res.statusText);
+              console.warn('Metadata submit failed:', res.status, t);
+            }
+          }catch(e){
+            console.warn('Metadata submit error:', e);
+          }
+        }
 
         uploadMsg.textContent='Uploaded! Thank you.';
-        setTimeout(()=>resetAndClose(),900);
+        setTimeout(()=>resetAndClose(),1000);
       }catch(e){
         console.error(e);
-        uploadMsg.textContent='Upload failed. Please try again.';
+        uploadMsg.textContent = 'Upload failed. ' + (e?.message || 'Please try again.');
       }
     }
 
+    // =========================================================================
+    // Wire UI events
+    // =========================================================================
     btnRecord.addEventListener('click',startRecording);
     btnPause .addEventListener('click',pauseRecording);
     btnResume.addEventListener('click',resumeRecording);
