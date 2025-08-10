@@ -42,7 +42,7 @@
   </style>
 </head>
 <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <body class="bg-white text-gray-800 font-sans">
+<body class="bg-white text-gray-800 font-sans">
 
   <!-- Header -->
   <header class="site-header">
@@ -63,7 +63,7 @@
 
       <div class="mt-8 max-w-3xl mx-auto reveal">
         <div class="video-viewport">
-          <!-- CloudFront video: autoplay muted, no loop, user can unmute/restart -->
+          <!-- CloudFront video -->
           <video
             id="introVideo"
             autoplay
@@ -261,6 +261,13 @@
 
   <script>
   (function(){
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // Configuration
+    const INVOKE_URL = "https://6117txq5ok.execute-api.us-east-2.amazonaws.com";
+    // TODO: replace with your n8n endpoint that stores metadata:
+    const METADATA_WEBHOOK = "https://YOUR_N8N_HOST/webhook/storiesofyou-recorder";
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
     const recModal=document.getElementById('recModal');
     const closeRec=document.getElementById('recClose');
     const nameEl=document.getElementById('recName');
@@ -285,14 +292,26 @@
     const btnUpload=document.getElementById('btnUpload');
     const uploadMsg=document.getElementById('uploadMsg');
 
-    // >>> Presign API (HTTP API Gateway + Lambda)
-    // Replace with your own API ID/path if different:
-    const PRESIGN_URL = "https://6117txq50k.execute-api.us-east-2.amazonaws.com/presign";
-
     let mediaStream, mediaRecorder, chunks=[];
     let audioCtx, analyser, dataArray, meterAnim;
     let startTime, timerInt, blob, mimeType;
     let photoFile=null; // processed (possibly resized) photo Blob
+
+    // --- Helpers for presign + upload ---
+    async function getPresign(ext, type){
+      const qs = new URLSearchParams({ ext, type });
+      const res = await fetch(`${INVOKE_URL}/presign?${qs.toString()}`, { method:'GET' });
+      if(!res.ok) throw new Error('Failed to get presign URL');
+      return res.json(); // { id, key, method:"POST", url, fields:{...} }
+    }
+    async function s3FormUpload(presign, file){
+      const fd = new FormData();
+      Object.entries(presign.fields).forEach(([k,v])=>fd.append(k,v));
+      fd.append('file', file);
+      const res = await fetch(presign.url, { method:'POST', body:fd });
+      if(!res.ok) throw new Error('S3 upload failed');
+      return presign.key;
+    }
 
     // --- Photo handling
     photoInput.addEventListener('change', async (e)=>{
@@ -412,7 +431,7 @@
       meterAnim=requestAnimationFrame(frame);
     }
     function stopMeter(){ if(meterAnim) cancelAnimationFrame(meterAnim); }
-    function startTimer(){ startTime=Date.now(); timerInt=setInterval(()=>{ const s=Math.floor((Date.now()-startTime)/1000); const mm=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); timerEl.textContent=`${mm}:${ss}`; },250); }
+    function startTimer(reset){ if(!reset) startTime=Date.now(); timerInt=setInterval(()=>{ const s=Math.floor((Date.now()-startTime)/1000); const mm=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); timerEl.textContent=`${mm}:${ss}`; },250); }
     function stopTimer(){ if(timerInt) clearInterval(timerInt); }
 
     function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
@@ -423,77 +442,53 @@
       return true;
     }
 
-    // --- S3 direct upload via presigned POST
-    async function s3DirectPost(presignJson, file){
-      // presignJson: { url, fields, key }
-      const fd = new FormData();
-      Object.entries(presignJson.fields).forEach(([k,v])=>fd.append(k, v));
-      fd.append('file', file, file.name || 'upload.bin');
-
-      const res = await fetch(presignJson.url, { method:'POST', body: fd });
-      if (!res.ok) {
-        const txt = await res.text().catch(()=> '');
-        throw new Error(`S3 upload failed (${res.status}) ${txt}`);
-      }
-      // S3 may return 204 (no content). Success.
-      return {
-        key: presignJson.key || presignJson.fields?.key,
-        location: presignJson.url.replace(/\/$/, '') + '/' + encodeURIComponent(presignJson.fields?.key || presignJson.key || '')
-      };
-    }
-
+    // --- Upload flow (presign -> S3 -> metadata) ---
     async function uploadBlob(){
       if(!blob) return;
       if(!canUpload()) return;
-      uploadMsg.classList.remove('hidden'); uploadMsg.textContent='Requesting upload slot…';
+      uploadMsg.classList.remove('hidden'); uploadMsg.textContent='Preparing upload…';
 
-      // Decide extension and type based on recorded mimeType
+      // Figure out extension & type for presign
       const fileExt = mimeType==='audio/mp4' ? 'm4a' : 'webm';
-      const contentType = mimeType || 'audio/webm';
-      const audioFile = new File([blob], `soyou_${Date.now()}.${fileExt}`, { type: contentType });
+      const audioType = mimeType || 'audio/webm';
+      const filename = `soyou_${Date.now()}.${fileExt}`;
 
       try{
-        // 1) Get presigned POST for audio
-        const presignAudioRes = await fetch(`${PRESIGN_URL}?ext=${encodeURIComponent(fileExt)}&type=${encodeURIComponent(contentType)}`, {
-          method: 'GET',
-          credentials: 'omit'
-        });
-        if(!presignAudioRes.ok) throw new Error('Presign (audio) failed');
-        const presignAudio = await presignAudioRes.json();
+        // 1) Get presign for audio
+        const presignAudio = await getPresign(fileExt, audioType);
+        uploadMsg.textContent='Uploading audio…';
+        const audioKey = await s3FormUpload(presignAudio, new File([blob], filename, {type: audioType}));
 
-        uploadMsg.textContent='Uploading audio to S3…';
-        const audioResult = await s3DirectPost(presignAudio, audioFile);
-
-        // 2) Optional photo
-        let photoResult = null;
-        if (photoFile) {
-          uploadMsg.textContent='Requesting photo slot…';
-          const photoExt = 'jpg';
-          const photoType = 'image/jpeg';
-          const presignPhotoRes = await fetch(`${PRESIGN_URL}?ext=${encodeURIComponent(photoExt)}&type=${encodeURIComponent(photoType)}&isPhoto=1`, {
-            method: 'GET',
-            credentials: 'omit'
-          });
-          if(!presignPhotoRes.ok) throw new Error('Presign (photo) failed');
-          const presignPhoto = await presignPhotoRes.json();
-
-          uploadMsg.textContent='Uploading photo to S3…';
-          photoResult = await s3DirectPost(presignPhoto, photoFile);
+        // 2) Photo (optional)
+        let photoKey = null;
+        if(photoFile){
+          const pExt = (photoFile.type==='image/png') ? 'png' :
+                       (photoFile.type==='image/webp') ? 'webp' : 'jpg';
+          const presignPhoto = await getPresign(pExt, photoFile.type);
+          uploadMsg.textContent='Uploading photo…';
+          photoKey = await s3FormUpload(presignPhoto, photoFile);
         }
 
-        // 3) (Optional) Send metadata somewhere (Airtable/n8n/etc.)
-        // await fetch('/your-metadata-endpoint', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
-        //   name: nameEl.value.trim(),
-        //   email: emailEl.value.trim(),
-        //   prompt: promptEl.value || '',
-        //   recorded_at: new Date().toISOString(),
-        //   audio_key: audioResult.key,
-        //   photo_key: photoResult?.key || null,
-        //   user_agent: navigator.userAgent
-        // })});
+        // 3) Send metadata to n8n
+        uploadMsg.textContent='Saving metadata…';
+        const meta = {
+          name: nameEl.value.trim(),
+          email: emailEl.value.trim(),
+          prompt: promptEl.value || '',
+          audio_key: presignAudio.key,
+          photo_key: photoKey,
+          recorded_at: new Date().toISOString(),
+          user_agent: navigator.userAgent
+        };
+        const res = await fetch(METADATA_WEBHOOK, {
+          method:'POST',
+          headers:{ 'content-type':'application/json' },
+          body: JSON.stringify(meta)
+        });
+        if(!res.ok) throw new Error('Metadata submit failed');
 
         uploadMsg.textContent='Uploaded! Thank you.';
-        setTimeout(()=>resetAndClose(), 900);
+        setTimeout(()=>resetAndClose(),900);
       }catch(e){
         console.error(e);
         uploadMsg.textContent='Upload failed. Please try again.';
