@@ -92,8 +92,31 @@
 
   <!-- Header -->
   <header class="site-header">
-    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
       <img src="logo.png" alt="Stories of You logo" class="h-8 w-auto rounded-sm" />
+      <nav class="hidden md:flex items-center space-x-6">
+        <a href="#faq" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
+        <a href="about.html" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">About</a>
+        <a href="pricing.html" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
+        <a href="privacy.html" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Privacy</a>
+        <button id="openRecorderNav" class="btn-primary px-4 py-2 text-sm rounded-lg">Record Story</button>
+      </nav>
+      <!-- Mobile menu button -->
+      <button id="mobileMenuBtn" class="md:hidden text-gray-600 hover:text-gray-900">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-200">
+      <div class="px-6 py-3 space-y-3">
+        <a href="#faq" class="block text-sm text-gray-600 hover:text-gray-900">FAQ</a>
+        <a href="about.html" class="block text-sm text-gray-600 hover:text-gray-900">About</a>
+        <a href="pricing.html" class="block text-sm text-gray-600 hover:text-gray-900">Pricing</a>
+        <a href="privacy.html" class="block text-sm text-gray-600 hover:text-gray-900">Privacy</a>
+        <button id="openRecorderMobile" class="btn-primary px-4 py-2 text-sm rounded-lg w-full text-left">Record Story</button>
+      </div>
     </div>
   </header>
 
@@ -384,53 +407,62 @@
 
     // Open recorder
     const recModal = document.getElementById('recModal');
-    ['openRecorder','openRecorderBottom'].forEach(id=>{
+    ['openRecorder','openRecorderBottom','openRecorderNav','openRecorderMobile'].forEach(id=>{
       const el=document.getElementById(id); if(el){el.addEventListener('click',()=>recModal.classList.remove('hidden'));}
     });
 
-    // FAQ functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      // Tab switching
-      const tabs = document.querySelectorAll('.faq-tab');
-      const categories = document.querySelectorAll('.faq-category');
-      
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          // Remove active class from all tabs and categories
-          tabs.forEach(t => t.classList.remove('active'));
-          categories.forEach(c => c.classList.remove('active'));
-          
-          // Add active class to clicked tab and corresponding category
-          tab.classList.add('active');
-          const targetCategory = document.getElementById(tab.dataset.category);
-          if (targetCategory) {
-            targetCategory.classList.add('active');
-          }
-        });
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (mobileMenuBtn && mobileMenu) {
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
       });
-      
-      // Accordion functionality
-      const faqItems = document.querySelectorAll('.faq-item');
-      
-      faqItems.forEach(item => {
-        const question = item.querySelector('.faq-question');
-        const answer = item.querySelector('.faq-answer');
+    }
+
+    // FAQ functionality - MOVED TO END TO ENSURE DOM IS READY
+    // Tab switching
+    const tabs = document.querySelectorAll('.faq-tab');
+    const categories = document.querySelectorAll('.faq-category');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs and categories
+        tabs.forEach(t => t.classList.remove('active'));
+        categories.forEach(c => c.classList.remove('active'));
         
-        question.addEventListener('click', () => {
-          const isOpen = item.classList.contains('open');
-          
-          // Close all other items
-          faqItems.forEach(otherItem => {
-            otherItem.classList.remove('open');
-            otherItem.querySelector('.faq-answer').classList.add('hidden');
-          });
-          
-          // Toggle current item
-          if (!isOpen) {
-            item.classList.add('open');
-            answer.classList.remove('hidden');
-          }
+        // Add active class to clicked tab and corresponding category
+        tab.classList.add('active');
+        const targetCategory = document.getElementById(tab.dataset.category);
+        if (targetCategory) {
+          targetCategory.classList.add('active');
+        }
+      });
+    });
+    
+    // Accordion functionality
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    faqItems.forEach(item => {
+      const question = item.querySelector('.faq-question');
+      const answer = item.querySelector('.faq-answer');
+      
+      question.addEventListener('click', () => {
+        const isOpen = item.classList.contains('open');
+        
+        // Close all other items in the same category
+        const currentCategory = item.closest('.faq-category');
+        const categoryItems = currentCategory.querySelectorAll('.faq-item');
+        categoryItems.forEach(otherItem => {
+          otherItem.classList.remove('open');
+          otherItem.querySelector('.faq-answer').classList.add('hidden');
         });
+        
+        // Toggle current item
+        if (!isOpen) {
+          item.classList.add('open');
+          answer.classList.remove('hidden');
+        }
       });
     });
   </script>
