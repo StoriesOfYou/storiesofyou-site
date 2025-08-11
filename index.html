@@ -38,6 +38,54 @@
     .btn-secondary:hover{background:#f7f2eb}
     .icon{width:52px;height:52px;display:inline-block;color:var(--brand-navy)}
     .icon-accent{color:var(--brand-orange)}
+    
+    /* FAQ Styles */
+    .faq-tab {
+      padding: 8px 16px;
+      border: 2px solid var(--brand-charcoal);
+      background: white;
+      color: var(--brand-charcoal);
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .faq-tab:hover {
+      background: var(--brand-charcoal);
+      color: white;
+    }
+    
+    .faq-tab.active {
+      background: var(--brand-charcoal);
+      color: white;
+    }
+    
+    .faq-category {
+      display: none;
+    }
+    
+    .faq-category.active {
+      display: block;
+    }
+    
+    .faq-question:hover .faq-icon {
+      color: var(--brand-orange);
+    }
+    
+    .faq-item.open .faq-icon {
+      transform: rotate(180deg);
+      color: var(--brand-orange);
+    }
+    
+    .faq-answer {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body class="bg-white text-gray-800 font-sans">
@@ -135,6 +183,83 @@
     </div>
   </section>
 
+  <!-- FAQ Section -->
+  <section class="bg-warm-light py-16" id="faq">
+    <div class="max-w-4xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-4 reveal" style="color:var(--brand-navy)">Frequently Asked Questions</h2>
+      <p class="text-center text-gray-600 mb-12 reveal">Everything you need to know about preserving your family's stories</p>
+      
+      <!-- FAQ Category Tabs -->
+      <div class="flex flex-wrap justify-center gap-4 mb-8">
+        <button class="faq-tab active" data-category="gift-givers">For Gift Givers</button>
+        <button class="faq-tab" data-category="storytellers">For Storytellers</button>
+        <button class="faq-tab" data-category="privacy">Privacy & Security</button>
+        <button class="faq-tab" data-category="pricing">Pricing & Plans</button>
+        <button class="faq-tab" data-category="support">Technical Support</button>
+      </div>
+
+      <!-- FAQ Categories -->
+      
+      <!-- For Gift Givers -->
+      <div class="faq-category active" id="gift-givers">
+        <div class="space-y-4">
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">What is Stories of You?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              We offer a 14-day refund on annual subscriptions if you're not satisfied.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technical Support -->
+      <div class="faq-category" id="support">
+        <div class="space-y-4">
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">I'm having trouble recording — what should I do?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              Make sure your browser or app has microphone permissions enabled. You can also refresh the page or restart your device.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Does it work on all devices?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              Yes. Stories of You works on most modern browsers and devices, including iPhone, Android, Windows, and Mac.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Who can I contact for help?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              Email us at support@storiesofyou.ai and we'll respond within one business day.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- CTA -->
   <section class="bg-warm-mid py-16">
     <div class="max-w-4xl mx-auto text-center px-6">
@@ -153,7 +278,7 @@
         <img src="logo.png" alt="Stories of You logo" class="h-7 w-auto rounded-sm" />
         <span class="text-sm tracking-wide">© <span id="year"></span> Stories of You. All rights reserved.</span>
       </div>
-      <a href="#" class="text-sm hover:text-white opacity-80">Privacy</a>
+      <a href="privacy.html" class="text-sm hover:text-white opacity-80">Privacy</a>
     </div>
   </footer>
 
@@ -261,6 +386,52 @@
     const recModal = document.getElementById('recModal');
     ['openRecorder','openRecorderBottom'].forEach(id=>{
       const el=document.getElementById(id); if(el){el.addEventListener('click',()=>recModal.classList.remove('hidden'));}
+    });
+
+    // FAQ functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab switching
+      const tabs = document.querySelectorAll('.faq-tab');
+      const categories = document.querySelectorAll('.faq-category');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Remove active class from all tabs and categories
+          tabs.forEach(t => t.classList.remove('active'));
+          categories.forEach(c => c.classList.remove('active'));
+          
+          // Add active class to clicked tab and corresponding category
+          tab.classList.add('active');
+          const targetCategory = document.getElementById(tab.dataset.category);
+          if (targetCategory) {
+            targetCategory.classList.add('active');
+          }
+        });
+      });
+      
+      // Accordion functionality
+      const faqItems = document.querySelectorAll('.faq-item');
+      
+      faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        const answer = item.querySelector('.faq-answer');
+        
+        question.addEventListener('click', () => {
+          const isOpen = item.classList.contains('open');
+          
+          // Close all other items
+          faqItems.forEach(otherItem => {
+            otherItem.classList.remove('open');
+            otherItem.querySelector('.faq-answer').classList.add('hidden');
+          });
+          
+          // Toggle current item
+          if (!isOpen) {
+            item.classList.add('open');
+            answer.classList.remove('hidden');
+          }
+        });
+      });
     });
   </script>
 
@@ -576,4 +747,211 @@
   })();
   </script>
 </body>
-</html>
+</html>--brand-orange)">
+              Stories of You is a unique gift that helps your loved ones record and preserve their personal memories in their own voice. Guided prompts make it easy for them to share life stories, reflections, and experiences that will be cherished for generations.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">How does gifting work?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              Choose a plan, purchase a gift subscription, and we'll send the recipient an invitation to create their account. Once set up, they can begin recording right away.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Do gift recipients need a credit card to redeem?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              No. Your gift covers the full subscription period, with no payment required from the recipient.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Can I help the recipient record stories?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              Yes. You can help them choose prompts, assist with recording, or even sit with them during the storytelling process.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Who can hear the recordings?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              By default, only the recipient (and you, if they choose to share) can access recordings. The storyteller controls who sees or hears their stories.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Can I change who the gift is for?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              Yes. You can update the recipient information anytime before it's redeemed.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- For Storytellers -->
+      <div class="faq-category" id="storytellers">
+        <div class="space-y-4">
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Do I need special equipment to record?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              No. You can record directly from your smartphone, tablet, or computer — no special gear required.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">How long can each recording be?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              Each story can be up to 10 minutes long — enough to share meaningful details without feeling rushed.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Can I upload an existing recording instead of recording live?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              Yes. You can upload audio files in standard formats like MP3, WAV, or M4A.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Can I add photos or other media?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              Yes. You can upload a photo alongside your story to give it visual context.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Do I have to use the provided prompts?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              No. Prompts are there to inspire you, but you're free to record any story you choose.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Who can hear my recordings?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              By default, only you (and the person who gifted the subscription, if you choose) can access your recordings.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Can I delete a recording?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              Yes. You can delete any story at any time.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Privacy & Security -->
+      <div class="faq-category" id="privacy">
+        <div class="space-y-4">
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">How is my data protected?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              All recordings are stored securely with encryption. We never sell or share your data without permission.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing & Plans -->
+      <div class="faq-category" id="pricing">
+        <div class="space-y-4">
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">How much does it cost?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              We offer monthly and annual plans, with options for single or family storytellers.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Is there a free trial?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              Yes. You can record and store one story for free to try the service before upgrading.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">What is your refund policy?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(
