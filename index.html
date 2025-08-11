@@ -93,11 +93,12 @@
   <!-- Header -->
   <header class="site-header">
     <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-      <img src="logo.png" alt="Stories of You logo" class="h-8 w-auto rounded-sm" />
+      <a href="/">
+        <img src="logo.png" alt="Stories of You logo" class="h-8 w-auto rounded-sm" />
+      </a>
       <nav class="hidden md:flex items-center space-x-6">
         <a href="#faq" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
         <a href="about.html" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">About</a>
-        <a href="pricing.html" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
         <a href="privacy.html" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Privacy</a>
         <button id="openRecorderNav" class="btn-primary px-4 py-2 text-sm rounded-lg">Record Story</button>
       </nav>
@@ -113,7 +114,6 @@
       <div class="px-6 py-3 space-y-3">
         <a href="#faq" class="block text-sm text-gray-600 hover:text-gray-900">FAQ</a>
         <a href="about.html" class="block text-sm text-gray-600 hover:text-gray-900">About</a>
-        <a href="pricing.html" class="block text-sm text-gray-600 hover:text-gray-900">Pricing</a>
         <a href="privacy.html" class="block text-sm text-gray-600 hover:text-gray-900">Privacy</a>
         <button id="openRecorderMobile" class="btn-primary px-4 py-2 text-sm rounded-lg w-full text-left">Record Story</button>
       </div>
@@ -229,6 +229,30 @@
           <div class="faq-item">
             <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
               <span class="font-semibold text-gray-900">What is Stories of You?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              We offer monthly and annual plans, with options for single or family storytellers.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">Is there a free trial?</span>
+              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
+              Yes. You can record and store one story for free to try the service before upgrading.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
+              <span class="font-semibold text-gray-900">What is your refund policy?</span>
               <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
@@ -773,13 +797,7 @@
     btnStop  .addEventListener('click',stopRecording);
     btnRerec.addEventListener('click',()=>{
       pbWrap.classList.add('hidden'); statusEl.textContent='Ready'; timerEl.textContent='00:00';
-      chunks=[]; blob=null; audioEl.src=''; btnRecord.classList.remove('hidden');
-    });
-    btnUpload.addEventListener('click',uploadBlob);
-  })();
-  </script>
-</body>
-</html>--brand-orange)">
+      chunks=[]; blob=null; audioEl.-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
               Stories of You is a unique gift that helps your loved ones record and preserve their personal memories in their own voice. Guided prompts make it easy for them to share life stories, reflections, and experiences that will be cherished for generations.
             </div>
           </div>
@@ -962,28 +980,4 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </button>
-            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
-              We offer monthly and annual plans, with options for single or family storytellers.
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
-              <span class="font-semibold text-gray-900">Is there a free trial?</span>
-              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </button>
-            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(--brand-orange)">
-              Yes. You can record and store one story for free to try the service before upgrading.
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-question w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex justify-between items-center">
-              <span class="font-semibold text-gray-900">What is your refund policy?</span>
-              <svg class="faq-icon w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </button>
-            <div class="faq-answer hidden p-4 text-gray-700 bg-white border-l-4" style="border-color:var(
+            <div class="faq-answer hidden p-4 text-gray
