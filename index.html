@@ -83,14 +83,16 @@
     /* FIXED: Mobile responsive progress steps */
     @media (max-width: 640px) {
       .progress-steps {
-        font-size: 0.6rem;
-        margin: 0.75rem 0;
+        font-size: 0.65rem;
+        margin: 0.5rem 0;
+        gap: 0.25rem;
       }
       
       .progress-step {
         padding: 0.25rem 0.1rem !important;
         min-width: 0;
         flex: 1;
+        font-weight: 500;
       }
     }
     
@@ -632,8 +634,8 @@
   </footer>
 
   <!-- Recorder Modal -->
-  <div id="recModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[60] p-4 overflow-y-auto">
-    <div class="modal-container bg-white rounded-xl shadow-2xl flex flex-col my-4">
+  <div id="recModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[60] p-4">
+    <div class="modal-container bg-white rounded-xl shadow-2xl flex flex-col my-4 overflow-hidden">
       <div class="flex items-center justify-between p-4 border-b flex-shrink-0">
         <div class="flex items-center gap-2">
           <img src="logo.png" alt="Stories of You" class="h-6 w-auto" />
@@ -641,7 +643,7 @@
         </div>
         <button id="recClose" class="text-gray-400 hover:text-gray-600 text-2xl leading-none" aria-label="Close">&times;</button>
       </div>
-      <div class="p-5 space-y-4 overflow-y-auto flex-1">
+      <div class="p-5 space-y-4 overflow-y-auto flex-1 max-h-[calc(95vh-8rem)]">
         <!-- Identity -->
         <div class="grid md:grid-cols-2 gap-3">
           <div>
@@ -785,10 +787,10 @@
         <!-- IMPROVED: Upload progress indicator - FIXED for mobile -->
         <div id="uploadProgress" class="upload-progress hidden">
           <div class="progress-steps">
-            <div class="progress-step" id="step-uploading">Uploading</div>
-            <div class="progress-step" id="step-processing">Processing</div>
-            <div class="progress-step" id="step-generating">Generating</div>
-            <div class="progress-step" id="step-complete">Complete</div>
+            <div class="progress-step" id="step-uploading">Upload</div>
+            <div class="progress-step" id="step-processing">Process</div>
+            <div class="progress-step" id="step-generating">Generate</div>
+            <div class="progress-step" id="step-complete">Done</div>
           </div>
           <div class="text-center">
             <div class="loading-spinner"></div>
@@ -837,10 +839,8 @@
     const recModal = document.getElementById('recModal');
     function openRecorderModal() {
       recModal.classList.remove('hidden');
-      // FIXED: Prevent background scrolling on mobile
+      // FIXED: Prevent background scrolling on mobile without breaking touch events
       document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
     }
     
     ['openRecorder','openRecorderBottom','openRecorderNav','openRecorderMobile'].forEach(id=>{
@@ -1023,8 +1023,6 @@
       
       // FIXED: Restore background scrolling
       document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
       
       statusEl.textContent='Ready';
       timerEl.textContent='00:00';
