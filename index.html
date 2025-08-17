@@ -57,7 +57,7 @@
       to { transform: rotate(360deg); }
     }
     
-    /* IMPROVED: Progress indicator - FIXED: Mobile responsive */
+    /* IMPROVED: Progress indicator */
     .upload-progress {
       background: #e5e7eb;
       border-radius: 8px;
@@ -65,34 +65,19 @@
       margin: 1rem 0;
       text-align: center;
       border-left: 4px solid var(--brand-orange);
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
     }
     
     .progress-steps {
       display: flex;
       justify-content: space-between;
       margin: 1rem 0;
-      font-size: 0.75rem;
-      width: 100%;
-      max-width: 100%;
-      overflow: hidden;
+      font-size: 0.875rem;
     }
     
-    /* FIXED: Mobile responsive progress steps */
+    /* FIXED: Mobile responsive progress steps - only change needed */
     @media (max-width: 640px) {
       .progress-steps {
-        font-size: 0.65rem;
-        margin: 0.5rem 0;
-        gap: 0.25rem;
-      }
-      
-      .progress-step {
-        padding: 0.25rem 0.1rem !important;
-        min-width: 0;
-        flex: 1;
-        font-weight: 500;
+        font-size: 0.75rem;
       }
     }
     
@@ -102,9 +87,6 @@
       padding: 0.5rem;
       color: #6b7280;
       position: relative;
-      min-width: 0;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
     }
     
     .progress-step.active {
@@ -178,34 +160,6 @@
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-    
-    /* FIXED: Modal mobile responsiveness */
-    .modal-container {
-      width: 100%;
-      max-width: 32rem;
-      max-height: 95vh;
-      margin: 0.5rem;
-      overflow: hidden;
-    }
-    
-    @media (max-width: 640px) {
-      .modal-container {
-        max-width: calc(100vw - 2rem);
-        margin: 1rem;
-        max-height: calc(100vh - 2rem);
-      }
-      
-      .upload-progress {
-        padding: 0.75rem;
-        margin: 0.75rem 0;
-      }
-      
-      .progress-text {
-        font-size: 0.875rem;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-      }
     }
   </style>
 </head>
@@ -634,8 +588,8 @@
   </footer>
 
   <!-- Recorder Modal -->
-  <div id="recModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[60] p-4">
-    <div class="modal-container bg-white rounded-xl shadow-2xl flex flex-col my-4 overflow-hidden">
+  <div id="recModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[60] p-4 overflow-y-auto">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[95vh] flex flex-col my-4">
       <div class="flex items-center justify-between p-4 border-b flex-shrink-0">
         <div class="flex items-center gap-2">
           <img src="logo.png" alt="Stories of You" class="h-6 w-auto" />
@@ -643,7 +597,7 @@
         </div>
         <button id="recClose" class="text-gray-400 hover:text-gray-600 text-2xl leading-none" aria-label="Close">&times;</button>
       </div>
-      <div class="p-5 space-y-4 overflow-y-auto flex-1 max-h-[calc(95vh-8rem)]">
+      <div class="p-5 space-y-4 overflow-y-auto flex-1">
         <!-- Identity -->
         <div class="grid md:grid-cols-2 gap-3">
           <div>
@@ -784,17 +738,17 @@
           <span id="recTimer" class="text-sm font-mono text-gray-700">00:00</span>
         </div>
 
-        <!-- IMPROVED: Upload progress indicator - FIXED for mobile -->
+        <!-- IMPROVED: Upload progress indicator - FIXED: Only changed progress steps to use smaller text on mobile -->
         <div id="uploadProgress" class="upload-progress hidden">
           <div class="progress-steps">
-            <div class="progress-step" id="step-uploading">Upload</div>
-            <div class="progress-step" id="step-processing">Process</div>
-            <div class="progress-step" id="step-generating">Generate</div>
-            <div class="progress-step" id="step-complete">Done</div>
+            <div class="progress-step" id="step-uploading">Uploading</div>
+            <div class="progress-step" id="step-processing">Processing</div>
+            <div class="progress-step" id="step-generating">Generating</div>
+            <div class="progress-step" id="step-complete">Complete</div>
           </div>
           <div class="text-center">
             <div class="loading-spinner"></div>
-            <span id="uploadStatusText" class="progress-text">Preparing your story...</span>
+            <span id="uploadStatusText">Preparing your story...</span>
           </div>
           <p class="text-xs text-gray-500 text-center mt-2">This usually takes 30-60 seconds</p>
         </div>
@@ -839,7 +793,7 @@
     const recModal = document.getElementById('recModal');
     function openRecorderModal() {
       recModal.classList.remove('hidden');
-      // FIXED: Prevent background scrolling on mobile without breaking touch events
+      // FIXED: Prevent background scrolling on mobile - ONLY using overflow hidden, no position fixed
       document.body.style.overflow = 'hidden';
     }
     
@@ -1021,7 +975,7 @@
       }catch(e){}
       recModal.classList.add('hidden');
       
-      // FIXED: Restore background scrolling
+      // FIXED: Restore background scrolling - ONLY restore overflow
       document.body.style.overflow = '';
       
       statusEl.textContent='Ready';
@@ -1030,4 +984,209 @@
       btnRecord.classList.remove('hidden');
       btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
       uploadMsg.classList.add('hidden'); uploadMsg.textContent='';
-      uploadProgress
+      uploadProgress.classList.add('hidden'); // IMPROVED: Hide progress indicator
+      chunks=[]; blob=null; if(audioEl) audioEl.src='';
+      [nameEl,emailEl,promptEl].forEach(i=>{ if(i) i.value=''; });
+      if(consentEl) consentEl.checked=false;
+      photoInput.value=''; photoFile=null; photoPreviewWrap.classList.add('hidden');
+      
+      // IMPROVED: Reset button states
+      btnUpload.disabled = false;
+      btnRerec.disabled = false;
+      btnUpload.innerHTML = 'Use This Story';
+    }
+
+    async function startRecording(){
+      try{
+        mimeType = MediaRecorder.isTypeSupported('audio/mp4;codecs=aac') ? 'audio/mp4'
+                 : MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm' : '';
+        mediaStream = await navigator.mediaDevices.getUserMedia({audio:true});
+        mediaRecorder = new MediaRecorder(mediaStream, mimeType ? {mimeType} : undefined);
+        chunks=[];
+
+        audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+        const src = audioCtx.createMediaStreamSource(mediaStream);
+        analyser = audioCtx.createAnalyser(); analyser.fftSize=2048;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        src.connect(analyser); drawMeter();
+
+        mediaRecorder.ondataavailable=e=>{ if(e.data.size) chunks.push(e.data); };
+        mediaRecorder.onstart=()=>{
+          statusEl.textContent='Recording…'; startTimer();
+          btnRecord.classList.add('hidden'); btnPause.classList.remove('hidden'); btnStop.classList.remove('hidden');
+        };
+        mediaRecorder.onpause =()=>{ statusEl.textContent='Paused'; stopTimer(); };
+        mediaRecorder.onresume=()=>{ statusEl.textContent='Recording…'; startTimer(true); };
+        mediaRecorder.onstop  =()=>{
+          stopMeter(); stopTimer();
+          blob=new Blob(chunks,{type:mimeType||'audio/webm'});
+          audioEl.src=URL.createObjectURL(blob);
+          pbWrap.classList.remove('hidden');
+          btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
+          statusEl.textContent='Review your recording';
+        };
+
+        mediaRecorder.start();
+      }catch(err){
+        console.error(err);
+        statusEl.textContent='Microphone access blocked. Please allow mic.';
+      }
+    }
+    function pauseRecording(){ if(mediaRecorder && mediaRecorder.state==='recording'){ mediaRecorder.pause(); btnPause.classList.add('hidden'); btnResume.classList.remove('hidden'); } }
+    function resumeRecording(){ if(mediaRecorder && mediaRecorder.state==='paused'){ mediaRecorder.resume(); btnResume.classList.add('hidden'); btnPause.classList.remove('hidden'); } }
+    function stopRecording(){ if(mediaRecorder && (mediaRecorder.state==='recording'||mediaRecorder.state==='paused')){ mediaRecorder.stop(); mediaStream.getTracks().forEach(t=>t.stop()); } }
+
+    function drawMeter(){
+      function frame(){
+        analyser.getByteTimeDomainData(dataArray);
+        let peak=0; for(let i=0;i<dataArray.length;i++){ const v=Math.abs(dataArray[i]-128)/128; if(v>peak) peak=v; }
+        const pct=Math.min(1,peak*2);
+        mtx.clearRect(0,0,meterCv.width,meterCv.height);
+        mtx.fillStyle='#e7e3db'; mtx.fillRect(0,0,meterCv.width,meterCv.height);
+        mtx.fillStyle=pct>0.8?'#d9534f':'#3d3528';
+        mtx.fillRect(0,0,Math.max(6,Math.floor(meterCv.width*pct)),meterCv.height);
+        meterAnim=requestAnimationFrame(frame);
+      }
+      meterAnim=requestAnimationFrame(frame);
+    }
+    function stopMeter(){ if(meterAnim) cancelAnimationFrame(meterAnim); }
+    function startTimer(reset){ if(!reset) startTime=Date.now(); timerInt=setInterval(()=>{ const s=Math.floor((Date.now()-startTime)/1000); const mm=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); timerEl.textContent=`${mm}:${ss}`; },250); }
+    function stopTimer(){ if(timerInt) clearInterval(timerInt); }
+
+    function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+    function canUpload(){
+      if(!nameEl.value.trim()){ uploadMsg.textContent="Please enter your name."; uploadMsg.classList.remove('hidden'); return false; }
+      if(!isValidEmail(emailEl.value.trim())){ uploadMsg.textContent="Please enter a valid email."; uploadMsg.classList.remove('hidden'); return false; }
+      if(consentEl && !consentEl.checked){ uploadMsg.textContent="Please accept the consent box."; uploadMsg.classList.remove('hidden'); return false; }
+      return true;
+    }
+
+    // IMPROVED: Enhanced upload function with progress tracking
+    async function uploadBlob(){
+      if(!blob) return;
+      if(!canUpload()) return;
+      
+      // IMPROVED: Disable buttons and show progress
+      btnUpload.disabled = true;
+      btnRerec.disabled = true;
+      btnUpload.innerHTML = '<span class="loading-spinner"></span>Uploading...';
+      uploadMsg.classList.add('hidden');
+      uploadProgress.classList.remove('hidden');
+      
+      // IMPROVED: Update progress steps
+      function updateProgress(step, text) {
+        // Reset all steps
+        [stepUploading, stepProcessing, stepGenerating, stepComplete].forEach(s => {
+          s.classList.remove('active', 'completed');
+        });
+        
+        // Mark completed steps
+        const steps = [stepUploading, stepProcessing, stepGenerating, stepComplete];
+        const currentIndex = steps.indexOf(step);
+        
+        for (let i = 0; i < currentIndex; i++) {
+          steps[i].classList.add('completed');
+        }
+        
+        // Mark current step
+        step.classList.add('active');
+        uploadStatusText.textContent = text;
+      }
+
+      const audioType = mimeType || 'audio/webm';
+      const audioExt  = (audioType==='audio/mp4') ? 'm4a' : 'webm';
+      const audioFile = new File([blob], `story.${audioExt}`, { type: audioType });
+
+      try{
+        updateProgress(stepUploading, 'Preparing upload slot (audio)...');
+        const presignAudio = await getPresign(audioExt, audioType);
+
+        updateProgress(stepUploading, 'Uploading audio file...');
+        const audioKey = await s3FormUpload(presignAudio, audioFile);
+
+        let photoKey = null;
+        if(photoFile){
+          const pType = photoFile.type || 'image/jpeg';
+          const pExt = pType.endsWith('png') ? 'png' : pType.endsWith('webp') ? 'webp' : 'jpg';
+          updateProgress(stepUploading, 'Uploading photo...');
+          const presignPhoto = await getPresign(pExt, pType);
+          photoKey = await s3FormUpload(presignPhoto, photoFile);
+        }
+
+        updateProgress(stepProcessing, 'Processing your story...');
+
+        if(METADATA_WEBHOOK){
+          const meta = {
+            name: nameEl.value.trim(),
+            email: emailEl.value.trim(),
+            prompt: promptEl.value || '',
+            audio_key: audioKey,
+            photo_key: photoKey,
+            recorded_at: new Date().toISOString(),
+            user_agent: navigator.userAgent
+          };
+          
+          updateProgress(stepGenerating, 'Creating your story page...');
+          
+          const res = await fetch(METADATA_WEBHOOK, {
+            method:'POST',
+            headers:{ 'content-type':'application/json' },
+            body: JSON.stringify(meta)
+          });
+          
+          if(!res.ok){
+            throw new Error('Processing failed: ' + res.status);
+          } else {
+            updateProgress(stepComplete, 'Story created successfully!');
+            uploadStatusText.textContent = 'Your story is being processed and will be emailed to you shortly.';
+            
+            // IMPROVED: Success state
+            setTimeout(() => {
+              uploadProgress.classList.add('hidden');
+              uploadMsg.classList.remove('hidden');
+              uploadMsg.innerHTML = '✅ <strong>Success!</strong> Your story has been submitted and will be emailed to you once processed.';
+              uploadMsg.style.color = '#059669';
+              uploadMsg.style.background = '#d1fae5';
+              uploadMsg.style.padding = '1rem';
+              uploadMsg.style.borderRadius = '8px';
+              uploadMsg.style.border = '1px solid #a7f3d0';
+            }, 1500);
+          }
+        }
+
+        setTimeout(()=>resetAndClose(),4000);
+      }catch(e){
+        console.error(e);
+        
+        // IMPROVED: Error state
+        uploadProgress.classList.add('hidden');
+        uploadMsg.classList.remove('hidden');
+        uploadMsg.innerHTML = `⚠ <strong>Upload failed:</strong> ${e?.message || 'Please try again.'}`;
+        uploadMsg.style.color = '#dc2626';
+        uploadMsg.style.background = '#fee2e2';
+        uploadMsg.style.padding = '1rem';
+        uploadMsg.style.borderRadius = '8px';
+        uploadMsg.style.border = '1px solid #fecaca';
+        
+        // IMPROVED: Re-enable buttons on error
+        btnUpload.disabled = false;
+        btnRerec.disabled = false;
+        btnUpload.innerHTML = 'Use This Story';
+      }
+    }
+
+    btnRecord.addEventListener('click',startRecording);
+    btnPause .addEventListener('click',pauseRecording);
+    btnResume.addEventListener('click',resumeRecording);
+    btnStop  .addEventListener('click',stopRecording);
+    btnRerec.addEventListener('click',()=>{
+      pbWrap.classList.add('hidden'); statusEl.textContent='Ready'; timerEl.textContent='00:00';
+      chunks=[]; blob=null; audioEl.src=''; btnRecord.classList.remove('hidden');
+      uploadMsg.classList.add('hidden'); uploadProgress.classList.add('hidden'); // IMPROVED: Reset states
+      btnUpload.disabled = false; btnRerec.disabled = false; btnUpload.innerHTML = 'Use This Story';
+    });
+    btnUpload.addEventListener('click',uploadBlob);
+  })();
+  </script>
+</body>
+</html>
