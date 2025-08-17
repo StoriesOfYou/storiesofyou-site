@@ -581,8 +581,8 @@
   </footer>
 
   <!-- Recorder Modal -->
-  <div id="recModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[60] p-4">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[95vh] flex flex-col">
+  <div id="recModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[60] p-4 overflow-y-auto">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[95vh] flex flex-col my-4">
       <div class="flex items-center justify-between p-4 border-b flex-shrink-0">
         <div class="flex items-center gap-2">
           <img src="logo.png" alt="Stories of You" class="h-6 w-auto" />
@@ -784,8 +784,17 @@
 
     // Open recorder
     const recModal = document.getElementById('recModal');
+    function openRecorderModal() {
+      recModal.classList.remove('hidden');
+      // FIXED: Prevent background scrolling on mobile
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    }
+    
     ['openRecorder','openRecorderBottom','openRecorderNav','openRecorderMobile'].forEach(id=>{
-      const el=document.getElementById(id); if(el){el.addEventListener('click',()=>recModal.classList.remove('hidden'));}
+      const el=document.getElementById(id); 
+      if(el){el.addEventListener('click', openRecorderModal);}
     });
 
     // Mobile menu toggle
@@ -960,6 +969,12 @@
         if(timerInt) clearInterval(timerInt);
       }catch(e){}
       recModal.classList.add('hidden');
+      
+      // FIXED: Restore background scrolling
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      
       statusEl.textContent='Ready';
       timerEl.textContent='00:00';
       pbWrap.classList.add('hidden');
