@@ -763,8 +763,9 @@
     // Open recorder
     const recModal = document.getElementById('recModal');
     function openRecorderModal() {
+      console.log('Opening recorder modal');
       recModal.classList.remove('hidden');
-      recModal.classList.add('flex'); // Make sure it displays
+      recModal.classList.add('flex');
       document.body.style.overflow = 'hidden';
     }
     
@@ -773,8 +774,11 @@
       if(el){
         el.addEventListener('click', (e) => {
           e.preventDefault();
+          console.log('Record button clicked:', id);
           openRecorderModal();
         });
+      } else {
+        console.log('Button not found:', id);
       }
     });
 
@@ -934,14 +938,6 @@
     }
 
     closeRec.addEventListener('click', resetAndClose);
-    
-    // Also close when clicking outside modal
-    recModal.addEventListener('click', (e) => {
-      if (e.target === recModal) {
-        resetAndClose();
-      }
-    });
-    
     function resetAndClose(){
       try{
         if(mediaRecorder && mediaRecorder.state!=='inactive') mediaRecorder.stop();
@@ -961,7 +957,7 @@
       btnRecord.classList.remove('hidden');
       btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
       uploadMsg.classList.add('hidden'); uploadMsg.textContent='';
-      successMessage.classList.add('hidden');
+      uploadProgress.classList.add('hidden');
       chunks=[]; blob=null; if(audioEl) audioEl.src='';
       [nameEl,emailEl,promptEl].forEach(i=>{ if(i) i.value=''; });
       if(consentEl) consentEl.checked=false;
@@ -1131,7 +1127,11 @@
       }
     }
 
-    btnRecord.addEventListener('click',startRecording);
+    btnRecord.addEventListener('click',(e) => {
+      e.preventDefault();
+      console.log('Record button in modal clicked');
+      startRecording();
+    });
     btnPause .addEventListener('click',pauseRecording);
     btnResume.addEventListener('click',resumeRecording);
     btnStop  .addEventListener('click',stopRecording);
