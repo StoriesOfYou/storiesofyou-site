@@ -764,12 +764,18 @@
     const recModal = document.getElementById('recModal');
     function openRecorderModal() {
       recModal.classList.remove('hidden');
+      recModal.classList.add('flex'); // Make sure it displays
       document.body.style.overflow = 'hidden';
     }
     
     ['openRecorder','openRecorderBottom','openRecorderNav','openRecorderMobile'].forEach(id=>{
       const el=document.getElementById(id); 
-      if(el){el.addEventListener('click', openRecorderModal);}
+      if(el){
+        el.addEventListener('click', (e) => {
+          e.preventDefault();
+          openRecorderModal();
+        });
+      }
     });
 
     // Mobile menu toggle
@@ -928,6 +934,14 @@
     }
 
     closeRec.addEventListener('click', resetAndClose);
+    
+    // Also close when clicking outside modal
+    recModal.addEventListener('click', (e) => {
+      if (e.target === recModal) {
+        resetAndClose();
+      }
+    });
+    
     function resetAndClose(){
       try{
         if(mediaRecorder && mediaRecorder.state!=='inactive') mediaRecorder.stop();
@@ -936,7 +950,9 @@
         if(meterAnim) cancelAnimationFrame(meterAnim);
         if(timerInt) clearInterval(timerInt);
       }catch(e){}
+      
       recModal.classList.add('hidden');
+      recModal.classList.remove('flex');
       document.body.style.overflow = '';
       
       statusEl.textContent='Ready';
