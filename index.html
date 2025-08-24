@@ -973,27 +973,48 @@
     }
 
     async function startRecording(){
+      console.log('Starting recording...'); // Debug log
+      
       try{
+        // Check if browser supports getUserMedia
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          statusEl.textContent = 'Recording not supported in this browser';
+          return;
+        }
+        
         mimeType = MediaRecorder.isTypeSupported('audio/mp4;codecs=aac') ? 'audio/mp4'
                  : MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm' : '';
+                 
+        console.log('Requesting microphone access...'); // Debug log
         mediaStream = await navigator.mediaDevices.getUserMedia({audio:true});
+        console.log('Microphone access granted'); // Debug log
+        
         mediaRecorder = new MediaRecorder(mediaStream, mimeType ? {mimeType} : undefined);
         chunks=[];
 
-        audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-        const src = audioCtx.createMediaStreamSource(mediaStream);
-        analyser = audioCtx.createAnalyser(); analyser.fftSize=2048;
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-        src.connect(analyser); drawMeter();
+        // Set up audio context for meter
+        try {
+          audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+          const src = audioCtx.createMediaStreamSource(mediaStream);
+          analyser = audioCtx.createAnalyser(); 
+          analyser.fftSize=2048;
+          dataArray = new Uint8Array(analyser.frequencyBinCount);
+          src.connect(analyser); 
+          drawMeter();
+        } catch(audioError) {
+          console.log('Audio visualization failed, continuing without meter:', audioError);
+        }
 
         mediaRecorder.ondataavailable=e=>{ if(e.data.size) chunks.push(e.data); };
         mediaRecorder.onstart=()=>{
+          console.log('Recording started'); // Debug log
           statusEl.textContent='Recording…'; startTimer();
           btnRecord.classList.add('hidden'); btnPause.classList.remove('hidden'); btnStop.classList.remove('hidden');
         };
         mediaRecorder.onpause =()=>{ statusEl.textContent='Paused'; stopTimer(); };
         mediaRecorder.onresume=()=>{ statusEl.textContent='Recording…'; startTimer(true); };
         mediaRecorder.onstop  =()=>{
+          console.log('Recording stopped'); // Debug log
           stopMeter(); stopTimer();
           blob=new Blob(chunks,{type:mimeType||'audio/webm'});
           audioEl.src=URL.createObjectURL(blob);
@@ -1004,8 +1025,14 @@
 
         mediaRecorder.start();
       }catch(err){
-        console.error(err);
-        statusEl.textContent='Microphone access blocked. Please allow mic.';
+        console.error('Recording error:', err);
+        if(err.name === 'NotAllowedError') {
+          statusEl.textContent='Please allow microphone access and try again';
+        } else if(err.name === 'NotFoundError') {
+          statusEl.textContent='No microphone found';
+        } else {
+          statusEl.textContent='Recording failed: ' + err.message;
+        }
       }
     }
     function pauseRecording(){ if(mediaRecorder && mediaRecorder.state==='recording'){ mediaRecorder.pause(); btnPause.classList.add('hidden'); btnResume.classList.remove('hidden'); } }
@@ -1131,21 +1158,55 @@
       }
     }
 
-    btnRecord.addEventListener('click',startRecording);
-    btnPause .addEventListener('click',pauseRecording);
-    btnResume.addEventListener('click',resumeRecording);
-    btnStop  .addEventListener('click',stopRecording);
-    btnRerec.addEventListener('click',()=>{
-      pbWrap.classList.add('hidden'); 
-      statusEl.textContent='Ready'; 
-      timerEl.textContent='00:00';
-      chunks=[]; blob=null; audioEl.src=''; 
-      btnRecord.classList.remove('hidden');
-      uploadMsg.classList.add('hidden'); 
-      successMessage.classList.add('hidden');
-      btnUpload.disabled = false; 
-      btnRerec.disabled = false; 
-      btnUpload.innerHTML = 'Use This Story';
-    });
-    btnUpload.addEventListener('click',uploadBlob);
+    // Add event listeners with error handling
+    if(btnRecord) {
+      btnRecord.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Record button clicked'); // Debug log
+        startRecording();
+      });
+    }
+    
+    if(btnPause) {
+      btnPause.addEventListener('click', (e) => {
+        e.preventDefault();
+        pauseRecording();
+      });
+    }
+    
+    if(btnResume) {
+      btnResume.addEventListener('click', (e) => {
+        e.preventDefault();
+        resumeRecording();
+      });
+    }
+    
+    if(btnStop) {
+      btnStop.addEventListener('click', (e) => {
+        e.preventDefault();
+        stopRecording();
+      });
+    }
+    if(btnRerec) {
+      btnRerec.addEventListener('click', (e) => {
+        e.preventDefault();
+        pbWrap.classList.add('hidden'); 
+        statusEl.textContent='Ready'; 
+        timerEl.textContent='00:00';
+        chunks=[]; blob=null; audioEl.src=''; 
+        btnRecord.classList.remove('hidden');
+        uploadMsg.classList.add('hidden'); 
+        successMessage.classList.add('hidden');
+        btnUpload.disabled = false; 
+        btnRerec.disabled = false; 
+        btnUpload.innerHTML = 'Use This Story';
+      });
+    }
+    
+    if(btnUpload) {
+      btnUpload.addEventListener('click', (e) => {
+        e.preventDefault();
+        uploadBlob();
+      });
+    }
   })();
