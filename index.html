@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Stories of You</title>
   <meta name="description" content="Your voice, your story — preserved forever. Capture your memories in your own words with Stories of You." />
   <link rel="icon" href="favicon.ico" />
@@ -74,7 +74,7 @@
       font-size: 0.875rem;
     }
     
-    /* FIXED: Mobile responsive progress steps - only change needed */
+    /* FIXED: Mobile responsive progress steps */
     @media (max-width: 640px) {
       .progress-steps {
         font-size: 0.75rem;
@@ -160,6 +160,77 @@
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* iPad-specific fixes for the duplication issue */
+    @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+      /* Fix the sticky header backdrop-filter issue on iPad */
+      .site-header {
+        position: fixed !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(255,255,255,0.95) !important;
+        z-index: 50 !important;
+      }
+      
+      /* Add body padding to compensate for fixed header */
+      body {
+        padding-top: 64px;
+      }
+      
+      /* Prevent transform issues that can cause duplication */
+      .reveal {
+        transform: translateY(0) !important;
+        opacity: 1 !important;
+      }
+      
+      /* Fix modal rendering on iPad */
+      #recModal {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+      }
+      
+      /* Ensure video doesn't cause layout issues */
+      .video-viewport {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+      }
+      
+      /* Fix any potential overflow issues */
+      html, body {
+        -webkit-overflow-scrolling: touch;
+        overflow-x: hidden;
+      }
+    }
+
+    /* Additional Safari-specific fixes */
+    @supports (-webkit-touch-callout: none) {
+      @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+        .site-header {
+          position: fixed !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+          background: rgba(255,255,255,0.95) !important;
+        }
+        
+        /* Prevent any GPU acceleration issues */
+        .hero-bg, .bg-warm-light, .bg-warm-mid {
+          -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+        }
+      }
+    }
+
+    /* Specific fix for iPad in landscape mode */
+    @media only screen 
+      and (min-device-width: 768px) 
+      and (max-device-width: 1024px) 
+      and (orientation: landscape) {
+      .site-header {
+        position: fixed !important;
+        backdrop-filter: none !important;
+        background: rgba(255,255,255,0.95) !important;
+      }
     }
   </style>
 </head>
@@ -738,7 +809,7 @@
           <span id="recTimer" class="text-sm font-mono text-gray-700">00:00</span>
         </div>
 
-        <!-- IMPROVED: Upload progress indicator - FIXED: Only changed progress steps to use smaller text on mobile -->
+        <!-- Upload progress indicator -->
         <div id="uploadProgress" class="upload-progress hidden">
           <div class="progress-steps">
             <div class="progress-step" id="step-uploading">Uploading</div>
@@ -766,7 +837,7 @@
           <button id="btnStop"   class="btn-secondary px-4 py-2 rounded-lg hidden">Stop</button>
         </div>
 
-        <!-- IMPROVED: Playback with better button order -->
+        <!-- Playback with better button order -->
         <div id="playbackWrap" class="hidden space-y-3">
           <audio id="recAudio" controls class="w-full"></audio>
           <div class="flex items-center justify-between gap-3">
@@ -793,7 +864,6 @@
     const recModal = document.getElementById('recModal');
     function openRecorderModal() {
       recModal.classList.remove('hidden');
-      // FIXED: Prevent background scrolling on mobile - ONLY using overflow hidden, no position fixed
       document.body.style.overflow = 'hidden';
     }
     
@@ -886,7 +956,6 @@
     const btnUpload=document.getElementById('btnUpload');
     const uploadMsg=document.getElementById('uploadMsg');
     
-    // IMPROVED: Upload progress elements
     const uploadProgress = document.getElementById('uploadProgress');
     const uploadStatusText = document.getElementById('uploadStatusText');
     const stepUploading = document.getElementById('step-uploading');
@@ -975,7 +1044,6 @@
       }catch(e){}
       recModal.classList.add('hidden');
       
-      // FIXED: Restore background scrolling - ONLY restore overflow
       document.body.style.overflow = '';
       
       statusEl.textContent='Ready';
@@ -984,13 +1052,12 @@
       btnRecord.classList.remove('hidden');
       btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
       uploadMsg.classList.add('hidden'); uploadMsg.textContent='';
-      uploadProgress.classList.add('hidden'); // IMPROVED: Hide progress indicator
+      uploadProgress.classList.add('hidden');
       chunks=[]; blob=null; if(audioEl) audioEl.src='';
       [nameEl,emailEl,promptEl].forEach(i=>{ if(i) i.value=''; });
       if(consentEl) consentEl.checked=false;
       photoInput.value=''; photoFile=null; photoPreviewWrap.classList.add('hidden');
       
-      // IMPROVED: Reset button states
       btnUpload.disabled = false;
       btnRerec.disabled = false;
       btnUpload.innerHTML = 'Use This Story';
@@ -1061,26 +1128,21 @@
       return true;
     }
 
-    // IMPROVED: Enhanced upload function with progress tracking
     async function uploadBlob(){
       if(!blob) return;
       if(!canUpload()) return;
       
-      // IMPROVED: Disable buttons and show progress
       btnUpload.disabled = true;
       btnRerec.disabled = true;
       btnUpload.innerHTML = '<span class="loading-spinner"></span>Uploading...';
       uploadMsg.classList.add('hidden');
       uploadProgress.classList.remove('hidden');
       
-      // IMPROVED: Update progress steps
       function updateProgress(step, text) {
-        // Reset all steps
         [stepUploading, stepProcessing, stepGenerating, stepComplete].forEach(s => {
           s.classList.remove('active', 'completed');
         });
         
-        // Mark completed steps
         const steps = [stepUploading, stepProcessing, stepGenerating, stepComplete];
         const currentIndex = steps.indexOf(step);
         
@@ -1088,7 +1150,6 @@
           steps[i].classList.add('completed');
         }
         
-        // Mark current step
         step.classList.add('active');
         uploadStatusText.textContent = text;
       }
@@ -1140,7 +1201,6 @@
             updateProgress(stepComplete, 'Story created successfully!');
             uploadStatusText.textContent = 'Your story is being processed and will be emailed to you shortly.';
             
-            // IMPROVED: Success state
             setTimeout(() => {
               uploadProgress.classList.add('hidden');
               uploadMsg.classList.remove('hidden');
@@ -1158,7 +1218,6 @@
       }catch(e){
         console.error(e);
         
-        // IMPROVED: Error state
         uploadProgress.classList.add('hidden');
         uploadMsg.classList.remove('hidden');
         uploadMsg.innerHTML = `⚠ <strong>Upload failed:</strong> ${e?.message || 'Please try again.'}`;
@@ -1168,7 +1227,6 @@
         uploadMsg.style.borderRadius = '8px';
         uploadMsg.style.border = '1px solid #fecaca';
         
-        // IMPROVED: Re-enable buttons on error
         btnUpload.disabled = false;
         btnRerec.disabled = false;
         btnUpload.innerHTML = 'Use This Story';
@@ -1182,7 +1240,7 @@
     btnRerec.addEventListener('click',()=>{
       pbWrap.classList.add('hidden'); statusEl.textContent='Ready'; timerEl.textContent='00:00';
       chunks=[]; blob=null; audioEl.src=''; btnRecord.classList.remove('hidden');
-      uploadMsg.classList.add('hidden'); uploadProgress.classList.add('hidden'); // IMPROVED: Reset states
+      uploadMsg.classList.add('hidden'); uploadProgress.classList.add('hidden');
       btnUpload.disabled = false; btnRerec.disabled = false; btnUpload.innerHTML = 'Use This Story';
     });
     btnUpload.addEventListener('click',uploadBlob);
