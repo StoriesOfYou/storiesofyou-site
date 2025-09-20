@@ -15,6 +15,10 @@
   <meta name="twitter:title" content="Stories of You" />
   <meta name="twitter:description" content="Your voice, your story — preserved forever." />
   <meta name="twitter:image" content="https://storiesofyou.ai/og-image.jpg" />
+  
+  <!-- iOS MediaRecorder Polyfill -->
+  <script src="https://cdn.jsdelivr.net/npm/audio-recorder-polyfill@0.4.1/index.js"></script>
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root{
@@ -32,14 +36,43 @@
     .video-viewport video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0;display:block}
     .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
     .reveal.visible{opacity:1;transform:none}
-    .btn-primary{background-color:var(--brand-charcoal);color:#fff;transition:all 0.3s ease;position:relative;overflow:hidden}
+    .btn-primary{background-color:var(--brand-charcoal);color:#fff;transition:all 0.3s ease;position:relative;overflow:hidden;min-height:44px;-webkit-tap-highlight-color:transparent;-webkit-appearance:none;user-select:none}
     .btn-primary:hover{background-color:#5a4d3a;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}
     .btn-primary:disabled{background-color:#9ca3af;cursor:not-allowed;transform:none;box-shadow:none}
-    .btn-secondary{background:#fff;color:var(--brand-charcoal);border:2px solid var(--brand-charcoal);transition:all 0.3s ease}
+    .btn-secondary{background:#fff;color:var(--brand-charcoal);border:2px solid var(--brand-charcoal);transition:all 0.3s ease;min-height:44px;-webkit-tap-highlight-color:transparent;-webkit-appearance:none;user-select:none}
     .btn-secondary:hover{background:#f7f2eb;transform:translateY(-1px)}
     .btn-secondary:disabled{background:#f9fafb;color:#9ca3af;border-color:#d1d5db;cursor:not-allowed;transform:none}
     .icon{width:52px;height:52px;display:inline-block;color:var(--brand-navy)}
     .icon-accent{color:var(--brand-orange)}
+    
+    /* iOS-compatible modal handling */
+    .modal-open {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      height: 100vh !important;
+      overflow: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+    
+    /* Enhanced modal container for iOS */
+    #recModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Prevent zoom on form inputs (iOS) */
+    input[type="text"], input[type="email"], select {
+      font-size: 16px !important;
+      -webkit-appearance: none;
+    }
     
     /* IMPROVED: Loading spinner */
     .loading-spinner {
@@ -802,6 +835,11 @@
     const recModal = document.getElementById('recModal');
     function openRecorderModal() {
       recModal.classList.remove('hidden');
+      // Enhanced iOS modal handling
+      document.body.classList.add('modal-open');
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
       document.body.style.overflow = 'hidden';
     }
     
@@ -867,6 +905,12 @@
 
   <script>
   (function(){
+    // Apply MediaRecorder polyfill for iOS Safari
+    if (!window.MediaRecorder && window.AudioRecorderPolyfill) {
+      window.MediaRecorder = window.AudioRecorderPolyfill.MediaRecorder;
+      console.log('Applied MediaRecorder polyfill for iOS compatibility');
+    }
+
     const INVOKE_URL = "https://6117txq5ok.execute-api.us-east-2.amazonaws.com";
     const METADATA_WEBHOOK = "https://mikelandin.app.n8n.cloud/webhook/storiesofyou-submit";
 
@@ -905,6 +949,27 @@
     let audioCtx, analyser, dataArray, meterAnim;
     let startTime, timerInt, blob, mimeType;
     let photoFile=null;
+
+    // Detect browser capabilities and show helpful messages
+    function detectCapabilities() {
+      const hasMediaRecorder = !!window.MediaRecorder;
+      const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+      
+      console.log('Browser capabilities:', {
+        MediaRecorder: hasMediaRecorder,
+        getUserMedia: hasGetUserMedia,
+        userAgent: navigator.userAgent,
+        polyfillApplied: window.MediaRecorder && window.MediaRecorder.toString().includes('polyfill')
+      });
+      
+      if (!hasMediaRecorder || !hasGetUserMedia) {
+        statusEl.textContent = 'Recording not supported on this device. Please try Safari or Chrome.';
+        btnRecord.disabled = true;
+      }
+    }
+
+    // Initialize capabilities detection
+    detectCapabilities();
 
     async function getPresign(ext, type){
       const qs = new URLSearchParams({ ext, type });
@@ -958,231 +1023,267 @@
           const scale = Math.min(1, maxDim/Math.max(w,h));
           const cw = Math.round(w*scale), ch = Math.round(h*scale);
           const canvas = document.createElement('canvas');
-          canvas.width = cw; canvas.height = ch;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img,0,0,cw,ch);
-          canvas.toBlob(b=>{
-            if(!b) return reject(new Error('toBlob failed'));
-            resolve(new File([b], 'photo.jpg', {type:'image/jpeg'}));
-          }, 'image/jpeg', quality);
-        };
-        img.onerror = reject;
-        img.src = URL.createObjectURL(file);
+        canvas.width = cw; canvas.height = ch;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img,0,0,cw,ch);
+        canvas.toBlob(b=>{
+          if(!b) return reject(new Error('toBlob failed'));
+          resolve(new File([b], 'photo.jpg', {type:'image/jpeg'}));
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  closeRec.addEventListener('click', resetAndClose);
+  function resetAndClose(){
+    try{
+      if(mediaRecorder && mediaRecorder.state!=='inactive') mediaRecorder.stop();
+      if(mediaStream) mediaStream.getTracks().forEach(t=>t.stop());
+      if(audioCtx) audioCtx.close();
+      if(meterAnim) cancelAnimationFrame(meterAnim);
+      if(timerInt) clearInterval(timerInt);
+    }catch(e){}
+    recModal.classList.add('hidden');
+    
+    // Restore iOS scrolling properly
+    document.body.classList.remove('modal-open');
+    document.body.style.position = '';
+    document.body.style.width = '';
+    document.body.style.height = '';
+    document.body.style.overflow = '';
+    
+    statusEl.textContent='Ready';
+    timerEl.textContent='00:00';
+    pbWrap.classList.add('hidden');
+    btnRecord.classList.remove('hidden');
+    btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
+    uploadMsg.classList.add('hidden'); uploadMsg.textContent='';
+    uploadProgress.classList.add('hidden');
+    chunks=[]; blob=null; if(audioEl) audioEl.src='';
+    [nameEl,emailEl,promptEl].forEach(i=>{ if(i) i.value=''; });
+    if(consentEl) consentEl.checked=false;
+    photoInput.value=''; photoFile=null; photoPreviewWrap.classList.add('hidden');
+    
+    btnUpload.disabled = false;
+    btnRerec.disabled = false;
+    btnUpload.innerHTML = 'Use This Story';
+  }
+
+  async function startRecording(){
+    try{
+      // iOS-friendly constraints
+      const constraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+          // Don't specify sampleRate or other iOS-problematic constraints
+        }
+      };
+      
+      mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      // iOS-compatible MIME type detection
+      let mimeType = '';
+      if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        mimeType = 'audio/mp4';
+      } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+        mimeType = 'audio/webm';
+      } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+        mimeType = 'audio/wav';
+      }
+      
+      const options = mimeType ? { mimeType } : {};
+      mediaRecorder = new MediaRecorder(mediaStream, options);
+      chunks=[];
+
+      // Create AudioContext for visualization (iOS compatible)
+      try {
+        audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+        const src = audioCtx.createMediaStreamSource(mediaStream);
+        analyser = audioCtx.createAnalyser(); 
+        analyser.fftSize=2048;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        src.connect(analyser); 
+        drawMeter();
+      } catch (audioCtxError) {
+        console.warn('AudioContext failed (expected on some iOS versions):', audioCtxError);
+        // Continue without visualization
+      }
+
+      mediaRecorder.ondataavailable=e=>{ if(e.data.size) chunks.push(e.data); };
+      mediaRecorder.onstart=()=>{
+        statusEl.textContent='Recording…'; startTimer();
+        btnRecord.classList.add('hidden'); btnPause.classList.remove('hidden'); btnStop.classList.remove('hidden');
+      };
+      mediaRecorder.onpause =()=>{ statusEl.textContent='Paused'; stopTimer(); };
+      mediaRecorder.onresume=()=>{ statusEl.textContent='Recording…'; startTimer(true); };
+      mediaRecorder.onstop  =()=>{
+        stopMeter(); stopTimer();
+        blob=new Blob(chunks,{type:mimeType||'audio/webm'});
+        audioEl.src=URL.createObjectURL(blob);
+        pbWrap.classList.remove('hidden');
+        btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
+        statusEl.textContent='Review your recording';
+      };
+
+      mediaRecorder.start();
+    }catch(err){
+      console.error('Recording failed:', err);
+      statusEl.textContent = `Recording failed: ${err.message}. Please allow microphone access and try again.`;
+    }
+  }
+  
+  function pauseRecording(){ if(mediaRecorder && mediaRecorder.state==='recording'){ mediaRecorder.pause(); btnPause.classList.add('hidden'); btnResume.classList.remove('hidden'); } }
+  function resumeRecording(){ if(mediaRecorder && mediaRecorder.state==='paused'){ mediaRecorder.resume(); btnResume.classList.add('hidden'); btnPause.classList.remove('hidden'); } }
+  function stopRecording(){ if(mediaRecorder && (mediaRecorder.state==='recording'||mediaRecorder.state==='paused')){ mediaRecorder.stop(); mediaStream.getTracks().forEach(t=>t.stop()); } }
+
+  function drawMeter(){
+    if (!analyser || !dataArray) return; // Skip if AudioContext failed
+    
+    function frame(){
+      analyser.getByteTimeDomainData(dataArray);
+      let peak=0; for(let i=0;i<dataArray.length;i++){ const v=Math.abs(dataArray[i]-128)/128; if(v>peak) peak=v; }
+      const pct=Math.min(1,peak*2);
+      mtx.clearRect(0,0,meterCv.width,meterCv.height);
+      mtx.fillStyle='#e7e3db'; mtx.fillRect(0,0,meterCv.width,meterCv.height);
+      mtx.fillStyle=pct>0.8?'#d9534f':'#3d3528';
+      mtx.fillRect(0,0,Math.max(6,Math.floor(meterCv.width*pct)),meterCv.height);
+      meterAnim=requestAnimationFrame(frame);
+    }
+    meterAnim=requestAnimationFrame(frame);
+  }
+  function stopMeter(){ if(meterAnim) cancelAnimationFrame(meterAnim); }
+  function startTimer(reset){ if(!reset) startTime=Date.now(); timerInt=setInterval(()=>{ const s=Math.floor((Date.now()-startTime)/1000); const mm=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); timerEl.textContent=`${mm}:${ss}`; },250); }
+  function stopTimer(){ if(timerInt) clearInterval(timerInt); }
+
+  function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function canUpload(){
+    if(!nameEl.value.trim()){ uploadMsg.textContent="Please enter your name."; uploadMsg.classList.remove('hidden'); return false; }
+    if(!isValidEmail(emailEl.value.trim())){ uploadMsg.textContent="Please enter a valid email."; uploadMsg.classList.remove('hidden'); return false; }
+    if(consentEl && !consentEl.checked){ uploadMsg.textContent="Please accept the consent box."; uploadMsg.classList.remove('hidden'); return false; }
+    return true;
+  }
+
+  async function uploadBlob(){
+    if(!blob) return;
+    if(!canUpload()) return;
+    
+    btnUpload.disabled = true;
+    btnRerec.disabled = true;
+    btnUpload.innerHTML = '<span class="loading-spinner"></span>Uploading...';
+    uploadMsg.classList.add('hidden');
+    uploadProgress.classList.remove('hidden');
+    
+    function updateProgress(step, text) {
+      [stepUploading, stepProcessing, stepGenerating, stepComplete].forEach(s => {
+        s.classList.remove('active', 'completed');
       });
+      
+      const steps = [stepUploading, stepProcessing, stepGenerating, stepComplete];
+      const currentIndex = steps.indexOf(step);
+      
+      for (let i = 0; i < currentIndex; i++) {
+        steps[i].classList.add('completed');
+      }
+      
+      step.classList.add('active');
+      uploadStatusText.textContent = text;
     }
 
-    closeRec.addEventListener('click', resetAndClose);
-    function resetAndClose(){
-      try{
-        if(mediaRecorder && mediaRecorder.state!=='inactive') mediaRecorder.stop();
-        if(mediaStream) mediaStream.getTracks().forEach(t=>t.stop());
-        if(audioCtx) audioCtx.close();
-        if(meterAnim) cancelAnimationFrame(meterAnim);
-        if(timerInt) clearInterval(timerInt);
-      }catch(e){}
-      recModal.classList.add('hidden');
+    const audioType = mimeType || 'audio/webm';
+    const audioExt  = (audioType==='audio/mp4') ? 'm4a' : 'webm';
+    const audioFile = new File([blob], `story.${audioExt}`, { type: audioType });
+
+    try{
+      updateProgress(stepUploading, 'Preparing upload slot (audio)...');
+      const presignAudio = await getPresign(audioExt, audioType);
+
+      updateProgress(stepUploading, 'Uploading audio file...');
+      const audioKey = await s3FormUpload(presignAudio, audioFile);
+
+      let photoKey = null;
+      if(photoFile){
+        const pType = photoFile.type || 'image/jpeg';
+        const pExt = pType.endsWith('png') ? 'png' : pType.endsWith('webp') ? 'webp' : 'jpg';
+        updateProgress(stepUploading, 'Uploading photo...');
+        const presignPhoto = await getPresign(pExt, pType);
+        photoKey = await s3FormUpload(presignPhoto, photoFile);
+      }
+
+      updateProgress(stepProcessing, 'Processing your story...');
+
+      if(METADATA_WEBHOOK){
+        const meta = {
+          name: nameEl.value.trim(),
+          email: emailEl.value.trim(),
+          prompt: promptEl.value || '',
+          audio_key: audioKey,
+          photo_key: photoKey,
+          recorded_at: new Date().toISOString(),
+          user_agent: navigator.userAgent
+        };
+        
+        updateProgress(stepGenerating, 'Creating your story page...');
+        
+        const res = await fetch(METADATA_WEBHOOK, {
+          method:'POST',
+          headers:{ 'content-type':'application/json' },
+          body: JSON.stringify(meta)
+        });
+        
+        if(!res.ok){
+          throw new Error('Processing failed: ' + res.status);
+        } else {
+          updateProgress(stepComplete, 'Story created successfully!');
+          uploadStatusText.textContent = 'Your story is being processed and will be emailed to you shortly.';
+          
+          setTimeout(() => {
+            uploadProgress.classList.add('hidden');
+            uploadMsg.classList.remove('hidden');
+            uploadMsg.innerHTML = '✅ <strong>Success!</strong> Your story has been submitted and will be emailed to you once processed.';
+            uploadMsg.style.color = '#059669';
+            uploadMsg.style.background = '#d1fae5';
+            uploadMsg.style.padding = '1rem';
+            uploadMsg.style.borderRadius = '8px';
+            uploadMsg.style.border = '1px solid #a7f3d0';
+          }, 1500);
+        }
+      }
+
+      setTimeout(()=>resetAndClose(),4000);
+    }catch(e){
+      console.error(e);
       
-      document.body.style.overflow = '';
-      
-      statusEl.textContent='Ready';
-      timerEl.textContent='00:00';
-      pbWrap.classList.add('hidden');
-      btnRecord.classList.remove('hidden');
-      btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
-      uploadMsg.classList.add('hidden'); uploadMsg.textContent='';
       uploadProgress.classList.add('hidden');
-      chunks=[]; blob=null; if(audioEl) audioEl.src='';
-      [nameEl,emailEl,promptEl].forEach(i=>{ if(i) i.value=''; });
-      if(consentEl) consentEl.checked=false;
-      photoInput.value=''; photoFile=null; photoPreviewWrap.classList.add('hidden');
+      uploadMsg.classList.remove('hidden');
+      uploadMsg.innerHTML = `⚠ <strong>Upload failed:</strong> ${e?.message || 'Please try again.'}`;
+      uploadMsg.style.color = '#dc2626';
+      uploadMsg.style.background = '#fee2e2';
+      uploadMsg.style.padding = '1rem';
+      uploadMsg.style.borderRadius = '8px';
+      uploadMsg.style.border = '1px solid #fecaca';
       
       btnUpload.disabled = false;
       btnRerec.disabled = false;
       btnUpload.innerHTML = 'Use This Story';
     }
+  }
 
-    async function startRecording(){
-      try{
-        mimeType = MediaRecorder.isTypeSupported('audio/mp4;codecs=aac') ? 'audio/mp4'
-                 : MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm' : '';
-        mediaStream = await navigator.mediaDevices.getUserMedia({audio:true});
-        mediaRecorder = new MediaRecorder(mediaStream, mimeType ? {mimeType} : undefined);
-        chunks=[];
-
-        audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-        const src = audioCtx.createMediaStreamSource(mediaStream);
-        analyser = audioCtx.createAnalyser(); analyser.fftSize=2048;
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-        src.connect(analyser); drawMeter();
-
-        mediaRecorder.ondataavailable=e=>{ if(e.data.size) chunks.push(e.data); };
-        mediaRecorder.onstart=()=>{
-          statusEl.textContent='Recording…'; startTimer();
-          btnRecord.classList.add('hidden'); btnPause.classList.remove('hidden'); btnStop.classList.remove('hidden');
-        };
-        mediaRecorder.onpause =()=>{ statusEl.textContent='Paused'; stopTimer(); };
-        mediaRecorder.onresume=()=>{ statusEl.textContent='Recording…'; startTimer(true); };
-        mediaRecorder.onstop  =()=>{
-          stopMeter(); stopTimer();
-          blob=new Blob(chunks,{type:mimeType||'audio/webm'});
-          audioEl.src=URL.createObjectURL(blob);
-          pbWrap.classList.remove('hidden');
-          btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
-          statusEl.textContent='Review your recording';
-        };
-
-        mediaRecorder.start();
-      }catch(err){
-        console.error(err);
-        statusEl.textContent='Microphone access blocked. Please allow mic.';
-      }
-    }
-    function pauseRecording(){ if(mediaRecorder && mediaRecorder.state==='recording'){ mediaRecorder.pause(); btnPause.classList.add('hidden'); btnResume.classList.remove('hidden'); } }
-    function resumeRecording(){ if(mediaRecorder && mediaRecorder.state==='paused'){ mediaRecorder.resume(); btnResume.classList.add('hidden'); btnPause.classList.remove('hidden'); } }
-    function stopRecording(){ if(mediaRecorder && (mediaRecorder.state==='recording'||mediaRecorder.state==='paused')){ mediaRecorder.stop(); mediaStream.getTracks().forEach(t=>t.stop()); } }
-
-    function drawMeter(){
-      function frame(){
-        analyser.getByteTimeDomainData(dataArray);
-        let peak=0; for(let i=0;i<dataArray.length;i++){ const v=Math.abs(dataArray[i]-128)/128; if(v>peak) peak=v; }
-        const pct=Math.min(1,peak*2);
-        mtx.clearRect(0,0,meterCv.width,meterCv.height);
-        mtx.fillStyle='#e7e3db'; mtx.fillRect(0,0,meterCv.width,meterCv.height);
-        mtx.fillStyle=pct>0.8?'#d9534f':'#3d3528';
-        mtx.fillRect(0,0,Math.max(6,Math.floor(meterCv.width*pct)),meterCv.height);
-        meterAnim=requestAnimationFrame(frame);
-      }
-      meterAnim=requestAnimationFrame(frame);
-    }
-    function stopMeter(){ if(meterAnim) cancelAnimationFrame(meterAnim); }
-    function startTimer(reset){ if(!reset) startTime=Date.now(); timerInt=setInterval(()=>{ const s=Math.floor((Date.now()-startTime)/1000); const mm=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); timerEl.textContent=`${mm}:${ss}`; },250); }
-    function stopTimer(){ if(timerInt) clearInterval(timerInt); }
-
-    function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-    function canUpload(){
-      if(!nameEl.value.trim()){ uploadMsg.textContent="Please enter your name."; uploadMsg.classList.remove('hidden'); return false; }
-      if(!isValidEmail(emailEl.value.trim())){ uploadMsg.textContent="Please enter a valid email."; uploadMsg.classList.remove('hidden'); return false; }
-      if(consentEl && !consentEl.checked){ uploadMsg.textContent="Please accept the consent box."; uploadMsg.classList.remove('hidden'); return false; }
-      return true;
-    }
-
-    async function uploadBlob(){
-      if(!blob) return;
-      if(!canUpload()) return;
-      
-      btnUpload.disabled = true;
-      btnRerec.disabled = true;
-      btnUpload.innerHTML = '<span class="loading-spinner"></span>Uploading...';
-      uploadMsg.classList.add('hidden');
-      uploadProgress.classList.remove('hidden');
-      
-      function updateProgress(step, text) {
-        [stepUploading, stepProcessing, stepGenerating, stepComplete].forEach(s => {
-          s.classList.remove('active', 'completed');
-        });
-        
-        const steps = [stepUploading, stepProcessing, stepGenerating, stepComplete];
-        const currentIndex = steps.indexOf(step);
-        
-        for (let i = 0; i < currentIndex; i++) {
-          steps[i].classList.add('completed');
-        }
-        
-        step.classList.add('active');
-        uploadStatusText.textContent = text;
-      }
-
-      const audioType = mimeType || 'audio/webm';
-      const audioExt  = (audioType==='audio/mp4') ? 'm4a' : 'webm';
-      const audioFile = new File([blob], `story.${audioExt}`, { type: audioType });
-
-      try{
-        updateProgress(stepUploading, 'Preparing upload slot (audio)...');
-        const presignAudio = await getPresign(audioExt, audioType);
-
-        updateProgress(stepUploading, 'Uploading audio file...');
-        const audioKey = await s3FormUpload(presignAudio, audioFile);
-
-        let photoKey = null;
-        if(photoFile){
-          const pType = photoFile.type || 'image/jpeg';
-          const pExt = pType.endsWith('png') ? 'png' : pType.endsWith('webp') ? 'webp' : 'jpg';
-          updateProgress(stepUploading, 'Uploading photo...');
-          const presignPhoto = await getPresign(pExt, pType);
-          photoKey = await s3FormUpload(presignPhoto, photoFile);
-        }
-
-        updateProgress(stepProcessing, 'Processing your story...');
-
-        if(METADATA_WEBHOOK){
-          const meta = {
-            name: nameEl.value.trim(),
-            email: emailEl.value.trim(),
-            prompt: promptEl.value || '',
-            audio_key: audioKey,
-            photo_key: photoKey,
-            recorded_at: new Date().toISOString(),
-            user_agent: navigator.userAgent
-          };
-          
-          updateProgress(stepGenerating, 'Creating your story page...');
-          
-          const res = await fetch(METADATA_WEBHOOK, {
-            method:'POST',
-            headers:{ 'content-type':'application/json' },
-            body: JSON.stringify(meta)
-          });
-          
-          if(!res.ok){
-            throw new Error('Processing failed: ' + res.status);
-          } else {
-            updateProgress(stepComplete, 'Story created successfully!');
-            uploadStatusText.textContent = 'Your story is being processed and will be emailed to you shortly.';
-            
-            setTimeout(() => {
-              uploadProgress.classList.add('hidden');
-              uploadMsg.classList.remove('hidden');
-              uploadMsg.innerHTML = '✅ <strong>Success!</strong> Your story has been submitted and will be emailed to you once processed.';
-              uploadMsg.style.color = '#059669';
-              uploadMsg.style.background = '#d1fae5';
-              uploadMsg.style.padding = '1rem';
-              uploadMsg.style.borderRadius = '8px';
-              uploadMsg.style.border = '1px solid #a7f3d0';
-            }, 1500);
-          }
-        }
-
-        setTimeout(()=>resetAndClose(),4000);
-      }catch(e){
-        console.error(e);
-        
-        uploadProgress.classList.add('hidden');
-        uploadMsg.classList.remove('hidden');
-        uploadMsg.innerHTML = `⚠ <strong>Upload failed:</strong> ${e?.message || 'Please try again.'}`;
-        uploadMsg.style.color = '#dc2626';
-        uploadMsg.style.background = '#fee2e2';
-        uploadMsg.style.padding = '1rem';
-        uploadMsg.style.borderRadius = '8px';
-        uploadMsg.style.border = '1px solid #fecaca';
-        
-        btnUpload.disabled = false;
-        btnRerec.disabled = false;
-        btnUpload.innerHTML = 'Use This Story';
-      }
-    }
-
-    btnRecord.addEventListener('click',startRecording);
-    btnPause .addEventListener('click',pauseRecording);
-    btnResume.addEventListener('click',resumeRecording);
-    btnStop  .addEventListener('click',stopRecording);
-    btnRerec.addEventListener('click',()=>{
-      pbWrap.classList.add('hidden'); statusEl.textContent='Ready'; timerEl.textContent='00:00';
-      chunks=[]; blob=null; audioEl.src=''; btnRecord.classList.remove('hidden');
-      uploadMsg.classList.add('hidden'); uploadProgress.classList.add('hidden');
-      btnUpload.disabled = false; btnRerec.disabled = false; btnUpload.innerHTML = 'Use This Story';
-    });
-    btnUpload.addEventListener('click',uploadBlob);
-  })();
-  </script>
+  btnRecord.addEventListener('click',startRecording);
+  btnPause .addEventListener('click',pauseRecording);
+  btnResume.addEventListener('click',resumeRecording);
+  btnStop  .addEventListener('click',stopRecording);
+  btnRerec.addEventListener('click',()=>{
+    pbWrap.classList.add('hidden'); statusEl.textContent='Ready'; timerEl.textContent='00:00';
+    chunks=[]; blob=null; audioEl.src=''; btnRecord.classList.remove('hidden');
+    uploadMsg.classList.add('hidden'); uploadProgress.classList.add('hidden');
+    btnUpload.disabled = false; btnRerec.disabled = false; btnUpload.innerHTML = 'Use This Story';
+  });
+  btnUpload.addEventListener('click',uploadBlob);
+})();
+</script>
 </body>
 </html>
