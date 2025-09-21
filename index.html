@@ -958,26 +958,64 @@
     let startTime, timerInt, blob, mimeType;
     let photoFile=null;
 
-    // Detect browser capabilities and show helpful messages
+    // Enhanced browser detection with helpful guidance
     function detectCapabilities() {
       const hasMediaRecorder = !!window.MediaRecorder;
       const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+      const isOldiOS = /iPad.*OS 1[0-2]_|iPhone.*OS 1[0-2]_/.test(navigator.userAgent);
+      const isOldSafari = /Version\/1[0-2].*Safari/.test(navigator.userAgent);
       
       console.log('Browser capabilities:', {
         MediaRecorder: hasMediaRecorder,
         getUserMedia: hasGetUserMedia,
         userAgent: navigator.userAgent,
-        polyfillApplied: window.MediaRecorder && window.MediaRecorder.toString().includes('polyfill')
+        isOldiOS: isOldiOS,
+        isOldSafari: isOldSafari
       });
       
-      if (!hasMediaRecorder || !hasGetUserMedia) {
-        statusEl.textContent = 'Recording not supported on this device. Please try Safari or Chrome.';
-        btnRecord.disabled = true;
+      if (!hasMediaRecorder || !hasGetUserMedia || isOldiOS) {
+        showUnsupportedBrowserMessage();
+        return false;
       }
+      return true;
+    }
+    
+    function showUnsupportedBrowserMessage() {
+      // Replace the modal content with a helpful message
+      document.querySelector('#recModal .p-5').innerHTML = `
+        <div style="text-align: center; padding: 2rem;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">📱</div>
+          <h3 style="color: var(--brand-navy); margin-bottom: 1rem;">Recording Not Available</h3>
+          <p style="margin-bottom: 1.5rem; line-height: 1.6;">
+            Your current browser or device doesn't support audio recording. 
+            To record your story, please try:
+          </p>
+          
+          <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin: 1rem 0; text-align: left;">
+            <h4 style="margin-bottom: 0.5rem;">✅ Recommended Options:</h4>
+            <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.8;">
+              <li><strong>iPhone/iPad:</strong> Use Safari 14.3+ or Chrome app</li>
+              <li><strong>Android:</strong> Use Chrome or Firefox</li>
+              <li><strong>Computer:</strong> Use Chrome, Firefox, or Safari</li>
+              <li><strong>Alternative:</strong> Record on a newer device</li>
+            </ul>
+          </div>
+          
+          <p style="font-size: 0.9rem; color: #666; margin-top: 1.5rem;">
+            Need help? Email us at <a href="mailto:support@storiesofyou.ai" style="color: var(--brand-orange);">support@storiesofyou.ai</a>
+          </p>
+        </div>
+      `;
+      
+      // Hide the action buttons section
+      document.getElementById('actionButtons').style.display = 'none';
     }
 
     // Initialize capabilities detection
-    detectCapabilities();
+    if (!detectCapabilities()) {
+      // If browser is unsupported, don't set up recording functionality
+      return;
+    }
 
     async function getPresign(ext, type){
       const qs = new URLSearchParams({ ext, type });
