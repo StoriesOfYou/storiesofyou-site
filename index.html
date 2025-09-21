@@ -839,7 +839,7 @@
     },{threshold:.15});
     revealEls.forEach(el=>io.observe(el));
 
-    // Open recorder
+    // Open recorder with enhanced detection
     const recModal = document.getElementById('recModal');
     function openRecorderModal() {
       recModal.classList.remove('hidden');
@@ -849,6 +849,13 @@
       document.body.style.width = '100%';
       document.body.style.height = '100%';
       document.body.style.overflow = 'hidden';
+      
+      // CRITICAL: Check browser support when modal opens
+      setTimeout(() => {
+        if (!detectCapabilities()) {
+          console.log('Browser not supported, showing fallback message');
+        }
+      }, 100);
     }
     
     ['openRecorder','openRecorderBottom','openRecorderNav','openRecorderMobile'].forEach(id=>{
@@ -958,22 +965,27 @@
     let startTime, timerInt, blob, mimeType;
     let photoFile=null;
 
-    // Enhanced browser detection with helpful guidance
+    // Enhanced browser detection with better iOS 12 detection
     function detectCapabilities() {
       const hasMediaRecorder = !!window.MediaRecorder;
       const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-      const isOldiOS = /iPad.*OS 1[0-2]_|iPhone.*OS 1[0-2]_/.test(navigator.userAgent);
-      const isOldSafari = /Version\/1[0-2].*Safari/.test(navigator.userAgent);
       
-      console.log('Browser capabilities:', {
-        MediaRecorder: hasMediaRecorder,
-        getUserMedia: hasGetUserMedia,
-        userAgent: navigator.userAgent,
-        isOldiOS: isOldiOS,
-        isOldSafari: isOldSafari
-      });
+      // More specific iOS 12 detection
+      const userAgent = navigator.userAgent;
+      const isOldiOS = /iPad.*OS 1[0-2]_|iPhone.*OS 1[0-2]_|iPad.*Version\/1[0-2]\.|iPhone.*Version\/1[0-2]\./.test(userAgent);
+      const isOldSafari = /Version\/1[0-2].*Safari/.test(userAgent);
       
-      if (!hasMediaRecorder || !hasGetUserMedia || isOldiOS) {
+      console.log('=== BROWSER DETECTION DEBUG ===');
+      console.log('User Agent:', userAgent);
+      console.log('MediaRecorder:', hasMediaRecorder);
+      console.log('getUserMedia:', hasGetUserMedia);
+      console.log('Old iOS detected:', isOldiOS);
+      console.log('Old Safari detected:', isOldSafari);
+      console.log('================================');
+      
+      // Show unsupported message if any condition fails
+      if (!hasMediaRecorder || !hasGetUserMedia || isOldiOS || isOldSafari) {
+        console.log('Browser detected as unsupported, showing message...');
         showUnsupportedBrowserMessage();
         return false;
       }
@@ -981,8 +993,17 @@
     }
     
     function showUnsupportedBrowserMessage() {
+      console.log('Executing showUnsupportedBrowserMessage...');
+      
+      // Find the modal content area
+      const modalContent = document.querySelector('#recModal .p-5');
+      if (!modalContent) {
+        console.error('Could not find modal content area');
+        return;
+      }
+      
       // Replace the modal content with a helpful message
-      document.querySelector('#recModal .p-5').innerHTML = `
+      modalContent.innerHTML = `
         <div style="text-align: center; padding: 2rem;">
           <div style="font-size: 3rem; margin-bottom: 1rem;">📱</div>
           <h3 style="color: var(--brand-navy); margin-bottom: 1rem;">Recording Not Available</h3>
@@ -1008,7 +1029,13 @@
       `;
       
       // Hide the action buttons section
-      document.getElementById('actionButtons').style.display = 'none';
+      const actionButtons = document.getElementById('actionButtons');
+      if (actionButtons) {
+        actionButtons.style.display = 'none';
+        console.log('Hidden action buttons');
+      }
+      
+      console.log('Unsupported browser message displayed');
     }
 
     // Initialize capabilities detection
