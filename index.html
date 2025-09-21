@@ -15,10 +15,6 @@
   <meta name="twitter:title" content="Stories of You" />
   <meta name="twitter:description" content="Your voice, your story — preserved forever." />
   <meta name="twitter:image" content="https://storiesofyou.ai/og-image.jpg" />
-  
-  <!-- iOS MediaRecorder Polyfill -->
-  <script src="https://cdn.jsdelivr.net/npm/audio-recorder-polyfill@0.4.1/index.js"></script>
-  
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root{
@@ -36,51 +32,14 @@
     .video-viewport video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0;display:block}
     .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
     .reveal.visible{opacity:1;transform:none}
-    .btn-primary{background-color:var(--brand-charcoal);color:#fff;transition:all 0.3s ease;position:relative;overflow:hidden;min-height:44px;-webkit-tap-highlight-color:transparent;-webkit-appearance:none;user-select:none}
+    .btn-primary{background-color:var(--brand-charcoal);color:#fff;transition:all 0.3s ease;position:relative;overflow:hidden}
     .btn-primary:hover{background-color:#5a4d3a;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}
     .btn-primary:disabled{background-color:#9ca3af;cursor:not-allowed;transform:none;box-shadow:none}
-    .btn-secondary{background:#fff;color:var(--brand-charcoal);border:2px solid var(--brand-charcoal);transition:all 0.3s ease;min-height:44px;-webkit-tap-highlight-color:transparent;-webkit-appearance:none;user-select:none}
+    .btn-secondary{background:#fff;color:var(--brand-charcoal);border:2px solid var(--brand-charcoal);transition:all 0.3s ease}
     .btn-secondary:hover{background:#f7f2eb;transform:translateY(-1px)}
     .btn-secondary:disabled{background:#f9fafb;color:#9ca3af;border-color:#d1d5db;cursor:not-allowed;transform:none}
     .icon{width:52px;height:52px;display:inline-block;color:var(--brand-navy)}
     .icon-accent{color:var(--brand-orange)}
-    
-    /* FIXED: iOS-compatible modal handling with proper z-index */
-    .modal-open {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      width: 100% !important;
-      height: 100vh !important;
-      overflow: hidden !important;
-      -webkit-overflow-scrolling: touch !important;
-    }
-    
-    /* CRITICAL FIX: Enhanced modal container with higher z-index for iOS */
-    #recModal {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      z-index: 999999 !important;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      background: rgba(0, 0, 0, 0.6) !important;
-    }
-    
-    /* Ensure modal content is properly positioned */
-    #recModal .bg-white {
-      position: relative !important;
-      z-index: 1000000 !important;
-    }
-    
-    /* Prevent zoom on form inputs (iOS) */
-    input[type="text"], input[type="email"], select {
-      font-size: 16px !important;
-      -webkit-appearance: none;
-    }
     
     /* IMPROVED: Loading spinner */
     .loading-spinner {
@@ -115,7 +74,7 @@
       font-size: 0.875rem;
     }
     
-    /* FIXED: Mobile responsive progress steps */
+    /* FIXED: Mobile responsive progress steps - only change needed */
     @media (max-width: 640px) {
       .progress-steps {
         font-size: 0.75rem;
@@ -201,15 +160,6 @@
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* MINIMAL iPad-specific fix - only target the duplication issue */
-    @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 1) {
-      .site-header {
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-        background: rgba(255,255,255,0.95);
-      }
     }
   </style>
 </head>
@@ -662,101 +612,65 @@
 
         <!-- Prompt -->
         <label class="block text-sm text-gray-600">Choose a prompt (optional)</label>
-        <select id="recPrompt" class="w-full border rounded-md px-3 py-2">
-          <option value="">— Pick a prompt —</option>
-          
-          <optgroup label="Childhood & Family">
-            <option>What was your childhood home like?</option>
-            <option>What was your favorite family tradition growing up?</option>
-            <option>Tell me about your relationship with your grandparents</option>
-            <option>What was dinnertime like in your house?</option>
-            <option>What did you want to be when you grew up?</option>
-            <option>Tell me about your siblings and your relationship with them</option>
-            <option>What was your neighborhood like when you were young?</option>
-            <option>What chores did you have to do as a kid?</option>
-            <option>Tell me about your parents' personalities</option>
-            <option>What was Christmas or holidays like in your family?</option>
-            <option>What games did you play as a child?</option>
-          </optgroup>
-          
-          <optgroup label="School & Growing Up">
-            <option>Tell me about your favorite teacher</option>
-            <option>What was high school like for you?</option>
-            <option>Did you go to college? What was that experience like?</option>
-            <option>What subject did you love or hate in school?</option>
-            <option>Tell me about your first crush or romantic relationship</option>
-            <option>What was the biggest trouble you got into as a teenager?</option>
-            <option>How did you choose your career path?</option>
-          </optgroup>
-          
-          <optgroup label="Work & Career">
-            <option>Tell me about your first job</option>
-            <option>What's the hardest you've ever worked for something?</option>
-            <option>Describe a mentor who influenced your career</option>
-            <option>What's your proudest professional moment?</option>
-            <option>Tell me about a time you had to overcome a challenge at work</option>
-            <option>What was your dream job when you were younger?</option>
-            <option>How has work changed since you started your career?</option>
-          </optgroup>
-          
-          <optgroup label="Love & Relationships">
-            <option>How did you meet your partner or spouse?</option>
-            <option>Tell me about your wedding day</option>
-            <option>What's the secret to a good relationship?</option>
-            <option>Tell me about your closest friendship</option>
-            <option>How did you know you were in love?</option>
-            <option>What's the best relationship advice you ever received?</option>
-            <option>Tell me about someone who broke your heart</option>
-          </optgroup>
-          
-          <optgroup label="Parenting & Family Life">
-            <option>What was it like when you first became a parent?</option>
-            <option>Tell me about each of your children's personalities</option>
-            <option>What's the hardest part about being a parent?</option>
-            <option>What traditions did you create in your own family?</option>
-            <option>What do you hope your children remember about their childhood?</option>
-            <option>How did you discipline your children?</option>
-          </optgroup>
-          
-          <optgroup label="Adventures & Travel">
-            <option>What's a favorite vacation memory?</option>
-            <option>Tell me about the farthest place you've traveled</option>
-            <option>What's the most beautiful place you've ever seen?</option>
-            <option>Tell me about a time you got lost</option>
-            <option>What's an adventure you'll never forget?</option>
-            <option>Where would you go if you could travel anywhere?</option>
-          </optgroup>
-          
-          <optgroup label="Challenges & Growth">
-            <option>Tell me about the hardest time in your life</option>
-            <option>What's the bravest thing you've ever done?</option>
-            <option>How did you get through a difficult period?</option>
-            <option>Tell me about a time you had to start over</option>
-            <option>What's something you failed at but learned from?</option>
-            <option>How have you changed over the years?</option>
-          </optgroup>
-          
-          <optgroup label="Wisdom & Life Lessons">
-            <option>What's the best advice you ever received?</option>
-            <option>What would you tell your younger self?</option>
-            <option>What are you most proud of in your life?</option>
-            <option>What's something you wish more people understood?</option>
-            <option>What's the most important lesson life has taught you?</option>
-            <option>What do you want to be remembered for?</option>
-            <option>What advice would you give to someone just starting out in life?</option>
-          </optgroup>
-          
-          <optgroup label="Personal & Reflective">
-            <option>What's something you've never told anyone before?</option>
-            <option>Tell me about your most embarrassing moment</option>
-            <option>What's your greatest fear?</option>
-            <option>What makes you laugh the hardest?</option>
-            <option>What's something you're grateful for every day?</option>
-            <option>If you could have dinner with anyone, who would it be?</option>
-            <option>What's a skill you wish you had learned?</option>
-            <option>What's your favorite thing about yourself?</option>
-          </optgroup>
-        </select>
+<select id="recPrompt" class="w-full border rounded-md px-3 py-2">
+  <option value="">— Pick a prompt —</option>
+
+  <optgroup label="Family & Childhood">
+    <option>What was your childhood home like?</option>
+    <option>What games or activities did you love as a child?</option>
+    <option>What was a holiday or tradition your family always celebrated?</option>
+    <option>Tell me about your grandparents or a favorite relative.</option>
+  </optgroup>
+
+  <optgroup label="School & Growing Up">
+    <option>Who was your favorite teacher, and why?</option>
+    <option>What was high school like for you?</option>
+    <option>Did you ever get into trouble as a kid or teenager?</option>
+    <option>What subject did you love (or hate) most in school?</option>
+  </optgroup>
+
+  <optgroup label="Work & Purpose">
+    <option>What was your very first job?</option>
+    <option>What’s the proudest moment you’ve had at work?</option>
+    <option>Who was a mentor who made a difference for you?</option>
+    <option>What did you dream of being when you grew up?</option>
+  </optgroup>
+
+  <optgroup label="Love & Relationships">
+    <option>How did you meet your partner or closest friend?</option>
+    <option>How did you know you were in love?</option>
+    <option>Tell me about your wedding day (or a special day with someone you loved).</option>
+    <option>What’s the best relationship advice you’ve ever received?</option>
+  </optgroup>
+
+  <optgroup label="Family Life & Parenting">
+    <option>What was it like when you first became a parent?</option>
+    <option>Tell me about each of your children’s personalities.</option>
+    <option>What family traditions did you create in your own home?</option>
+    <option>What do you hope your children remember most about growing up?</option>
+  </optgroup>
+
+  <optgroup label="Adventures & Travel">
+    <option>What’s your favorite vacation memory?</option>
+    <option>What’s the most beautiful place you’ve ever seen?</option>
+    <option>Tell me about a time you got lost while traveling.</option>
+    <option>What adventure will you never forget?</option>
+  </optgroup>
+
+  <optgroup label="Challenges & Triumphs">
+    <option>What’s the bravest thing you’ve ever done?</option>
+    <option>Tell me about a hard time and how you got through it.</option>
+    <option>What’s something you failed at but learned from?</option>
+    <option>Have you ever had to start over in life?</option>
+  </optgroup>
+
+  <optgroup label="Life Lessons & Legacy">
+    <option>What’s the best advice you ever received?</option>
+    <option>What would you tell your younger self?</option>
+    <option>What are you most proud of in your life?</option>
+    <option>What do you want to be remembered for?</option>
+  </optgroup>
+</select>
 
         <!-- Consent -->
         <label class="flex items-start gap-2 text-sm text-gray-600">
@@ -788,7 +702,7 @@
           <span id="recTimer" class="text-sm font-mono text-gray-700">00:00</span>
         </div>
 
-        <!-- Upload progress indicator -->
+        <!-- IMPROVED: Upload progress indicator - FIXED: Only changed progress steps to use smaller text on mobile -->
         <div id="uploadProgress" class="upload-progress hidden">
           <div class="progress-steps">
             <div class="progress-step" id="step-uploading">Uploading</div>
@@ -816,7 +730,7 @@
           <button id="btnStop"   class="btn-secondary px-4 py-2 rounded-lg hidden">Stop</button>
         </div>
 
-        <!-- Playback with better button order -->
+        <!-- IMPROVED: Playback with better button order -->
         <div id="playbackWrap" class="hidden space-y-3">
           <audio id="recAudio" controls class="w-full"></audio>
           <div class="flex items-center justify-between gap-3">
@@ -839,23 +753,12 @@
     },{threshold:.15});
     revealEls.forEach(el=>io.observe(el));
 
-    // Open recorder with enhanced detection
+    // Open recorder
     const recModal = document.getElementById('recModal');
     function openRecorderModal() {
       recModal.classList.remove('hidden');
-      // Enhanced iOS modal handling
-      document.body.classList.add('modal-open');
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-      document.body.style.height = '100%';
+      // FIXED: Prevent background scrolling on mobile - ONLY using overflow hidden, no position fixed
       document.body.style.overflow = 'hidden';
-      
-      // CRITICAL: Check browser support when modal opens
-      setTimeout(() => {
-        if (!detectCapabilities()) {
-          console.log('Browser not supported, showing fallback message');
-        }
-      }, 100);
     }
     
     ['openRecorder','openRecorderBottom','openRecorderNav','openRecorderMobile'].forEach(id=>{
@@ -920,12 +823,6 @@
 
   <script>
   (function(){
-    // Apply MediaRecorder polyfill for iOS Safari
-    if (!window.MediaRecorder && window.AudioRecorderPolyfill) {
-      window.MediaRecorder = window.AudioRecorderPolyfill.MediaRecorder;
-      console.log('Applied MediaRecorder polyfill for iOS compatibility');
-    }
-
     const INVOKE_URL = "https://6117txq5ok.execute-api.us-east-2.amazonaws.com";
     const METADATA_WEBHOOK = "https://mikelandin.app.n8n.cloud/webhook/storiesofyou-submit";
 
@@ -953,6 +850,7 @@
     const btnUpload=document.getElementById('btnUpload');
     const uploadMsg=document.getElementById('uploadMsg');
     
+    // IMPROVED: Upload progress elements
     const uploadProgress = document.getElementById('uploadProgress');
     const uploadStatusText = document.getElementById('uploadStatusText');
     const stepUploading = document.getElementById('step-uploading');
@@ -964,85 +862,6 @@
     let audioCtx, analyser, dataArray, meterAnim;
     let startTime, timerInt, blob, mimeType;
     let photoFile=null;
-
-    // Enhanced browser detection with better iOS 12 detection
-    function detectCapabilities() {
-      const hasMediaRecorder = !!window.MediaRecorder;
-      const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-      
-      // More specific iOS 12 detection
-      const userAgent = navigator.userAgent;
-      const isOldiOS = /iPad.*OS 1[0-2]_|iPhone.*OS 1[0-2]_|iPad.*Version\/1[0-2]\.|iPhone.*Version\/1[0-2]\./.test(userAgent);
-      const isOldSafari = /Version\/1[0-2].*Safari/.test(userAgent);
-      
-      console.log('=== BROWSER DETECTION DEBUG ===');
-      console.log('User Agent:', userAgent);
-      console.log('MediaRecorder:', hasMediaRecorder);
-      console.log('getUserMedia:', hasGetUserMedia);
-      console.log('Old iOS detected:', isOldiOS);
-      console.log('Old Safari detected:', isOldSafari);
-      console.log('================================');
-      
-      // Show unsupported message if any condition fails
-      if (!hasMediaRecorder || !hasGetUserMedia || isOldiOS || isOldSafari) {
-        console.log('Browser detected as unsupported, showing message...');
-        showUnsupportedBrowserMessage();
-        return false;
-      }
-      return true;
-    }
-    
-    function showUnsupportedBrowserMessage() {
-      console.log('Executing showUnsupportedBrowserMessage...');
-      
-      // Find the modal content area
-      const modalContent = document.querySelector('#recModal .p-5');
-      if (!modalContent) {
-        console.error('Could not find modal content area');
-        return;
-      }
-      
-      // Replace the modal content with a helpful message
-      modalContent.innerHTML = `
-        <div style="text-align: center; padding: 2rem;">
-          <div style="font-size: 3rem; margin-bottom: 1rem;">📱</div>
-          <h3 style="color: var(--brand-navy); margin-bottom: 1rem;">Recording Not Available</h3>
-          <p style="margin-bottom: 1.5rem; line-height: 1.6;">
-            Your current browser or device doesn't support audio recording. 
-            To record your story, please try:
-          </p>
-          
-          <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin: 1rem 0; text-align: left;">
-            <h4 style="margin-bottom: 0.5rem;">✅ Recommended Options:</h4>
-            <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.8;">
-              <li><strong>iPhone/iPad:</strong> Use Safari 14.3+ or Chrome app</li>
-              <li><strong>Android:</strong> Use Chrome or Firefox</li>
-              <li><strong>Computer:</strong> Use Chrome, Firefox, or Safari</li>
-              <li><strong>Alternative:</strong> Record on a newer device</li>
-            </ul>
-          </div>
-          
-          <p style="font-size: 0.9rem; color: #666; margin-top: 1.5rem;">
-            Need help? Email us at <a href="mailto:support@storiesofyou.ai" style="color: var(--brand-orange);">support@storiesofyou.ai</a>
-          </p>
-        </div>
-      `;
-      
-      // Hide the action buttons section
-      const actionButtons = document.getElementById('actionButtons');
-      if (actionButtons) {
-        actionButtons.style.display = 'none';
-        console.log('Hidden action buttons');
-      }
-      
-      console.log('Unsupported browser message displayed');
-    }
-
-    // Initialize capabilities detection
-    if (!detectCapabilities()) {
-      // If browser is unsupported, don't set up recording functionality
-      return;
-    }
 
     async function getPresign(ext, type){
       const qs = new URLSearchParams({ ext, type });
@@ -1096,267 +915,242 @@
           const scale = Math.min(1, maxDim/Math.max(w,h));
           const cw = Math.round(w*scale), ch = Math.round(h*scale);
           const canvas = document.createElement('canvas');
-        canvas.width = cw; canvas.height = ch;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img,0,0,cw,ch);
-        canvas.toBlob(b=>{
-          if(!b) return reject(new Error('toBlob failed'));
-          resolve(new File([b], 'photo.jpg', {type:'image/jpeg'}));
-        }, 'image/jpeg', quality);
-      };
-      img.onerror = reject;
-      img.src = URL.createObjectURL(file);
-    });
-  }
-
-  closeRec.addEventListener('click', resetAndClose);
-  function resetAndClose(){
-    try{
-      if(mediaRecorder && mediaRecorder.state!=='inactive') mediaRecorder.stop();
-      if(mediaStream) mediaStream.getTracks().forEach(t=>t.stop());
-      if(audioCtx) audioCtx.close();
-      if(meterAnim) cancelAnimationFrame(meterAnim);
-      if(timerInt) clearInterval(timerInt);
-    }catch(e){}
-    recModal.classList.add('hidden');
-    
-    // Restore iOS scrolling properly
-    document.body.classList.remove('modal-open');
-    document.body.style.position = '';
-    document.body.style.width = '';
-    document.body.style.height = '';
-    document.body.style.overflow = '';
-    
-    statusEl.textContent='Ready';
-    timerEl.textContent='00:00';
-    pbWrap.classList.add('hidden');
-    btnRecord.classList.remove('hidden');
-    btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
-    uploadMsg.classList.add('hidden'); uploadMsg.textContent='';
-    uploadProgress.classList.add('hidden');
-    chunks=[]; blob=null; if(audioEl) audioEl.src='';
-    [nameEl,emailEl,promptEl].forEach(i=>{ if(i) i.value=''; });
-    if(consentEl) consentEl.checked=false;
-    photoInput.value=''; photoFile=null; photoPreviewWrap.classList.add('hidden');
-    
-    btnUpload.disabled = false;
-    btnRerec.disabled = false;
-    btnUpload.innerHTML = 'Use This Story';
-  }
-
-  async function startRecording(){
-    try{
-      // iOS-friendly constraints
-      const constraints = {
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
-          // Don't specify sampleRate or other iOS-problematic constraints
-        }
-      };
-      
-      mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-      
-      // iOS-compatible MIME type detection
-      let mimeType = '';
-      if (MediaRecorder.isTypeSupported('audio/mp4')) {
-        mimeType = 'audio/mp4';
-      } else if (MediaRecorder.isTypeSupported('audio/webm')) {
-        mimeType = 'audio/webm';
-      } else if (MediaRecorder.isTypeSupported('audio/wav')) {
-        mimeType = 'audio/wav';
-      }
-      
-      const options = mimeType ? { mimeType } : {};
-      mediaRecorder = new MediaRecorder(mediaStream, options);
-      chunks=[];
-
-      // Create AudioContext for visualization (iOS compatible)
-      try {
-        audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-        const src = audioCtx.createMediaStreamSource(mediaStream);
-        analyser = audioCtx.createAnalyser(); 
-        analyser.fftSize=2048;
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-        src.connect(analyser); 
-        drawMeter();
-      } catch (audioCtxError) {
-        console.warn('AudioContext failed (expected on some iOS versions):', audioCtxError);
-        // Continue without visualization
-      }
-
-      mediaRecorder.ondataavailable=e=>{ if(e.data.size) chunks.push(e.data); };
-      mediaRecorder.onstart=()=>{
-        statusEl.textContent='Recording…'; startTimer();
-        btnRecord.classList.add('hidden'); btnPause.classList.remove('hidden'); btnStop.classList.remove('hidden');
-      };
-      mediaRecorder.onpause =()=>{ statusEl.textContent='Paused'; stopTimer(); };
-      mediaRecorder.onresume=()=>{ statusEl.textContent='Recording…'; startTimer(true); };
-      mediaRecorder.onstop  =()=>{
-        stopMeter(); stopTimer();
-        blob=new Blob(chunks,{type:mimeType||'audio/webm'});
-        audioEl.src=URL.createObjectURL(blob);
-        pbWrap.classList.remove('hidden');
-        btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
-        statusEl.textContent='Review your recording';
-      };
-
-      mediaRecorder.start();
-    }catch(err){
-      console.error('Recording failed:', err);
-      statusEl.textContent = `Recording failed: ${err.message}. Please allow microphone access and try again.`;
-    }
-  }
-  
-  function pauseRecording(){ if(mediaRecorder && mediaRecorder.state==='recording'){ mediaRecorder.pause(); btnPause.classList.add('hidden'); btnResume.classList.remove('hidden'); } }
-  function resumeRecording(){ if(mediaRecorder && mediaRecorder.state==='paused'){ mediaRecorder.resume(); btnResume.classList.add('hidden'); btnPause.classList.remove('hidden'); } }
-  function stopRecording(){ if(mediaRecorder && (mediaRecorder.state==='recording'||mediaRecorder.state==='paused')){ mediaRecorder.stop(); mediaStream.getTracks().forEach(t=>t.stop()); } }
-
-  function drawMeter(){
-    if (!analyser || !dataArray) return; // Skip if AudioContext failed
-    
-    function frame(){
-      analyser.getByteTimeDomainData(dataArray);
-      let peak=0; for(let i=0;i<dataArray.length;i++){ const v=Math.abs(dataArray[i]-128)/128; if(v>peak) peak=v; }
-      const pct=Math.min(1,peak*2);
-      mtx.clearRect(0,0,meterCv.width,meterCv.height);
-      mtx.fillStyle='#e7e3db'; mtx.fillRect(0,0,meterCv.width,meterCv.height);
-      mtx.fillStyle=pct>0.8?'#d9534f':'#3d3528';
-      mtx.fillRect(0,0,Math.max(6,Math.floor(meterCv.width*pct)),meterCv.height);
-      meterAnim=requestAnimationFrame(frame);
-    }
-    meterAnim=requestAnimationFrame(frame);
-  }
-  function stopMeter(){ if(meterAnim) cancelAnimationFrame(meterAnim); }
-  function startTimer(reset){ if(!reset) startTime=Date.now(); timerInt=setInterval(()=>{ const s=Math.floor((Date.now()-startTime)/1000); const mm=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); timerEl.textContent=`${mm}:${ss}`; },250); }
-  function stopTimer(){ if(timerInt) clearInterval(timerInt); }
-
-  function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-  function canUpload(){
-    if(!nameEl.value.trim()){ uploadMsg.textContent="Please enter your name."; uploadMsg.classList.remove('hidden'); return false; }
-    if(!isValidEmail(emailEl.value.trim())){ uploadMsg.textContent="Please enter a valid email."; uploadMsg.classList.remove('hidden'); return false; }
-    if(consentEl && !consentEl.checked){ uploadMsg.textContent="Please accept the consent box."; uploadMsg.classList.remove('hidden'); return false; }
-    return true;
-  }
-
-  async function uploadBlob(){
-    if(!blob) return;
-    if(!canUpload()) return;
-    
-    btnUpload.disabled = true;
-    btnRerec.disabled = true;
-    btnUpload.innerHTML = '<span class="loading-spinner"></span>Uploading...';
-    uploadMsg.classList.add('hidden');
-    uploadProgress.classList.remove('hidden');
-    
-    function updateProgress(step, text) {
-      [stepUploading, stepProcessing, stepGenerating, stepComplete].forEach(s => {
-        s.classList.remove('active', 'completed');
-      });
-      
-      const steps = [stepUploading, stepProcessing, stepGenerating, stepComplete];
-      const currentIndex = steps.indexOf(step);
-      
-      for (let i = 0; i < currentIndex; i++) {
-        steps[i].classList.add('completed');
-      }
-      
-      step.classList.add('active');
-      uploadStatusText.textContent = text;
-    }
-
-    const audioType = mimeType || 'audio/webm';
-    const audioExt  = (audioType==='audio/mp4') ? 'm4a' : 'webm';
-    const audioFile = new File([blob], `story.${audioExt}`, { type: audioType });
-
-    try{
-      updateProgress(stepUploading, 'Preparing upload slot (audio)...');
-      const presignAudio = await getPresign(audioExt, audioType);
-
-      updateProgress(stepUploading, 'Uploading audio file...');
-      const audioKey = await s3FormUpload(presignAudio, audioFile);
-
-      let photoKey = null;
-      if(photoFile){
-        const pType = photoFile.type || 'image/jpeg';
-        const pExt = pType.endsWith('png') ? 'png' : pType.endsWith('webp') ? 'webp' : 'jpg';
-        updateProgress(stepUploading, 'Uploading photo...');
-        const presignPhoto = await getPresign(pExt, pType);
-        photoKey = await s3FormUpload(presignPhoto, photoFile);
-      }
-
-      updateProgress(stepProcessing, 'Processing your story...');
-
-      if(METADATA_WEBHOOK){
-        const meta = {
-          name: nameEl.value.trim(),
-          email: emailEl.value.trim(),
-          prompt: promptEl.value || '',
-          audio_key: audioKey,
-          photo_key: photoKey,
-          recorded_at: new Date().toISOString(),
-          user_agent: navigator.userAgent
+          canvas.width = cw; canvas.height = ch;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img,0,0,cw,ch);
+          canvas.toBlob(b=>{
+            if(!b) return reject(new Error('toBlob failed'));
+            resolve(new File([b], 'photo.jpg', {type:'image/jpeg'}));
+          }, 'image/jpeg', quality);
         };
-        
-        updateProgress(stepGenerating, 'Creating your story page...');
-        
-        const res = await fetch(METADATA_WEBHOOK, {
-          method:'POST',
-          headers:{ 'content-type':'application/json' },
-          body: JSON.stringify(meta)
-        });
-        
-        if(!res.ok){
-          throw new Error('Processing failed: ' + res.status);
-        } else {
-          updateProgress(stepComplete, 'Story created successfully!');
-          uploadStatusText.textContent = 'Your story is being processed and will be emailed to you shortly.';
-          
-          setTimeout(() => {
-            uploadProgress.classList.add('hidden');
-            uploadMsg.classList.remove('hidden');
-            uploadMsg.innerHTML = '✅ <strong>Success!</strong> Your story has been submitted and will be emailed to you once processed.';
-            uploadMsg.style.color = '#059669';
-            uploadMsg.style.background = '#d1fae5';
-            uploadMsg.style.padding = '1rem';
-            uploadMsg.style.borderRadius = '8px';
-            uploadMsg.style.border = '1px solid #a7f3d0';
-          }, 1500);
-        }
-      }
+        img.onerror = reject;
+        img.src = URL.createObjectURL(file);
+      });
+    }
 
-      setTimeout(()=>resetAndClose(),4000);
-    }catch(e){
-      console.error(e);
+    closeRec.addEventListener('click', resetAndClose);
+    function resetAndClose(){
+      try{
+        if(mediaRecorder && mediaRecorder.state!=='inactive') mediaRecorder.stop();
+        if(mediaStream) mediaStream.getTracks().forEach(t=>t.stop());
+        if(audioCtx) audioCtx.close();
+        if(meterAnim) cancelAnimationFrame(meterAnim);
+        if(timerInt) clearInterval(timerInt);
+      }catch(e){}
+      recModal.classList.add('hidden');
       
-      uploadProgress.classList.add('hidden');
-      uploadMsg.classList.remove('hidden');
-      uploadMsg.innerHTML = `⚠ <strong>Upload failed:</strong> ${e?.message || 'Please try again.'}`;
-      uploadMsg.style.color = '#dc2626';
-      uploadMsg.style.background = '#fee2e2';
-      uploadMsg.style.padding = '1rem';
-      uploadMsg.style.borderRadius = '8px';
-      uploadMsg.style.border = '1px solid #fecaca';
+      // FIXED: Restore background scrolling - ONLY restore overflow
+      document.body.style.overflow = '';
       
+      statusEl.textContent='Ready';
+      timerEl.textContent='00:00';
+      pbWrap.classList.add('hidden');
+      btnRecord.classList.remove('hidden');
+      btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
+      uploadMsg.classList.add('hidden'); uploadMsg.textContent='';
+      uploadProgress.classList.add('hidden'); // IMPROVED: Hide progress indicator
+      chunks=[]; blob=null; if(audioEl) audioEl.src='';
+      [nameEl,emailEl,promptEl].forEach(i=>{ if(i) i.value=''; });
+      if(consentEl) consentEl.checked=false;
+      photoInput.value=''; photoFile=null; photoPreviewWrap.classList.add('hidden');
+      
+      // IMPROVED: Reset button states
       btnUpload.disabled = false;
       btnRerec.disabled = false;
       btnUpload.innerHTML = 'Use This Story';
     }
-  }
 
-  btnRecord.addEventListener('click',startRecording);
-  btnPause .addEventListener('click',pauseRecording);
-  btnResume.addEventListener('click',resumeRecording);
-  btnStop  .addEventListener('click',stopRecording);
-  btnRerec.addEventListener('click',()=>{
-    pbWrap.classList.add('hidden'); statusEl.textContent='Ready'; timerEl.textContent='00:00';
-    chunks=[]; blob=null; audioEl.src=''; btnRecord.classList.remove('hidden');
-    uploadMsg.classList.add('hidden'); uploadProgress.classList.add('hidden');
-    btnUpload.disabled = false; btnRerec.disabled = false; btnUpload.innerHTML = 'Use This Story';
-  });
-  btnUpload.addEventListener('click',uploadBlob);
-})();
-</script>
+    async function startRecording(){
+      try{
+        mimeType = MediaRecorder.isTypeSupported('audio/mp4;codecs=aac') ? 'audio/mp4'
+                 : MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm' : '';
+        mediaStream = await navigator.mediaDevices.getUserMedia({audio:true});
+        mediaRecorder = new MediaRecorder(mediaStream, mimeType ? {mimeType} : undefined);
+        chunks=[];
+
+        audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+        const src = audioCtx.createMediaStreamSource(mediaStream);
+        analyser = audioCtx.createAnalyser(); analyser.fftSize=2048;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        src.connect(analyser); drawMeter();
+
+        mediaRecorder.ondataavailable=e=>{ if(e.data.size) chunks.push(e.data); };
+        mediaRecorder.onstart=()=>{
+          statusEl.textContent='Recording…'; startTimer();
+          btnRecord.classList.add('hidden'); btnPause.classList.remove('hidden'); btnStop.classList.remove('hidden');
+        };
+        mediaRecorder.onpause =()=>{ statusEl.textContent='Paused'; stopTimer(); };
+        mediaRecorder.onresume=()=>{ statusEl.textContent='Recording…'; startTimer(true); };
+        mediaRecorder.onstop  =()=>{
+          stopMeter(); stopTimer();
+          blob=new Blob(chunks,{type:mimeType||'audio/webm'});
+          audioEl.src=URL.createObjectURL(blob);
+          pbWrap.classList.remove('hidden');
+          btnPause.classList.add('hidden'); btnResume.classList.add('hidden'); btnStop.classList.add('hidden');
+          statusEl.textContent='Review your recording';
+        };
+
+        mediaRecorder.start();
+      }catch(err){
+        console.error(err);
+        statusEl.textContent='Microphone access blocked. Please allow mic.';
+      }
+    }
+    function pauseRecording(){ if(mediaRecorder && mediaRecorder.state==='recording'){ mediaRecorder.pause(); btnPause.classList.add('hidden'); btnResume.classList.remove('hidden'); } }
+    function resumeRecording(){ if(mediaRecorder && mediaRecorder.state==='paused'){ mediaRecorder.resume(); btnResume.classList.add('hidden'); btnPause.classList.remove('hidden'); } }
+    function stopRecording(){ if(mediaRecorder && (mediaRecorder.state==='recording'||mediaRecorder.state==='paused')){ mediaRecorder.stop(); mediaStream.getTracks().forEach(t=>t.stop()); } }
+
+    function drawMeter(){
+      function frame(){
+        analyser.getByteTimeDomainData(dataArray);
+        let peak=0; for(let i=0;i<dataArray.length;i++){ const v=Math.abs(dataArray[i]-128)/128; if(v>peak) peak=v; }
+        const pct=Math.min(1,peak*2);
+        mtx.clearRect(0,0,meterCv.width,meterCv.height);
+        mtx.fillStyle='#e7e3db'; mtx.fillRect(0,0,meterCv.width,meterCv.height);
+        mtx.fillStyle=pct>0.8?'#d9534f':'#3d3528';
+        mtx.fillRect(0,0,Math.max(6,Math.floor(meterCv.width*pct)),meterCv.height);
+        meterAnim=requestAnimationFrame(frame);
+      }
+      meterAnim=requestAnimationFrame(frame);
+    }
+    function stopMeter(){ if(meterAnim) cancelAnimationFrame(meterAnim); }
+    function startTimer(reset){ if(!reset) startTime=Date.now(); timerInt=setInterval(()=>{ const s=Math.floor((Date.now()-startTime)/1000); const mm=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); timerEl.textContent=`${mm}:${ss}`; },250); }
+    function stopTimer(){ if(timerInt) clearInterval(timerInt); }
+
+    function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+    function canUpload(){
+      if(!nameEl.value.trim()){ uploadMsg.textContent="Please enter your name."; uploadMsg.classList.remove('hidden'); return false; }
+      if(!isValidEmail(emailEl.value.trim())){ uploadMsg.textContent="Please enter a valid email."; uploadMsg.classList.remove('hidden'); return false; }
+      if(consentEl && !consentEl.checked){ uploadMsg.textContent="Please accept the consent box."; uploadMsg.classList.remove('hidden'); return false; }
+      return true;
+    }
+
+    // IMPROVED: Enhanced upload function with progress tracking
+    async function uploadBlob(){
+      if(!blob) return;
+      if(!canUpload()) return;
+      
+      // IMPROVED: Disable buttons and show progress
+      btnUpload.disabled = true;
+      btnRerec.disabled = true;
+      btnUpload.innerHTML = '<span class="loading-spinner"></span>Uploading...';
+      uploadMsg.classList.add('hidden');
+      uploadProgress.classList.remove('hidden');
+      
+      // IMPROVED: Update progress steps
+      function updateProgress(step, text) {
+        // Reset all steps
+        [stepUploading, stepProcessing, stepGenerating, stepComplete].forEach(s => {
+          s.classList.remove('active', 'completed');
+        });
+        
+        // Mark completed steps
+        const steps = [stepUploading, stepProcessing, stepGenerating, stepComplete];
+        const currentIndex = steps.indexOf(step);
+        
+        for (let i = 0; i < currentIndex; i++) {
+          steps[i].classList.add('completed');
+        }
+        
+        // Mark current step
+        step.classList.add('active');
+        uploadStatusText.textContent = text;
+      }
+
+      const audioType = mimeType || 'audio/webm';
+      const audioExt  = (audioType==='audio/mp4') ? 'm4a' : 'webm';
+      const audioFile = new File([blob], `story.${audioExt}`, { type: audioType });
+
+      try{
+        updateProgress(stepUploading, 'Preparing upload slot (audio)...');
+        const presignAudio = await getPresign(audioExt, audioType);
+
+        updateProgress(stepUploading, 'Uploading audio file...');
+        const audioKey = await s3FormUpload(presignAudio, audioFile);
+
+        let photoKey = null;
+        if(photoFile){
+          const pType = photoFile.type || 'image/jpeg';
+          const pExt = pType.endsWith('png') ? 'png' : pType.endsWith('webp') ? 'webp' : 'jpg';
+          updateProgress(stepUploading, 'Uploading photo...');
+          const presignPhoto = await getPresign(pExt, pType);
+          photoKey = await s3FormUpload(presignPhoto, photoFile);
+        }
+
+        updateProgress(stepProcessing, 'Processing your story...');
+
+        if(METADATA_WEBHOOK){
+          const meta = {
+            name: nameEl.value.trim(),
+            email: emailEl.value.trim(),
+            prompt: promptEl.value || '',
+            audio_key: audioKey,
+            photo_key: photoKey,
+            recorded_at: new Date().toISOString(),
+            user_agent: navigator.userAgent
+          };
+          
+          updateProgress(stepGenerating, 'Creating your story page...');
+          
+          const res = await fetch(METADATA_WEBHOOK, {
+            method:'POST',
+            headers:{ 'content-type':'application/json' },
+            body: JSON.stringify(meta)
+          });
+          
+          if(!res.ok){
+            throw new Error('Processing failed: ' + res.status);
+          } else {
+            updateProgress(stepComplete, 'Story created successfully!');
+            uploadStatusText.textContent = 'Your story is being processed and will be emailed to you shortly.';
+            
+            // IMPROVED: Success state
+            setTimeout(() => {
+              uploadProgress.classList.add('hidden');
+              uploadMsg.classList.remove('hidden');
+              uploadMsg.innerHTML = '✅ <strong>Success!</strong> Your story has been submitted and will be emailed to you once processed.';
+              uploadMsg.style.color = '#059669';
+              uploadMsg.style.background = '#d1fae5';
+              uploadMsg.style.padding = '1rem';
+              uploadMsg.style.borderRadius = '8px';
+              uploadMsg.style.border = '1px solid #a7f3d0';
+            }, 1500);
+          }
+        }
+
+        setTimeout(()=>resetAndClose(),4000);
+      }catch(e){
+        console.error(e);
+        
+        // IMPROVED: Error state
+        uploadProgress.classList.add('hidden');
+        uploadMsg.classList.remove('hidden');
+        uploadMsg.innerHTML = `⚠ <strong>Upload failed:</strong> ${e?.message || 'Please try again.'}`;
+        uploadMsg.style.color = '#dc2626';
+        uploadMsg.style.background = '#fee2e2';
+        uploadMsg.style.padding = '1rem';
+        uploadMsg.style.borderRadius = '8px';
+        uploadMsg.style.border = '1px solid #fecaca';
+        
+        // IMPROVED: Re-enable buttons on error
+        btnUpload.disabled = false;
+        btnRerec.disabled = false;
+        btnUpload.innerHTML = 'Use This Story';
+      }
+    }
+
+    btnRecord.addEventListener('click',startRecording);
+    btnPause .addEventListener('click',pauseRecording);
+    btnResume.addEventListener('click',resumeRecording);
+    btnStop  .addEventListener('click',stopRecording);
+    btnRerec.addEventListener('click',()=>{
+      pbWrap.classList.add('hidden'); statusEl.textContent='Ready'; timerEl.textContent='00:00';
+      chunks=[]; blob=null; audioEl.src=''; btnRecord.classList.remove('hidden');
+      uploadMsg.classList.add('hidden'); uploadProgress.classList.add('hidden'); // IMPROVED: Reset states
+      btnUpload.disabled = false; btnRerec.disabled = false; btnUpload.innerHTML = 'Use This Story';
+    });
+    btnUpload.addEventListener('click',uploadBlob);
+  })();
+  </script>
 </body>
 </html>
