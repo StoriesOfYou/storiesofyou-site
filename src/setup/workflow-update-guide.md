@@ -18,57 +18,130 @@ This guide shows exactly which fields to add to each DynamoDB operation in the e
 
 Since most fields aren't available until the workflow completes, the **safest approach** is to add all new fields only in the **final DynamoDB update**. This avoids any risk of overwriting data or having incomplete information.
 
-### **Only Update These Two Operations:**
+### **RECOMMENDED APPROACH: Add Code Nodes + Update DynamoDB**
 
-### 1. "Update DynamoDB for Toxicity Fail" (Rejected Stories)
-**Location**: After "Toxicity Check" fails
-**Add these fields** (for rejected stories):
+Since DynamoDB field values must map to actual workflow data, we need to:
+
+1. **Add a Code node** before each DynamoDB update to prepare the new fields
+2. **Update the DynamoDB operations** to reference the prepared data
+
+### **Step 1: Add Code Node for Rejected Stories**
+**Location**: After "Toxicity Check" fails, before "Update DynamoDB for Toxicity Fail"
+**Add new Code node**:
+```javascript
+// Prepare storyboard fields for rejected stories
+const originalData = $('Prepare Story Data').first().json;
+const toxicityData = $json;
+
+// Audio duration from toxicity check
+const audioDuration = toxicityData.audio_duration_seconds || 0;
+
+// Thumbnail logic
+let thumbnailUrl = '';
+if (originalData.photo_key && originalData.photo_key !== 'default-story-image.jpg') {
+  thumbnailUrl = `https://storiesofyou-incoming.s3.us-east-2.amazonaws.com/${originalData.photo_key}`;
+} else {
+  thumbnailUrl = ''; // No thumbnail for rejected stories
+}
+
+return {
+  json: {
+    ...originalData,
+    ...toxicityData,
+    audio_duration_seconds: audioDuration,
+    video_url: '',
+    thumbnail_url: thumbnailUrl,
+    story_created_day: '',
+    file_size_mb: 0
+  }
+};
+```
+
+### **Step 2: Update "Update DynamoDB for Toxicity Fail"**
+**Add these fields**:
 ```json
 {
   "fieldId": "audio_duration_seconds",
-  "fieldValue": "={{ $json.audio_duration_seconds || null }}"
+  "fieldValue": "={{ $json.audio_duration_seconds }}"
 },
 {
   "fieldId": "video_url",
-  "fieldValue": "null"
+  "fieldValue": "={{ $json.video_url }}"
 },
 {
   "fieldId": "thumbnail_url",
-  "fieldValue": "={{ $('Prepare Story Data').first().json.photo_key && $('Prepare Story Data').first().json.photo_key !== 'default-story-image.jpg' ? 'https://storiesofyou-incoming.s3.us-east-2.amazonaws.com/' + $('Prepare Story Data').first().json.photo_key : null }}"
+  "fieldValue": "={{ $json.thumbnail_url }}"
 },
 {
   "fieldId": "story_created_day",
-  "fieldValue": "null"
+  "fieldValue": "={{ $json.story_created_day }}"
 },
 {
   "fieldId": "file_size_mb",
-  "fieldValue": "null"
+  "fieldValue": "={{ $json.file_size_mb }}"
 }
 ```
 
-### 2. "Final Dynamo Update with Page URL" (Completion) - **MAIN UPDATE**
-**Location**: Final update after story page generation
-**Add these fields** (for completed stories):
+### **Step 3: Add Code Node for Completed Stories**
+**Location**: Before "Final Dynamo Update with Page URL"
+**Add new Code node**:
+```javascript
+// Prepare storyboard fields for completed stories
+const originalData = $('Prepare Story Data').first().json;
+const toxicityData = $('Toxicity Check').first().json;
+
+// Audio duration
+const audioDuration = toxicityData.audio_duration_seconds || 0;
+
+// Video URL
+const videoUrl = `https://storiesofyou-stories.s3.us-east-2.amazonaws.com/videos/${originalData.story_id}_complete.mp4`;
+
+// Thumbnail logic
+let thumbnailUrl = '';
+if (originalData.photo_key && originalData.photo_key !== 'default-story-image.jpg') {
+  thumbnailUrl = `https://storiesofyou-incoming.s3.us-east-2.amazonaws.com/${originalData.photo_key}`;
+} else {
+  thumbnailUrl = `https://storiesofyou-stories.s3.us-east-2.amazonaws.com/generated-images/${originalData.story_id}-1.png`;
+}
+
+// Story created day (completion date)
+const storyCreatedDay = new Date().toISOString();
+
+return {
+  json: {
+    ...originalData,
+    ...toxicityData,
+    audio_duration_seconds: audioDuration,
+    video_url: videoUrl,
+    thumbnail_url: thumbnailUrl,
+    story_created_day: storyCreatedDay,
+    file_size_mb: 0 // Could calculate from audio file if needed
+  }
+};
+```
+
+### **Step 4: Update "Final Dynamo Update with Page URL"**
+**Add these fields**:
 ```json
 {
   "fieldId": "audio_duration_seconds",
-  "fieldValue": "={{ $('Toxicity Check').first().json.audio_duration_seconds || null }}"
+  "fieldValue": "={{ $json.audio_duration_seconds }}"
 },
 {
   "fieldId": "video_url",
-  "fieldValue": "={{ 'https://storiesofyou-stories.s3.us-east-2.amazonaws.com/videos/' + $('Prepare Story Data').first().json.story_id + '_complete.mp4' }}"
+  "fieldValue": "={{ $json.video_url }}"
 },
 {
   "fieldId": "thumbnail_url",
-  "fieldValue": "={{ $('Prepare Story Data').first().json.photo_key && $('Prepare Story Data').first().json.photo_key !== 'default-story-image.jpg' ? 'https://storiesofyou-incoming.s3.us-east-2.amazonaws.com/' + $('Prepare Story Data').first().json.photo_key : 'https://storiesofyou-stories.s3.us-east-2.amazonaws.com/generated-images/' + $('Prepare Story Data').first().json.story_id + '-1.png' }}"
+  "fieldValue": "={{ $json.thumbnail_url }}"
 },
 {
   "fieldId": "story_created_day",
-  "fieldValue": "={{ new Date().toISOString() }}"
+  "fieldValue": "={{ $json.story_created_day }}"
 },
 {
   "fieldId": "file_size_mb",
-  "fieldValue": "null"
+  "fieldValue": "={{ $json.file_size_mb }}"
 }
 ```
 
