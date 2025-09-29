@@ -1,0 +1,19 @@
+
+<!-- Warm Background matching your website colors -->
+<!-- Convert to PNG (1920x1080) and upload as warm-background.png -->
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Exact same gradient as your website hero section -->
+    <radialGradient id="heroGradient" cx="50%" cy="-18.5%" r="55.6%">
+      <stop offset="0%" style="stop-color:#fff7e9;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#fce8c8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e0cba7;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background matching your website exactly -->
+  <rect width="1920" height="1080" fill="url(#heroGradient)"/>
+  
+  <!-- Optional: Subtle texture overlay -->
+  <rect width="1920" height="1080" fill="url(#heroGradient)" opacity="0.95"/>
+</svg>
