@@ -26,13 +26,67 @@
     },
     {
       "parameters": {
-        "jsCode": "// Validate and decode session token\nconst sessionToken = $json.query?.session_token;\n\nif (!sessionToken) {\n  throw new Error('Session token is required');\n}\n\n// Simple JWT decode (in production, use a proper JWT library)\nfunction base64UrlDecode(str) {\n  str += '='.repeat((4 - str.length % 4) % 4);\n  return atob(str.replace(/\\-/g, '+').replace(/_/g, '/'));\n}\n\nfunction decodeJWT(token) {\n  try {\n    const parts = token.split('.');\n    if (parts.length !== 3) {\n      throw new Error('Invalid token format');\n    }\n    \n    const payload = JSON.parse(base64UrlDecode(parts[1]));\n    \n    // Check expiration\n    const currentTime = Math.floor(Date.now() / 1000);\n    if (payload.exp && payload.exp < currentTime) {\n      throw new Error('Session has expired');\n    }\n    \n    return payload;\n  } catch (error) {\n    throw new Error('Invalid session token');\n  }\n}\n\nconst decodedToken = decodeJWT(sessionToken);\n\n// Validate token type and email\nif (decodedToken.type !== 'storyteller_session' || !decodedToken.email) {\n  throw new Error('Invalid session token');\n}\n\nreturn {\n  json: {\n    email: decodedToken.email,\n    session_token: sessionToken,\n    token_data: decodedToken\n  }\n};"
+        "jsCode": "// Validate session token input\nconst sessionToken = $json.query?.session_token;\n\nif (!sessionToken) {\n  throw new Error('Session token is required');\n}\n\nreturn {\n  json: {\n    session_token: sessionToken\n  }\n};"
+      },
+      "id": "validate-input",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [384, 48]
+    },
+    {
+      "parameters": {
+        "operation": "getItem",
+        "tableName": "storiesofyou-sessions",
+        "key": {
+          "session_token": "={{ $json.session_token }}"
+        }
+      },
+      "id": "get-session",
+      "name": "Get Session",
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [608, 48],
+      "credentials": {
+        "aws": {
+          "id": "aws-credentials",
+          "name": "AWS Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate session exists and is not expired\nconst sessionData = $json.Item;\n\nif (!sessionData) {\n  throw new Error('Invalid session token');\n}\n\n// Check if session is expired\nconst currentTime = new Date();\nconst expiresAt = new Date(sessionData.expires_at);\n\nif (currentTime > expiresAt) {\n  throw new Error('Session has expired. Please log in again.');\n}\n\n// Update last activity\nconst lastActivity = currentTime.toISOString();\n\nreturn {\n  json: {\n    email: sessionData.email,\n    session_token: sessionData.session_token,\n    created_at: sessionData.created_at,\n    expires_at: sessionData.expires_at,\n    last_activity: lastActivity\n  }\n};"
       },
       "id": "validate-session",
       "name": "Validate Session",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [384, 48]
+      "position": [832, 48]
+    },
+    {
+      "parameters": {
+        "operation": "updateItem",
+        "tableName": "storiesofyou-sessions",
+        "key": {
+          "session_token": "={{ $('Validate Input').first().json.session_token }}"
+        },
+        "updateExpression": "SET last_activity = :last_activity",
+        "expressionAttributeValues": {
+          "last_activity": "={{ $json.last_activity }}"
+        }
+      },
+      "id": "update-session-activity",
+      "name": "Update Session Activity",
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [1056, 48],
+      "credentials": {
+        "aws": {
+          "id": "aws-credentials",
+          "name": "AWS Credentials"
+        }
+      }
     },
     {
       "parameters": {
@@ -63,7 +117,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Process and format user stories for frontend\nconst stories = $json.Items || [];\nconst email = $('Validate Session').first().json.email;\n\n// Sort stories by creation date (newest first)\nconst sortedStories = stories.sort((a, b) => {\n  const dateA = new Date(a.created_at || 0);\n  const dateB = new Date(b.created_at || 0);\n  return dateB - dateA;\n});\n\n// Format stories for frontend display\nconst formattedStories = sortedStories.map(story => {\n  const status = story.status || 'unknown';\n  let statusText = 'Processing';\n  let statusColor = 'blue';\n  \n  switch (status) {\n    case 'completed':\n      statusText = 'Ready';\n      statusColor = 'green';\n      break;\n    case 'generating':\n      statusText = 'Creating Video';\n      statusColor = 'yellow';\n      break;\n    case 'transcribing':\n      statusText = 'Transcribing';\n      statusColor = 'blue';\n      break;\n    case 'rejected':\n      statusText = 'Content Not Suitable';\n      statusColor = 'red';\n      break;\n    default:\n      statusText = 'Processing';\n      statusColor = 'gray';\n  }\n  \n  return {\n    story_id: story.story_id,\n    name: story.name || 'Unknown',\n    prompt: story.prompt || 'No prompt',\n    status: status,\n    status_text: statusText,\n    status_color: statusColor,\n    story_url: story.story_url || null,\n    created_at: story.created_at,\n    updated_at: story.updated_at,\n    audio_duration: story.audio_duration_seconds || null,\n    has_video: !!story.story_url\n  };\n});\n\n// Calculate summary statistics\nconst stats = {\n  total_stories: formattedStories.length,\n  completed_stories: formattedStories.filter(s => s.status === 'completed').length,\n  processing_stories: formattedStories.filter(s => ['generating', 'transcribing'].includes(s.status)).length,\n  rejected_stories: formattedStories.filter(s => s.status === 'rejected').length\n};\n\nreturn {\n  json: {\n    email: email,\n    stories: formattedStories,\n    stats: stats,\n    total_count: formattedStories.length\n  }\n};"
+        "jsCode": "// Process and format user stories for frontend\nconst stories = $json.Items || [];\nconst email = $('Update Session Activity').first().json.email;\n\n// Sort stories by creation date (newest first)\nconst sortedStories = stories.sort((a, b) => {\n  const dateA = new Date(a.created_at || 0);\n  const dateB = new Date(b.created_at || 0);\n  return dateB - dateA;\n});\n\n// Format stories for frontend display\nconst formattedStories = sortedStories.map(story => {\n  const status = story.status || 'unknown';\n  let statusText = 'Processing';\n  let statusColor = 'blue';\n  \n  switch (status) {\n    case 'completed':\n      statusText = 'Ready';\n      statusColor = 'green';\n      break;\n    case 'generating':\n      statusText = 'Creating Video';\n      statusColor = 'yellow';\n      break;\n    case 'transcribing':\n      statusText = 'Transcribing';\n      statusColor = 'blue';\n      break;\n    case 'rejected':\n      statusText = 'Content Not Suitable';\n      statusColor = 'red';\n      break;\n    default:\n      statusText = 'Processing';\n      statusColor = 'gray';\n  }\n  \n  return {\n    story_id: story.story_id,\n    name: story.name || 'Unknown',\n    prompt: story.prompt || 'No prompt',\n    status: status,\n    status_text: statusText,\n    status_color: statusColor,\n    story_url: story.story_url || null,\n    created_at: story.created_at,\n    updated_at: story.updated_at,\n    audio_duration: story.audio_duration_seconds || null,\n    has_video: !!story.story_url\n  };\n});\n\n// Calculate summary statistics\nconst stats = {\n  total_stories: formattedStories.length,\n  completed_stories: formattedStories.filter(s => s.status === 'completed').length,\n  processing_stories: formattedStories.filter(s => ['generating', 'transcribing'].includes(s.status)).length,\n  rejected_stories: formattedStories.filter(s => s.status === 'rejected').length\n};\n\nreturn {\n  json: {\n    email: email,\n    stories: formattedStories,\n    stats: stats,\n    total_count: formattedStories.length\n  }\n};"
       },
       "id": "format-stories",
       "name": "Format Stories",
@@ -100,6 +154,28 @@
       "main": [
         [
           {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Get Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Session": {
+      "main": [
+        [
+          {
             "node": "Validate Session",
             "type": "main",
             "index": 0
@@ -108,6 +184,17 @@
       ]
     },
     "Validate Session": {
+      "main": [
+        [
+          {
+            "node": "Update Session Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Session Activity": {
       "main": [
         [
           {

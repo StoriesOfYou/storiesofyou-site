@@ -6,7 +6,7 @@
       "KeyType": "HASH"
     },
     {
-      "AttributeName": "code",
+      "AttributeName": "otp_code",
       "KeyType": "RANGE"
     }
   ],
@@ -16,7 +16,7 @@
       "AttributeType": "S"
     },
     {
-      "AttributeName": "code",
+      "AttributeName": "otp_code",
       "AttributeType": "S"
     }
   ],

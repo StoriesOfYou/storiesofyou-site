@@ -31,7 +31,7 @@
         "tableName": "storiesofyou-otp-codes",
         "key": {
           "email": "={{ $json.email }}",
-          "code": "={{ $json.code }}"
+          "otp_code": "={{ $json.code }}"
         }
       },
       "id": "get-otp-code",
@@ -91,7 +91,7 @@
         "tableName": "storiesofyou-otp-codes",
         "key": {
           "email": "={{ $('Validate Input').first().json.email }}",
-          "code": "={{ $('Validate Input').first().json.code }}"
+          "otp_code": "={{ $('Validate Input').first().json.code }}"
         },
         "updateExpression": "SET used = :used, used_at = :used_at",
         "expressionAttributeValues": {
@@ -113,7 +113,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Generate JWT session token\nconst email = $('Validate Input').first().json.email;\nconst currentTime = Math.floor(Date.now() / 1000);\nconst expiresAt = currentTime + (2 * 60 * 60); // 2 hours\n\n// JWT Secret Key (in production, store this securely)\nconst jwtSecret = 'storiesofyou-jwt-secret-key-2024-production';\n\n// Simple JWT implementation (in production, use a proper JWT library)\nfunction base64UrlEncode(str) {\n  return btoa(str)\n    .replace(/\\+/g, '-')\n    .replace(/\\//g, '_')\n    .replace(/=/g, '');\n}\n\nfunction createJWT(payload, secret) {\n  const header = {\n    alg: 'HS256',\n    typ: 'JWT'\n  };\n  \n  const encodedHeader = base64UrlEncode(JSON.stringify(header));\n  const encodedPayload = base64UrlEncode(JSON.stringify(payload));\n  \n  // In production, use proper HMAC-SHA256\n  const signature = base64UrlEncode(secret + encodedHeader + encodedPayload);\n  \n  return `${encodedHeader}.${encodedPayload}.${signature}`;\n}\n\nconst payload = {\n  email: email,\n  iat: currentTime,\n  exp: expiresAt,\n  type: 'storyteller_session'\n};\n\nconst sessionToken = createJWT(payload, jwtSecret);\n\nreturn {\n  json: {\n    email: email,\n    session_token: sessionToken,\n    expires_at: new Date(expiresAt * 1000).toISOString(),\n    expires_in: 7200 // 2 hours in seconds\n  }\n};"
+        "jsCode": "// Generate session token and store in sessions table\nconst email = $('Validate Input').first().json.email;\nconst currentTime = new Date().toISOString();\nconst expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(); // 2 hours\n\n// Generate secure session token\nfunction generateSessionToken() {\n  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\n  let result = '';\n  for (let i = 0; i < 64; i++) {\n    result += chars.charAt(Math.floor(Math.random() * chars.length));\n  }\n  return result;\n}\n\nconst sessionToken = generateSessionToken();\n\nreturn {\n  json: {\n    email: email,\n    session_token: sessionToken,\n    created_at: currentTime,\n    expires_at: expiresAt,\n    last_activity: currentTime\n  }\n};"
       },
       "id": "generate-session-token",
       "name": "Generate Session Token",
@@ -123,8 +123,32 @@
     },
     {
       "parameters": {
+        "operation": "putItem",
+        "tableName": "storiesofyou-sessions",
+        "item": {
+          "session_token": "={{ $json.session_token }}",
+          "email": "={{ $json.email }}",
+          "created_at": "={{ $json.created_at }}",
+          "expires_at": "={{ $json.expires_at }}",
+          "last_activity": "={{ $json.last_activity }}"
+        }
+      },
+      "id": "store-session",
+      "name": "Store Session",
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [1728, 48],
+      "credentials": {
+        "aws": {
+          "id": "aws-credentials",
+          "name": "AWS Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
         "respondWith": "json",
-        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Login successful! Welcome to your storyboard.\",\n  \"session_token\": \"{{ $json.session_token }}\",\n  \"email\": \"{{ $json.email }}\",\n  \"expires_at\": \"{{ $json.expires_at }}\",\n  \"expires_in\": {{ $json.expires_in }}\n}"
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Login successful! Welcome to your storyboard.\",\n  \"session_token\": \"{{ $('Store Session').first().json.session_token }}\",\n  \"email\": \"{{ $('Store Session').first().json.email }}\",\n  \"expires_at\": \"{{ $('Store Session').first().json.expires_at }}\",\n  \"expires_in\": 7200\n}"
       },
       "id": "respond-success",
       "name": "Respond Success",
@@ -220,6 +244,17 @@
       ]
     },
     "Generate Session Token": {
+      "main": [
+        [
+          {
+            "node": "Store Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Session": {
       "main": [
         [
           {

@@ -52,7 +52,7 @@
         "tableName": "storiesofyou-otp-codes",
         "item": {
           "email": "={{ $('Prepare OTP Data').first().json.email }}",
-          "code": "={{ $('Prepare OTP Data').first().json.code }}",
+          "otp_code": "={{ $('Prepare OTP Data').first().json.code }}",
           "expires_at": "={{ $('Prepare OTP Data').first().json.expires_at }}",
           "created_at": "={{ $('Prepare OTP Data').first().json.created_at }}",
           "used": false
