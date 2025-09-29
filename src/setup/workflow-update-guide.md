@@ -18,71 +18,46 @@ This guide shows exactly which fields to add to each DynamoDB operation in the e
 
 Since most fields aren't available until the workflow completes, the **safest approach** is to add all new fields only in the **final DynamoDB update**. This avoids any risk of overwriting data or having incomplete information.
 
-### **RECOMMENDED APPROACH: Add Code Nodes + Update DynamoDB**
+### **RECOMMENDED APPROACH: Minimal Updates for Rejected, Full Updates for Completed**
 
 Since DynamoDB field values must map to actual workflow data, we need to:
 
-1. **Add a Code node** before each DynamoDB update to prepare the new fields
-2. **Update the DynamoDB operations** to reference the prepared data
+1. **For rejected stories**: Direct field mapping (minimal data)
+2. **For completed stories**: Code node + DynamoDB update (full data)
 
-### **Step 1: Add Code Node for Rejected Stories**
-**Location**: After "Toxicity Check" fails, before "Update DynamoDB for Toxicity Fail"
-**Add new Code node**:
-```javascript
-// Prepare storyboard fields for rejected stories
-const originalData = $('Prepare Story Data').first().json;
-const toxicityData = $json;
-
-// Audio duration from toxicity check
-const audioDuration = toxicityData.audio_duration_seconds || 0;
-
-// Thumbnail logic
-let thumbnailUrl = '';
-if (originalData.photo_key && originalData.photo_key !== 'default-story-image.jpg') {
-  thumbnailUrl = `https://storiesofyou-incoming.s3.us-east-2.amazonaws.com/${originalData.photo_key}`;
-} else {
-  thumbnailUrl = ''; // No thumbnail for rejected stories
-}
-
-return {
-  json: {
-    ...originalData,
-    ...toxicityData,
-    audio_duration_seconds: audioDuration,
-    video_url: '',
-    thumbnail_url: thumbnailUrl,
-    story_created_day: '',
-    file_size_mb: 0
-  }
-};
-```
-
-### **Step 2: Update "Update DynamoDB for Toxicity Fail"**
-**Add these fields**:
+### **Step 1: Update "Update DynamoDB for Toxicity Fail" (Rejected Stories)**
+**Location**: After "Toxicity Check" fails
+**Add only these fields** (minimal data for rejected stories):
 ```json
 {
   "fieldId": "audio_duration_seconds",
-  "fieldValue": "={{ $json.audio_duration_seconds }}"
+  "fieldValue": "={{ $json.audio_duration_seconds || 0 }}"
 },
 {
   "fieldId": "video_url",
-  "fieldValue": "={{ $json.video_url }}"
+  "fieldValue": "rejected"
 },
 {
   "fieldId": "thumbnail_url",
-  "fieldValue": "={{ $json.thumbnail_url }}"
+  "fieldValue": "rejected"
 },
 {
   "fieldId": "story_created_day",
-  "fieldValue": "={{ $json.story_created_day }}"
+  "fieldValue": "rejected"
 },
 {
   "fieldId": "file_size_mb",
-  "fieldValue": "={{ $json.file_size_mb }}"
+  "fieldValue": "0"
 }
 ```
 
-### **Step 3: Add Code Node for Completed Stories**
+**Why minimal data?**
+- No images generated → No thumbnail URL
+- No video created → No video URL  
+- Story rejected → No completion date
+- Only audio duration is useful for analytics
+
+### **Step 2: Add Code Node for Completed Stories**
 **Location**: Before "Final Dynamo Update with Page URL"
 **Add new Code node**:
 ```javascript
@@ -120,7 +95,7 @@ return {
 };
 ```
 
-### **Step 4: Update "Final Dynamo Update with Page URL"**
+### **Step 3: Update "Final Dynamo Update with Page URL"**
 **Add these fields**:
 ```json
 {
