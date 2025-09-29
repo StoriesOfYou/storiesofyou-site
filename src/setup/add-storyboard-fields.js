@@ -36,7 +36,7 @@ async function addStoryboardFields() {
         },
         ExpressionAttributeValues: {
           ':audio_duration': null, // Will be populated by future stories
-          ':video_url': item.story_url ? item.story_url.replace('.html', '_complete.mp4') : null,
+          ':video_url': item.status === 'completed' ? generateVideoUrl(item) : null,
           ':thumbnail_url': generateThumbnailUrl(item),
           ':story_created_day': item.status === 'completed' ? item.created_at : null,
           ':file_size_mb': null // Will be populated by future stories
@@ -64,6 +64,15 @@ function generateThumbnailUrl(item) {
   // Otherwise, use first AI-generated image
   if (item.story_id) {
     return `https://storiesofyou-stories.s3.us-east-2.amazonaws.com/generated-images/${item.story_id}-1.png`;
+  }
+  
+  return null;
+}
+
+function generateVideoUrl(item) {
+  // Generate video URL from story_id
+  if (item.story_id) {
+    return `https://storiesofyou-stories.s3.us-east-2.amazonaws.com/videos/${item.story_id}_complete.mp4`;
   }
   
   return null;

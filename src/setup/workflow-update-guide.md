@@ -14,87 +14,15 @@ This guide shows exactly which fields to add to each DynamoDB operation in the e
 
 ## DynamoDB Operations to Update
 
-### 1. "Create Story in DynamoDB" (Initial Creation)
-**Location**: First DynamoDB operation after "Prepare Story Data"
-**Add these fields**:
-```json
-{
-  "fieldId": "audio_duration_seconds",
-  "fieldValue": "null"
-},
-{
-  "fieldId": "video_url", 
-  "fieldValue": "null"
-},
-{
-  "fieldId": "thumbnail_url",
-  "fieldValue": "={{ $('Prepare Story Data').first().json.photo_key && $('Prepare Story Data').first().json.photo_key !== 'default-story-image.jpg' ? 'https://storiesofyou-incoming.s3.us-east-2.amazonaws.com/' + $('Prepare Story Data').first().json.photo_key : null }}"
-},
-{
-  "fieldId": "story_created_day",
-  "fieldValue": "null"
-},
-{
-  "fieldId": "file_size_mb",
-  "fieldValue": "null"
-}
-```
+### **RECOMMENDED APPROACH: Add Fields Only at the End**
 
-### 2. "Update DynamoDB w Status" (Transcribing Status)
-**Location**: After "Start AssemblyAI Transcription"
-**Add these fields** (keep existing + add new):
-```json
-{
-  "fieldId": "audio_duration_seconds",
-  "fieldValue": "={{ $('Toxicity Check').first().json.audio_duration_seconds || null }}"
-},
-{
-  "fieldId": "video_url",
-  "fieldValue": "null"
-},
-{
-  "fieldId": "thumbnail_url", 
-  "fieldValue": "={{ $('Prepare Story Data').first().json.photo_key && $('Prepare Story Data').first().json.photo_key !== 'default-story-image.jpg' ? 'https://storiesofyou-incoming.s3.us-east-2.amazonaws.com/' + $('Prepare Story Data').first().json.photo_key : null }}"
-},
-{
-  "fieldId": "story_created_day",
-  "fieldValue": "null"
-},
-{
-  "fieldId": "file_size_mb",
-  "fieldValue": "null"
-}
-```
+Since most fields aren't available until the workflow completes, the **safest approach** is to add all new fields only in the **final DynamoDB update**. This avoids any risk of overwriting data or having incomplete information.
 
-### 3. "Update Transcript in DynamoDB" (After Toxicity Check)
-**Location**: After "Toxicity Check" passes
-**Add these fields**:
-```json
-{
-  "fieldId": "audio_duration_seconds",
-  "fieldValue": "={{ $json.audio_duration_seconds || null }}"
-},
-{
-  "fieldId": "video_url",
-  "fieldValue": "null"
-},
-{
-  "fieldId": "thumbnail_url",
-  "fieldValue": "={{ $('Prepare Story Data').first().json.photo_key && $('Prepare Story Data').first().json.photo_key !== 'default-story-image.jpg' ? 'https://storiesofyou-incoming.s3.us-east-2.amazonaws.com/' + $('Prepare Story Data').first().json.photo_key : null }}"
-},
-{
-  "fieldId": "story_created_day", 
-  "fieldValue": "null"
-},
-{
-  "fieldId": "file_size_mb",
-  "fieldValue": "null"
-}
-```
+### **Only Update These Two Operations:**
 
-### 4. "Update DynamoDB for Toxicity Fail" (Rejected Stories)
+### 1. "Update DynamoDB for Toxicity Fail" (Rejected Stories)
 **Location**: After "Toxicity Check" fails
-**Add these fields**:
+**Add these fields** (for rejected stories):
 ```json
 {
   "fieldId": "audio_duration_seconds",
@@ -113,14 +41,14 @@ This guide shows exactly which fields to add to each DynamoDB operation in the e
   "fieldValue": "null"
 },
 {
-  "fieldId": "file_size_mb", 
+  "fieldId": "file_size_mb",
   "fieldValue": "null"
 }
 ```
 
-### 5. "Final Dynamo Update with Page URL" (Completion)
+### 2. "Final Dynamo Update with Page URL" (Completion) - **MAIN UPDATE**
 **Location**: Final update after story page generation
-**Add these fields**:
+**Add these fields** (for completed stories):
 ```json
 {
   "fieldId": "audio_duration_seconds",
@@ -143,6 +71,13 @@ This guide shows exactly which fields to add to each DynamoDB operation in the e
   "fieldValue": "null"
 }
 ```
+
+### **Why This Approach is Better:**
+
+1. **No risk of overwriting** - Only updates at the very end
+2. **All data available** - Video URL, completion date, etc. are all ready
+3. **Simpler logic** - Don't need to track field availability throughout workflow
+4. **Safer** - Less chance of breaking existing functionality
 
 ## Important Notes
 
