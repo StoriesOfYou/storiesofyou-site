@@ -1,0 +1,42 @@
+{
+  "TableName": "storiesofyou-otp-codes",
+  "KeySchema": [
+    {
+      "AttributeName": "email",
+      "KeyType": "HASH"
+    },
+    {
+      "AttributeName": "code",
+      "KeyType": "RANGE"
+    }
+  ],
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "email",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "code",
+      "AttributeType": "S"
+    }
+  ],
+  "BillingMode": "PAY_PER_REQUEST",
+  "TimeToLiveSpecification": {
+    "AttributeName": "expires_at",
+    "Enabled": true
+  },
+  "Tags": [
+    {
+      "Key": "Project",
+      "Value": "StoriesOfYou"
+    },
+    {
+      "Key": "Environment",
+      "Value": "Production"
+    },
+    {
+      "Key": "Purpose",
+      "Value": "OTP Authentication"
+    }
+  ]
+}

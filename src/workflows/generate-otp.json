@@ -1,0 +1,185 @@
+{
+  "name": "Generate OTP",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-otp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-generate-otp",
+      "name": "Webhook - Generate OTP",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [160, 48],
+      "webhookId": "generate-otp"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate OTP and prepare data for DynamoDB\nconst email = $json.body?.email?.trim();\n\n// Validate email input\nif (!email || !email.includes('@')) {\n  throw new Error('Valid email address is required');\n}\n\n// Generate 6-digit OTP code\nconst otpCode = Math.floor(100000 + Math.random() * 900000).toString();\n\n// Set expiration time (10 minutes from now)\nconst expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();\nconst createdAt = new Date().toISOString();\n\n// Check for existing OTP codes for this email (rate limiting)\nconst existingCodes = $('Check Existing OTP Codes').first()?.json?.Items || [];\nconst recentCodes = existingCodes.filter(item => {\n  const created = new Date(item.created_at);\n  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);\n  return created > oneHourAgo;\n});\n\n// Rate limiting: max 3 codes per hour per email\nif (recentCodes.length >= 3) {\n  throw new Error('Too many requests. Please wait before requesting another code.');\n}\n\n// Clean up expired codes for this email\nconst validCodes = existingCodes.filter(item => {\n  const expires = new Date(item.expires_at);\n  return expires > new Date();\n});\n\nreturn {\n  json: {\n    email: email,\n    code: otpCode,\n    expires_at: expiresAt,\n    created_at: createdAt,\n    existing_codes_count: recentCodes.length,\n    valid_codes_count: validCodes.length\n  }\n};"
+      },
+      "id": "prepare-otp-data",
+      "name": "Prepare OTP Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [384, 48]
+    },
+    {
+      "parameters": {
+        "operation": "scan",
+        "tableName": "storiesofyou-otp-codes",
+        "filterExpression": "email = :email",
+        "expressionAttributeValues": {
+          "email": "={{ $json.email }}"
+        }
+      },
+      "id": "check-existing-otp",
+      "name": "Check Existing OTP Codes",
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [608, 48],
+      "credentials": {
+        "aws": {
+          "id": "aws-credentials",
+          "name": "AWS Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "putItem",
+        "tableName": "storiesofyou-otp-codes",
+        "item": {
+          "email": "={{ $('Prepare OTP Data').first().json.email }}",
+          "code": "={{ $('Prepare OTP Data').first().json.code }}",
+          "expires_at": "={{ $('Prepare OTP Data').first().json.expires_at }}",
+          "created_at": "={{ $('Prepare OTP Data').first().json.created_at }}",
+          "used": false
+        }
+      },
+      "id": "store-otp-code",
+      "name": "Store OTP Code",
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [832, 48],
+      "credentials": {
+        "aws": {
+          "id": "aws-credentials",
+          "name": "AWS Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@storiesofyou.ai",
+        "toEmail": "={{ $('Prepare OTP Data').first().json.email }}",
+        "subject": "Your Stories of You Login Code",
+        "message": "Your login code is: {{ $('Prepare OTP Data').first().json.code }}\n\nThis code will expire in 10 minutes.\n\nIf you didn't request this code, please ignore this email.\n\nBest regards,\nThe Stories of You Team",
+        "options": {
+          "replyTo": "support@storiesofyou.ai"
+        }
+      },
+      "id": "send-otp-email",
+      "name": "Send OTP Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1056, 48],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-credentials",
+          "name": "SMTP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Login code sent to your email. Please check your inbox.\",\n  \"email\": \"{{ $('Prepare OTP Data').first().json.email }}\",\n  \"expires_in\": 600\n}"
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1280, 48]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": false,\n  \"message\": \"{{ $json.message || 'An error occurred while sending the login code.' }}\",\n  \"error\": \"{{ $json.message || 'Unknown error' }}\"\n}",
+        "responseCode": 400
+      },
+      "id": "respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1280, 240]
+    }
+  ],
+  "connections": {
+    "Webhook - Generate OTP": {
+      "main": [
+        [
+          {
+            "node": "Prepare OTP Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare OTP Data": {
+      "main": [
+        [
+          {
+            "node": "Check Existing OTP Codes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Existing OTP Codes": {
+      "main": [
+        [
+          {
+            "node": "Store OTP Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store OTP Code": {
+      "main": [
+        [
+          {
+            "node": "Send OTP Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send OTP Email": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-15T10:30:00.000Z",
+  "versionId": "1"
+}

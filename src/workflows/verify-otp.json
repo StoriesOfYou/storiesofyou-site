@@ -1,0 +1,243 @@
+{
+  "name": "Verify OTP",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "verify-otp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-verify-otp",
+      "name": "Webhook - Verify OTP",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [160, 48],
+      "webhookId": "verify-otp"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate input and prepare verification data\nconst email = $json.body?.email?.trim();\nconst code = $json.body?.code?.trim();\n\n// Validate inputs\nif (!email || !email.includes('@')) {\n  throw new Error('Valid email address is required');\n}\n\nif (!code || code.length !== 6 || !/^\\d{6}$/.test(code)) {\n  throw new Error('Valid 6-digit code is required');\n}\n\nreturn {\n  json: {\n    email: email,\n    code: code,\n    current_time: new Date().toISOString()\n  }\n};"
+      },
+      "id": "validate-input",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [384, 48]
+    },
+    {
+      "parameters": {
+        "operation": "getItem",
+        "tableName": "storiesofyou-otp-codes",
+        "key": {
+          "email": "={{ $json.email }}",
+          "code": "={{ $json.code }}"
+        }
+      },
+      "id": "get-otp-code",
+      "name": "Get OTP Code",
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [608, 48],
+      "credentials": {
+        "aws": {
+          "id": "aws-credentials",
+          "name": "AWS Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "otp-exists",
+              "leftValue": "={{ $json.Item }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-otp-exists",
+      "name": "Check OTP Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [832, 48]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check if OTP is expired and not used\nconst otpData = $json.Item;\nconst currentTime = new Date();\nconst expiresAt = new Date(otpData.expires_at);\nconst isExpired = currentTime > expiresAt;\nconst isUsed = otpData.used === true;\n\nif (isExpired) {\n  throw new Error('Code has expired. Please request a new one.');\n}\n\nif (isUsed) {\n  throw new Error('Code has already been used. Please request a new one.');\n}\n\n// Mark code as used\nreturn {\n  json: {\n    ...otpData,\n    used: true,\n    used_at: currentTime.toISOString()\n  }\n};"
+      },
+      "id": "validate-otp-status",
+      "name": "Validate OTP Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1056, 48]
+    },
+    {
+      "parameters": {
+        "operation": "updateItem",
+        "tableName": "storiesofyou-otp-codes",
+        "key": {
+          "email": "={{ $('Validate Input').first().json.email }}",
+          "code": "={{ $('Validate Input').first().json.code }}"
+        },
+        "updateExpression": "SET used = :used, used_at = :used_at",
+        "expressionAttributeValues": {
+          "used": true,
+          "used_at": "={{ $json.used_at }}"
+        }
+      },
+      "id": "mark-otp-used",
+      "name": "Mark OTP as Used",
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [1280, 48],
+      "credentials": {
+        "aws": {
+          "id": "aws-credentials",
+          "name": "AWS Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate JWT session token\nconst email = $('Validate Input').first().json.email;\nconst currentTime = Math.floor(Date.now() / 1000);\nconst expiresAt = currentTime + (2 * 60 * 60); // 2 hours\n\n// JWT Secret Key (in production, store this securely)\nconst jwtSecret = 'storiesofyou-jwt-secret-key-2024-production';\n\n// Simple JWT implementation (in production, use a proper JWT library)\nfunction base64UrlEncode(str) {\n  return btoa(str)\n    .replace(/\\+/g, '-')\n    .replace(/\\//g, '_')\n    .replace(/=/g, '');\n}\n\nfunction createJWT(payload, secret) {\n  const header = {\n    alg: 'HS256',\n    typ: 'JWT'\n  };\n  \n  const encodedHeader = base64UrlEncode(JSON.stringify(header));\n  const encodedPayload = base64UrlEncode(JSON.stringify(payload));\n  \n  // In production, use proper HMAC-SHA256\n  const signature = base64UrlEncode(secret + encodedHeader + encodedPayload);\n  \n  return `${encodedHeader}.${encodedPayload}.${signature}`;\n}\n\nconst payload = {\n  email: email,\n  iat: currentTime,\n  exp: expiresAt,\n  type: 'storyteller_session'\n};\n\nconst sessionToken = createJWT(payload, jwtSecret);\n\nreturn {\n  json: {\n    email: email,\n    session_token: sessionToken,\n    expires_at: new Date(expiresAt * 1000).toISOString(),\n    expires_in: 7200 // 2 hours in seconds\n  }\n};"
+      },
+      "id": "generate-session-token",
+      "name": "Generate Session Token",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1504, 48]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Login successful! Welcome to your storyboard.\",\n  \"session_token\": \"{{ $json.session_token }}\",\n  \"email\": \"{{ $json.email }}\",\n  \"expires_at\": \"{{ $json.expires_at }}\",\n  \"expires_in\": {{ $json.expires_in }}\n}"
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1728, 48]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": false,\n  \"message\": \"{{ $json.message || 'Invalid or expired code. Please try again.' }}\",\n  \"error\": \"{{ $json.message || 'Verification failed' }}\"\n}",
+        "responseCode": 400
+      },
+      "id": "respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1728, 240]
+    }
+  ],
+  "connections": {
+    "Webhook - Verify OTP": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Get OTP Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get OTP Code": {
+      "main": [
+        [
+          {
+            "node": "Check OTP Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check OTP Exists": {
+      "main": [
+        [
+          {
+            "node": "Validate OTP Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate OTP Status": {
+      "main": [
+        [
+          {
+            "node": "Mark OTP as Used",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark OTP as Used": {
+      "main": [
+        [
+          {
+            "node": "Generate Session Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Session Token": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-15T10:30:00.000Z",
+  "versionId": "1"
+}
