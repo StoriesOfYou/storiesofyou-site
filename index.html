@@ -1280,7 +1280,7 @@
     const loginEmail = document.getElementById('loginEmail');
     const sendLoginCode = document.getElementById('sendLoginCode');
     const magicLinkEmailDisplay = document.getElementById('magicLinkEmailDisplay');
-    const resendMagicLink = document.getElementById('resendMagicLink');
+    const resendMagicLinkBtn = document.getElementById('resendMagicLink');
     const changeEmail = document.getElementById('changeEmail');
     
     let currentEmail = '';
@@ -1412,7 +1412,7 @@
     openLoginMobile?.addEventListener('click', openLogin);
     loginClose?.addEventListener('click', closeLogin);
     sendLoginCode?.addEventListener('click', sendMagicLink);
-    resendMagicLink?.addEventListener('click', resendMagicLink);
+    resendMagicLinkBtn?.addEventListener('click', resendMagicLink);
     changeEmail?.addEventListener('click', changeEmailAddress);
     
     // Allow Enter key to submit forms
