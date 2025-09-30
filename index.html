@@ -1336,7 +1336,7 @@
       loginError.classList.add('hidden');
       
       try {
-        const response = await fetch(`${N8N_BASE_URL}/generate-otp`, {
+        const response = await fetch(`${N8N_BASE_URL}/webhook/generate-otp`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -1375,7 +1375,7 @@
       loginError.classList.add('hidden');
       
       try {
-        const response = await fetch(`${N8N_BASE_URL}/generate-otp`, {
+        const response = await fetch(`${N8N_BASE_URL}/webhook/generate-otp`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -1432,3 +1432,4 @@
   </script>
 </body>
 </html>
+
