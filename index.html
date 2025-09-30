@@ -1263,7 +1263,7 @@
 
   // Login Modal Functionality
   (function(){
-    const N8N_BASE_URL = "https://storiesofyou.ai/api"; // CloudFront proxy to n8n
+    const N8N_BASE_URL = "https://stories.storiesofyou.ai/api"; // CloudFront proxy to n8n
     
     const loginModal = document.getElementById('loginModal');
     const loginClose = document.getElementById('loginClose');
@@ -1336,7 +1336,7 @@
       loginError.classList.add('hidden');
       
       try {
-        const response = await fetch(`${N8N_BASE_URL}/webhook/generate-otp`, {
+        const response = await fetch(`${N8N_BASE_URL}/webhook-test/generate-otp`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -1375,7 +1375,7 @@
       loginError.classList.add('hidden');
       
       try {
-        const response = await fetch(`${N8N_BASE_URL}/webhook/generate-otp`, {
+        const response = await fetch(`${N8N_BASE_URL}/webhook-test/generate-otp`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -1432,4 +1432,3 @@
   </script>
 </body>
 </html>
-
