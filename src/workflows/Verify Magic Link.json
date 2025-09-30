@@ -1,0 +1,311 @@
+{
+  "name": "Verify Magic Link",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "verify-magic-link",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "5c098398-150c-4037-bf40-ea8ec627fc10",
+      "name": "Webhook - Verify Magic Link",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        -352
+      ],
+      "webhookId": "verify-magic-link"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract token and email from URL query parameters\nconst token = $json.query?.token?.trim();\nconst email = $json.query?.email?.trim();\n\nif (!token || token.length !== 32) {\n  throw new Error('Invalid authentication link');\n}\n\nif (!email || !email.includes('@')) {\n  throw new Error('Invalid authentication link');\n}\n\nreturn {\n  json: {\n    token: token,\n    email: email,\n    current_time: new Date().toISOString()\n  }\n};"
+      },
+      "id": "9641b9e7-76de-4aa3-94f3-ad76a6d9ac53",
+      "name": "Extract Parameters",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        -352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableName": "storiesofyou-otp-codes",
+        "keysUi": {
+          "keyValues": [
+            {
+              "key": "otp_code",
+              "value": "={{ $json.token }}"
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "id": "f8136f3b-28bc-4140-940c-5e9cddcdd833",
+      "name": "Get Magic Link Token",
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -352
+      ],
+      "credentials": {
+        "aws": {
+          "id": "36gQdGtTiwfgvBUA",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verify token exists, matches email, not expired, not used\nconst tokenData = $json;\n\nif (!tokenData) {\n  throw new Error('Invalid or expired link');\n}\n\nconst requestEmail = $('Extract Parameters').first().json.email;\nif (tokenData.email !== requestEmail) {\n  throw new Error('Link does not match email address');\n}\n\n// Fix: Use timestamps for timezone-safe comparison\nconst currentTime = Date.now();\nconst expiresAt = new Date(tokenData.expires_at).getTime();\n\nif (currentTime > expiresAt) {\n  throw new Error('Link has expired. Please request a new one.');\n}\n\nif (tokenData.used === true || tokenData.used === 'true') {\n  throw new Error('Link has already been used. Please request a new one.');\n}\n\nreturn {\n  json: {\n    token: tokenData.otp_code,\n    email: tokenData.email,\n    created_at: tokenData.created_at,\n    expires_at: tokenData.expires_at\n  }\n};"
+      },
+      "id": "96f22f0d-79c5-42c5-aca5-83758b4c72a0",
+      "name": "Verify Token Valid",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        -352
+      ]
+    },
+    {
+      "parameters": {
+        "tableName": "storiesofyou-otp-codes",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "otp_code",
+              "fieldValue": "={{ $json.token }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.email }}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ $json.created_at }}"
+            },
+            {
+              "fieldId": "expires_at",
+              "fieldValue": "={{ $json.expires_at }}"
+            },
+            {
+              "fieldId": "used",
+              "fieldValue": "true"
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "id": "29bf09a0-ee40-48af-a02b-4abd9d76f346",
+      "name": "Mark Token as Used",
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [
+        512,
+        -352
+      ],
+      "credentials": {
+        "aws": {
+          "id": "36gQdGtTiwfgvBUA",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate session token\nconst email = $('Extract Parameters').first().json.email;\nconst currentTime = new Date().toISOString();\nconst expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();\n\nfunction generateSessionToken() {\n  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\n  let result = '';\n  for (let i = 0; i < 64; i++) {\n    result += chars.charAt(Math.floor(Math.random() * chars.length));\n  }\n  return result;\n}\n\nconst sessionToken = generateSessionToken();\n\nreturn {\n  json: {\n    session_token: sessionToken,\n    email: email,\n    created_at: currentTime,\n    expires_at: expiresAt,\n    last_activity: currentTime\n  }\n};"
+      },
+      "id": "7cbe4fb0-d0b6-4dd5-b186-c689a87e9d05",
+      "name": "Generate Session Token",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        -352
+      ]
+    },
+    {
+      "parameters": {
+        "tableName": "storiesofyou-sessions",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "session_token",
+              "fieldValue": "={{ $json.session_token }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.email }}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ $json.created_at }}"
+            },
+            {
+              "fieldId": "expires_at",
+              "fieldValue": "={{ $json.expires_at }}"
+            },
+            {
+              "fieldId": "last_activity",
+              "fieldValue": "={{ $json.last_activity }}"
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "id": "348d472e-20cc-4555-a502-0b959117d68f",
+      "name": "Store Session",
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [
+        960,
+        -352
+      ],
+      "credentials": {
+        "aws": {
+          "id": "36gQdGtTiwfgvBUA",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "redirect",
+        "redirectURL": "https://stories/storyofyou.ai/storyboard",
+        "options": {}
+      },
+      "id": "de531266-0e94-4ce5-bdc9-9b1ce96b47ae",
+      "name": "Redirect to Storyboard",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        -352
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<!DOCTYPE html>\n<html>\n<head>\n  <title>Login Error - Stories of You</title>\n  <style>\n    body { font-family: sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; text-align: center; }\n    .error { background: #fee; border: 2px solid #c33; padding: 20px; border-radius: 8px; }\n    .button { display: inline-block; margin-top: 20px; padding: 12px 24px; background: #3d3528; color: white; text-decoration: none; border-radius: 6px; }\n  </style>\n</head>\n<body>\n  <div class=\"error\">\n    <h2>Login Failed</h2>\n    <p>{{ $json.message || 'Your magic link is invalid or has expired.' }}</p>\n    <a href=\"https://storiesofyou.ai/login.html\" class=\"button\">Request New Link</a>\n  </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "aea1d981-13bc-4c16-b2f9-2826d646fcf7",
+      "name": "Show Error Page",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        736,
+        -160
+      ]
+    }
+  ],
+  "pinData": {
+    "Webhook - Verify Magic Link": [
+      {
+        "json": {
+          "headers": {},
+          "params": {},
+          "query": {
+            "token": "8YQf835Jpkh4rBmUA1Wb2iDsTugyCndQ",
+            "email": "michaellzorn@gmail.com"
+          },
+          "body": {}
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook - Verify Magic Link": {
+      "main": [
+        [
+          {
+            "node": "Extract Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Parameters": {
+      "main": [
+        [
+          {
+            "node": "Get Magic Link Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Magic Link Token": {
+      "main": [
+        [
+          {
+            "node": "Verify Token Valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Token Valid": {
+      "main": [
+        [
+          {
+            "node": "Mark Token as Used",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Token as Used": {
+      "main": [
+        [
+          {
+            "node": "Generate Session Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Session Token": {
+      "main": [
+        [
+          {
+            "node": "Store Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Session": {
+      "main": [
+        [
+          {
+            "node": "Redirect to Storyboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "70950320-1cda-41e6-8764-ff088aa364e7",
+  "meta": {
+    "instanceId": "915e9e153d2d5f26d2303ae9943268f5017ba8476548714beb1378374a62cdf2"
+  },
+  "id": "JoXZiBaqkhRnEVWe",
+  "tags": []
+}

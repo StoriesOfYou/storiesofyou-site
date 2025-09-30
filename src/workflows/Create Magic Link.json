@@ -1,0 +1,228 @@
+{
+  "name": "Create Magic Link",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-otp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "511347ec-dc23-461e-93f7-14597423ceca",
+      "name": "Webhook - Generate OTP",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "generate-otp"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate Magic Link Token\nconst email = $json.body?.email?.trim();\n\n// Validate email\nif (!email || !email.includes('@')) {\n  throw new Error('Valid email address is required');\n}\n\n// Generate secure 32-character token\nfunction generateToken() {\n  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\n  let result = '';\n  for (let i = 0; i < 32; i++) {\n    result += chars.charAt(Math.floor(Math.random() * chars.length));\n  }\n  return result;\n}\n\nconst token = generateToken();\nconst expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 minutes\nconst createdAt = new Date().toISOString();\n\n// Build magic link URL\nconst magicLink = `https://storiesofyou.ai/auth/verify?token=${token}&email=${encodeURIComponent(email)}`;\n\nreturn {\n  json: {\n    email: email,\n    code: token,  // Store as 'code' for compatibility with existing workflow\n    expires_at: expiresAt,\n    created_at: createdAt,\n    magic_link: magicLink\n  }\n};"
+      },
+      "id": "0a434922-5a8b-40fc-88ad-4ea6f604c9c0",
+      "name": "Prepare OTP Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "tableName": "storiesofyou-otp-codes",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('Prepare OTP Data').first().json.email }}"
+            },
+            {
+              "fieldId": "otp_code",
+              "fieldValue": "={{ $('Prepare OTP Data').first().json.code }}"
+            },
+            {
+              "fieldId": "expires_at",
+              "fieldValue": "={{ $('Prepare OTP Data').first().json.expires_at }}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ $('Prepare OTP Data').first().json.created_at }}"
+            },
+            {
+              "fieldId": "used",
+              "fieldValue": "\"false\""
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "id": "bbcaa572-ef8a-49ee-920e-121345ff68fc",
+      "name": "Store OTP Code",
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ],
+      "credentials": {
+        "aws": {
+          "id": "36gQdGtTiwfgvBUA",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Login code sent to your email. Please check your inbox.\",\n  \"email\": \"{{ $('Prepare OTP Data').first().json.email }}\",\n  \"expires_in\": 600\n}",
+        "options": {}
+      },
+      "id": "bdf40ac1-9b0c-4e62-9b65-092c32617840",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        896,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": false,\n  \"message\": \"{{ $json.message || 'An error occurred while sending the login code.' }}\",\n  \"error\": \"{{ $json.message || 'Unknown error' }}\"\n}",
+        "options": {}
+      },
+      "id": "1c3a131c-73fc-4f4d-a12c-09f5f94a5fa3",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "isBodyHtml": true,
+        "subject": "Your Stories of You Login Code",
+        "body": "=<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Log in to Stories of You</title>\n    <style>\n        /* Force proper text colors across email clients */\n        .header-text {\n            color: #000000 !important;\n        }\n        .header-subtitle {\n            color: #333333 !important;\n        }\n        /* Prevent dark mode issues */\n        [data-ogsc] .header-text {\n            color: #000000 !important;\n        }\n        [data-ogsc] .header-subtitle {\n            color: #333333 !important;\n        }\n        /* Gmail specific fixes */\n        u + .body .header-text {\n            color: #000000 !important;\n        }\n        /* Outlook fixes */\n        .ExternalClass .header-text {\n            color: #000000 !important;\n        }\n    </style>\n</head>\n<body class=\"body\" style=\"margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: radial-gradient(1200px 500px at 50% -200px, #fff7e9 0%, #fce8c8 50%, #e0cba7 100%); min-height: 100vh;\">\n    <div style=\"max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;\">\n        \n        <!-- Header with Logo -->\n        <div style=\"background: #e0cba7; padding: 40px 20px; text-align: center;\">\n            <img src=\"https://raw.githubusercontent.com/StoriesOfYou/storiesofyou-site/main/logo.png\" alt=\"Stories of You\" style=\"height: 48px; width: auto; margin-bottom: 16px;\" />\n            <h1 class=\"header-text\" style=\"color: #000000 !important; margin: 0; font-size: 28px; font-weight: 800; text-shadow: none;\">Log in to Stories of You</h1>\n            <p class=\"header-subtitle\" style=\"color: #333333 !important; margin: 10px 0 0 0; font-size: 16px; font-style: italic; text-shadow: none;\">1-Click Login to Your Storyboard</p>\n        </div>\n        \n        <!-- Content -->\n        <div style=\"padding: 40px 30px; background: white;\">\n            \n            <!-- CTA Button -->\n            <div style=\"text-align: center; margin: 32px 0;\">\n                <a href=\"{{ $('Prepare OTP Data').first().json.magic_link }}\" style=\"background-color: #3d3528; color: white; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 18px; display: inline-block; box-shadow: 0 4px 12px rgba(61, 53, 40, 0.3); transition: all 0.2s ease;\">\n                    🔐 Log In to Your Storyboard\n                </a>\n            </div>\n            \n            <!-- Security notice -->\n            <div style=\"background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0; border-radius: 0 8px 8px 0;\">\n                <p style=\"color: #92400e; font-size: 14px; margin: 0 0 8px 0; font-weight: 600;\">\n                    ⏱️ This link expires in 5 minutes\n                </p>\n                <p style=\"color: #78350f; font-size: 13px; margin: 0;\">\n                    If you didn't request this login, please ignore this email.\n                </p>\n            </div>\n            \n            <!-- Alternative link -->\n            <details style=\"margin-top: 24px;\">\n                <summary style=\"cursor: pointer; color: #6b7280; font-size: 14px; font-weight: 600;\">\n                    Or copy and paste this link\n                </summary>\n                <div style=\"background: #f9fafb; padding: 12px; border-radius: 6px; margin-top: 8px; word-break: break-all; font-family: monospace; font-size: 12px; color: #4b5563;\">\n                    {{ $('Prepare OTP Data').first().json.magic_link }}\n                </div>\n            </details>\n        </div>\n        \n        <!-- Footer -->\n        <div style=\"background: #3d3528; color: white; padding: 24px 30px; text-align: center;\">\n            <p style=\"color: rgba(255,255,255,0.9); font-size: 12px; margin: 0 0 8px 0;\">\n                Best regards,<br>\n                <strong>The Stories of You Team</strong>\n            </p>\n            <p style=\"color: rgba(255,255,255,0.7); font-size: 11px; margin: 0; font-style: italic;\">\n                Your voice, your story — preserved forever\n            </p>\n        </div>\n    </div>\n</body>\n</html>",
+        "fromEmail": "noreply@storiesofyou.ai",
+        "toAddresses": [
+          "={{ $('Prepare OTP Data').first().json.email }}"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.awsSes",
+      "typeVersion": 1,
+      "position": [
+        672,
+        0
+      ],
+      "id": "f6af0a7d-9ef0-425d-9c0a-21e08c00e9c7",
+      "name": "SES Send OTP",
+      "credentials": {
+        "aws": {
+          "id": "36gQdGtTiwfgvBUA",
+          "name": "AWS account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook - Generate OTP": [
+      {
+        "json": {
+          "headers": {
+            "host": "mikelandin.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.6584",
+            "content-length": "35",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "50.47.211.75",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "9868a5f571fdc6c8-SEA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "50.47.211.75, 172.71.146.227",
+            "x-forwarded-host": "mikelandin.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-59-5786bcf55-lcz9t",
+            "x-is-trusted": "yes",
+            "x-real-ip": "50.47.211.75"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "email": "michaellzorn@gmail.com"
+          },
+          "webhookUrl": "https://mikelandin.app.n8n.cloud/webhook/generate-otp",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook - Generate OTP": {
+      "main": [
+        [
+          {
+            "node": "Prepare OTP Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare OTP Data": {
+      "main": [
+        [
+          {
+            "node": "Store OTP Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store OTP Code": {
+      "main": [
+        [
+          {
+            "node": "SES Send OTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SES Send OTP": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4f9230cd-a95e-4609-9dfe-bb81c69b1dbf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "915e9e153d2d5f26d2303ae9943268f5017ba8476548714beb1378374a62cdf2"
+  },
+  "id": "T1UYENOsgLcmrHYa",
+  "tags": []
+}
