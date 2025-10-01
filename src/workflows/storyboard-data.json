@@ -1,0 +1,146 @@
+{
+  "name": "Get Storyboard Data",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "storyboard-data",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-storyboard",
+      "name": "Webhook - Get Storyboard Data",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sessionToken = $json.body?.session_token;\n\nif (!sessionToken || sessionToken.trim() === '') {\n  throw new Error('Session token is required');\n}\n\nreturn {\n  json: {\n    session_token: sessionToken.trim()\n  }\n};"
+      },
+      "id": "extract-token",
+      "name": "Extract Session Token",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableName": "storiesofyou-sessions",
+        "keysUi": {
+          "keyValues": [
+            {
+              "key": "session_token",
+              "value": "={{ $json.session_token }}"
+            }
+          ]
+        }
+      },
+      "id": "get-session",
+      "name": "Get Session",
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [680, 300],
+      "credentials": {
+        "aws": {
+          "id": "36gQdGtTiwfgvBUA",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const session = $json;\n\nif (!session || !session.email) {\n  throw new Error('Invalid or expired session');\n}\n\nconst expiresAt = new Date(session.expires_at).getTime();\nconst now = Date.now();\n\nif (now > expiresAt) {\n  throw new Error('Session has expired. Please log in again.');\n}\n\nreturn {\n  json: {\n    email: session.email,\n    session_token: session.session_token\n  }\n};"
+      },
+      "id": "validate-session",
+      "name": "Validate Session",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "operation": "scan",
+        "tableName": "storiesofyou-recordings",
+        "scanFilterUi": {
+          "scanFilterValues": [
+            {
+              "attribute": "email",
+              "condition": "=",
+              "value": "={{ $json.email }}"
+            }
+          ]
+        }
+      },
+      "id": "query-stories",
+      "name": "Query Stories",
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "typeVersion": 1,
+      "position": [1120, 300],
+      "credentials": {
+        "aws": {
+          "id": "36gQdGtTiwfgvBUA",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const email = $('Validate Session').first().json.email;\nconst allItems = $input.all();\nconst stories = allItems.map(item => item.json);\n\nconst stats = {\n  total_stories: stories.length,\n  completed_stories: stories.filter(s => s.status === 'completed').length,\n  processing_stories: stories.filter(s => ['processing', 'generating', 'transcribing', 'submitted'].includes(s.status)).length,\n  rejected_stories: stories.filter(s => s.status === 'rejected').length\n};\n\nfunction formatStatus(status) {\n  const statusMap = {\n    'submitted': 'Submitted',\n    'transcribing': 'Transcribing',\n    'generating': 'Generating',\n    'processing': 'Processing',\n    'completed': 'Completed',\n    'rejected': 'Rejected'\n  };\n  return statusMap[status] || status;\n}\n\nconst formattedStories = stories.map(story => ({\n  story_id: story.story_id,\n  name: story.name || 'Untitled Story',\n  prompt: story.prompt || 'No prompt provided',\n  status: story.status,\n  status_text: formatStatus(story.status),\n  created_at: story.created_at,\n  story_url: story.story_url || null,\n  video_url: story.video_url ? `https://storiesofyou-stories.s3.us-east-2.amazonaws.com/videos/${story.story_id}_complete.mp4` : null,\n  thumbnail_url: story.photo_key && story.photo_key !== 'default-story-image.jpg' \n    ? `https://storiesofyou-incoming.s3.us-east-2.amazonaws.com/${story.photo_key}` \n    : null\n}));\n\nformattedStories.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nreturn {\n  json: {\n    stories: formattedStories,\n    stats: stats,\n    email: email\n  }\n};"
+      },
+      "id": "format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseCode": 401,
+        "responseBody": "={{ { \"error\": $json.message || \"Authentication failed\" } }}",
+        "options": {}
+      },
+      "id": "respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 500]
+    }
+  ],
+  "connections": {
+    "Webhook - Get Storyboard Data": {
+      "main": [[{ "node": "Extract Session Token", "type": "main", "index": 0 }]]
+    },
+    "Extract Session Token": {
+      "main": [[{ "node": "Get Session", "type": "main", "index": 0 }]]
+    },
+    "Get Session": {
+      "main": [[{ "node": "Validate Session", "type": "main", "index": 0 }]]
+    },
+    "Validate Session": {
+      "main": [[{ "node": "Query Stories", "type": "main", "index": 0 }]]
+    },
+    "Query Stories": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
+    },
+    "Format Response": {
+      "main": [[{ "node": "Respond Success", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "get-storyboard-data"
+}
