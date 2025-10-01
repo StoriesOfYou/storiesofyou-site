@@ -293,7 +293,6 @@
             background: #d4841c;
         }
         
-        /* Share Modal */
         .modal {
             display: none;
             position: fixed;
@@ -474,19 +473,18 @@
                     <div class="stat-label">Total Stories</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="sharedWith">0</div>
-                    <div class="stat-label">Shared With</div>
+                    <div class="stat-number" id="completedStories">0</div>
+                    <div class="stat-label">Completed</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="lastRecorded">--</div>
-                    <div class="stat-label">Last Recorded</div>
+                    <div class="stat-number" id="processingStories">0</div>
+                    <div class="stat-label">Processing</div>
                 </div>
             </div>
         </div>
         
         <div class="actions-section">
             <button class="btn-record" onclick="recordNewStory()">
-                <span>🎙️</span>
                 Record New Story
             </button>
         </div>
@@ -513,13 +511,11 @@
             <h3 class="empty-title">No stories yet</h3>
             <p class="empty-text">Record your first story and start preserving your memories</p>
             <button class="btn-record" onclick="recordNewStory()">
-                <span>🎙️</span>
                 Record Your First Story
             </button>
         </div>
     </div>
     
-    <!-- Share Modal -->
     <div class="modal" id="shareModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -540,28 +536,25 @@
             
             <div class="share-list" id="shareList">
                 <h4 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--brand-charcoal);">Currently shared with:</h4>
-                <!-- Shared users will appear here -->
             </div>
         </div>
     </div>
 
     <script>
-        const API_BASE = 'https://stories.storiesofyou.ai/api';
+        const API_BASE = 'https://mikelandin.app.n8n.cloud/webhook';
         let currentStories = [];
         let currentView = 'grid';
         let selectedStoryId = null;
         
-        // Check authentication
         function checkAuth() {
             const token = localStorage.getItem('storiesofyou_token');
             if (!token) {
-                window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+                window.location.href = 'https://storiesofyou.ai';
                 return false;
             }
             return token;
         }
         
-        // Load user data and stories
         async function loadStoryboard() {
             const token = checkAuth();
             if (!token) return;
@@ -571,35 +564,36 @@
             
             try {
                 const response = await fetch(`${API_BASE}/storyboard-data`, {
+                    method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_token: token
+                    })
                 });
                 
                 if (!response.ok) {
-                    if (response.status === 401) {
-                        // Token expired
+                    if (response.status === 401 || response.status === 403) {
                         localStorage.removeItem('storiesofyou_token');
                         localStorage.removeItem('storiesofyou_email');
-                        window.location.href = '/login.html';
+                        window.location.href = 'https://storiesofyou.ai';
                         return;
                     }
                     throw new Error('Failed to load stories');
                 }
                 
                 const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
                 currentStories = data.stories || [];
                 
-                // Update stats
-                document.getElementById('totalStories').textContent = currentStories.length;
-                document.getElementById('sharedWith').textContent = data.sharedWithCount || 0;
-                
-                if (currentStories.length > 0) {
-                    const lastStory = currentStories[0];
-                    const lastDate = new Date(lastStory.created_at);
-                    document.getElementById('lastRecorded').textContent = 
-                        lastDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                }
+                document.getElementById('totalStories').textContent = data.stats?.total_stories || 0;
+                document.getElementById('completedStories').textContent = data.stats?.completed_stories || 0;
+                document.getElementById('processingStories').textContent = data.stats?.processing_stories || 0;
                 
                 renderStories();
                 
@@ -623,13 +617,12 @@
             
             empty.style.display = 'none';
             
-            // Render grid view
             grid.innerHTML = currentStories.map(story => `
                 <div class="story-card" onclick="openStory('${story.story_id}')">
                     <span class="story-status ${story.status === 'completed' ? 'status-ready' : 'status-processing'}">
-                        ${story.status === 'completed' ? 'Ready' : 'Processing'}
+                        ${story.status_text || story.status}
                     </span>
-                    <h4 class="story-title">${story.prompt || 'Untitled Story'}</h4>
+                    <h4 class="story-title">${escapeHtml(story.prompt || 'Untitled Story')}</h4>
                     <p class="story-date">
                         ${new Date(story.created_at).toLocaleDateString('en-US', { 
                             month: 'long', 
@@ -638,10 +631,9 @@
                         })}
                     </p>
                     <div class="story-actions" onclick="event.stopPropagation()">
-                        ${story.status === 'completed' ? `
+                        ${story.status === 'completed' && story.story_url ? `
                             <button class="story-btn primary" onclick="playStory('${story.story_id}')">Play</button>
-                            <button class="story-btn" onclick="shareStory('${story.story_id}', '${story.prompt || 'Untitled'}')">Share</button>
-                            <button class="story-btn" onclick="downloadStory('${story.story_id}')">Download</button>
+                            <button class="story-btn" onclick="shareStory('${story.story_id}', '${escapeHtml(story.prompt || 'Untitled')}')">Share</button>
                         ` : `
                             <button class="story-btn" disabled>Processing...</button>
                         `}
@@ -649,22 +641,20 @@
                 </div>
             `).join('');
             
-            // Render list view (similar but different layout)
             list.innerHTML = currentStories.map(story => `
                 <div class="story-card" style="margin-bottom: 1rem;">
                     <div style="display: flex; justify-content: space-between; align-items: start;">
                         <div style="flex: 1;">
                             <span class="story-status ${story.status === 'completed' ? 'status-ready' : 'status-processing'}">
-                                ${story.status === 'completed' ? 'Ready' : 'Processing'}
+                                ${story.status_text || story.status}
                             </span>
-                            <h4 class="story-title">${story.prompt || 'Untitled Story'}</h4>
+                            <h4 class="story-title">${escapeHtml(story.prompt || 'Untitled Story')}</h4>
                             <p class="story-date">${new Date(story.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
                         </div>
                         <div class="story-actions" style="margin-top: 0;">
-                            ${story.status === 'completed' ? `
+                            ${story.status === 'completed' && story.story_url ? `
                                 <button class="story-btn primary" onclick="playStory('${story.story_id}')">Play</button>
-                                <button class="story-btn" onclick="shareStory('${story.story_id}', '${story.prompt || 'Untitled'}')">Share</button>
-                                <button class="story-btn" onclick="downloadStory('${story.story_id}')">Download</button>
+                                <button class="story-btn" onclick="shareStory('${story.story_id}', '${escapeHtml(story.prompt || 'Untitled')}')">Share</button>
                             ` : `
                                 <button class="story-btn" disabled>Processing...</button>
                             `}
@@ -672,6 +662,12 @@
                     </div>
                 </div>
             `).join('');
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
         
         function setView(view) {
@@ -697,12 +693,15 @@
         }
         
         function openStory(storyId) {
-            window.open(`https://stories.storiesofyou.ai/${storyId}.html`, '_blank');
+            const story = currentStories.find(s => s.story_id === storyId);
+            if (story && story.story_url) {
+                window.open(story.story_url, '_blank');
+            }
         }
         
         function playStory(storyId) {
             event.stopPropagation();
-            window.open(`https://stories.storiesofyou.ai/${storyId}.html`, '_blank');
+            openStory(storyId);
         }
         
         function shareStory(storyId, title) {
@@ -726,49 +725,15 @@
                 return;
             }
             
-            const token = checkAuth();
-            if (!token) return;
-            
-            try {
-                const response = await fetch(`${API_BASE}/share-story`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        story_id: selectedStoryId,
-                        share_with_email: email,
-                        permissions: ['view', 'download']
-                    })
-                });
-                
-                if (response.ok) {
-                    alert(`Invitation sent to ${email}`);
-                    document.getElementById('shareEmail').value = '';
-                    loadShareList(selectedStoryId);
-                } else {
-                    alert('Failed to share story. Please try again.');
-                }
-            } catch (error) {
-                console.error('Error sharing story:', error);
-                alert('Failed to share story. Please try again.');
-            }
+            alert('Sharing feature coming soon! For now, you can copy the story URL and share it directly.');
+            document.getElementById('shareEmail').value = '';
         }
         
         async function loadShareList(storyId) {
-            // Load existing shares for this story
-            // This would fetch from your API
             document.getElementById('shareList').innerHTML = `
                 <h4 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--brand-charcoal);">Currently shared with:</h4>
-                <p style="color: #6b7280;">No one yet. Add email addresses above to share this story.</p>
+                <p style="color: #6b7280;">Sharing feature coming soon.</p>
             `;
-        }
-        
-        async function downloadStory(storyId) {
-            event.stopPropagation();
-            // For now, open the story page where download links are available
-            window.open(`https://stories.storiesofyou.ai/${storyId}.html`, '_blank');
         }
         
         function recordNewStory() {
@@ -778,17 +743,28 @@
         function logout() {
             localStorage.removeItem('storiesofyou_token');
             localStorage.removeItem('storiesofyou_email');
-            document.cookie = 'storiesofyou_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            window.location.href = '/login.html';
+            window.location.href = 'https://storiesofyou.ai';
         }
         
         function showError(message) {
-            // You can implement a toast notification here
             alert(message);
         }
         
-        // Load on page ready
         document.addEventListener('DOMContentLoaded', () => {
+            // CRITICAL: Extract token from URL params FIRST, before any auth checks
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlToken = urlParams.get('token');
+            const urlEmail = urlParams.get('email');
+            
+            if (urlToken && urlEmail) {
+                // Store credentials from magic link
+                localStorage.setItem('storiesofyou_token', urlToken);
+                localStorage.setItem('storiesofyou_email', urlEmail);
+                // Clean up URL (remove sensitive params from address bar)
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            
+            // Now safe to check auth and load stories
             loadStoryboard();
             // Refresh every 30 seconds to check for newly processed stories
             setInterval(loadStoryboard, 30000);
