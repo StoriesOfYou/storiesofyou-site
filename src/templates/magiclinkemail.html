@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in to Stories of You</title>
+    <style>
+        /* Force proper text colors across email clients */
+        .header-text {
+            color: #000000 !important;
+        }
+        .header-subtitle {
+            color: #333333 !important;
+        }
+        /* Prevent dark mode issues */
+        [data-ogsc] .header-text {
+            color: #000000 !important;
+        }
+        [data-ogsc] .header-subtitle {
+            color: #333333 !important;
+        }
+        /* Gmail specific fixes */
+        u + .body .header-text {
+            color: #000000 !important;
+        }
+        /* Outlook fixes */
+        .ExternalClass .header-text {
+            color: #000000 !important;
+        }
+    </style>
+</head>
+<body class="body" style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: radial-gradient(1200px 500px at 50% -200px, #fff7e9 0%, #fce8c8 50%, #e0cba7 100%); min-height: 100vh;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;">
+        
+        <!-- Header with Logo -->
+        <div style="background: #e0cba7; padding: 40px 20px; text-align: center;">
+            <img src="https://raw.githubusercontent.com/StoriesOfYou/storiesofyou-site/main/logo.png" alt="Stories of You" style="height: 48px; width: auto; margin-bottom: 16px;" />
+            <h1 class="header-text" style="color: #000000 !important; margin: 0; font-size: 28px; font-weight: 800; text-shadow: none;">Log in to Stories of You</h1>
+            <p class="header-subtitle" style="color: #333333 !important; margin: 10px 0 0 0; font-size: 16px; font-style: italic; text-shadow: none;">1-Click Login to Your Storyboard</p>
+        </div>
+        
+        <!-- Content -->
+        <div style="padding: 40px 30px; background: white;">
+            
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 32px 0;">
+                <a href="{{ $('Prepare OTP Data').first().json.magic_link }}" style="background-color: #3d3528; color: white; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 18px; display: inline-block; box-shadow: 0 4px 12px rgba(61, 53, 40, 0.3); transition: all 0.2s ease;">
+                    🔐 Log In to Your Storyboard
+                </a>
+            </div>
+            
+            <!-- Security notice -->
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0; border-radius: 0 8px 8px 0;">
+                <p style="color: #92400e; font-size: 14px; margin: 0 0 8px 0; font-weight: 600;">
+                    ⏱️ This link expires in 5 minutes
+                </p>
+                <p style="color: #78350f; font-size: 13px; margin: 0;">
+                    If you didn't request this login, please ignore this email.
+                </p>
+            </div>
+            
+            <!-- Alternative link -->
+            <details style="margin-top: 24px;">
+                <summary style="cursor: pointer; color: #6b7280; font-size: 14px; font-weight: 600;">
+                    Or copy and paste this link
+                </summary>
+                <div style="background: #f9fafb; padding: 12px; border-radius: 6px; margin-top: 8px; word-break: break-all; font-family: monospace; font-size: 12px; color: #4b5563;">
+                    {{ $('Prepare OTP Data').first().json.magic_link }}
+                </div>
+            </details>
+        </div>
+        
+        <!-- Footer -->
+        <div style="background: #3d3528; color: white; padding: 24px 30px; text-align: center;">
+            <p style="color: rgba(255,255,255,0.9); font-size: 12px; margin: 0 0 8px 0;">
+                Best regards,<br>
+                <strong>The Stories of You Team</strong>
+            </p>
+            <p style="color: rgba(255,255,255,0.7); font-size: 11px; margin: 0; font-style: italic;">
+                Your voice, your story — preserved forever
+            </p>
+        </div>
+    </div>
+</body>
+</html>
