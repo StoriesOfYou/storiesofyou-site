@@ -1,0 +1,26 @@
+# Stories of You - robots.txt
+# Individual story pages are shareable but not searchable
+# Only allow indexing of the main marketing site (storiesofyou.ai)
+
+User-agent: *
+
+# Block all story pages from search indexing
+Disallow: /s/
+Disallow: /stories/
+Disallow: /videos/
+Disallow: /generated-images/
+Disallow: /audio/
+
+# Allow main site pages (if hosted on same domain)
+Allow: /
+Allow: /index.html
+Allow: /about
+Allow: /pricing
+Allow: /faq
+
+# Crawl delay (optional - helps with server load)
+Crawl-delay: 10
+
+# Sitemap for main marketing site pages
+Sitemap: https://storiesofyou.ai/sitemap.xml
+
