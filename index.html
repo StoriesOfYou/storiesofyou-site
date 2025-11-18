@@ -1455,6 +1455,14 @@
           body: JSON.stringify({ email: email })
         });
         
+        // Handle rate limiting
+        if (response.status === 429) {
+          loginLoading.classList.add('hidden');
+          loginForm.classList.remove('hidden');
+          showError('Too many login attempts. Please wait a few minutes and try again.');
+          return;
+        }
+        
         const data = await response.json();
         
         if (data.success) {
@@ -1490,6 +1498,14 @@
           },
           body: JSON.stringify({ email: currentEmail })
         });
+        
+        // Handle rate limiting
+        if (response.status === 429) {
+          loginLoading.classList.add('hidden');
+          magicLinkForm.classList.remove('hidden');
+          showError('Too many login attempts. Please wait a few minutes and try again.');
+          return;
+        }
         
         const data = await response.json();
         
