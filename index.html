@@ -65,7 +65,7 @@
     }
     .site-header{position:fixed;top:0;left:0;right:0;z-index:100;background:transparent;backdrop-filter:none;box-shadow:none;transition:all 0.3s ease}
     .site-header.scrolled{background:rgba(255,255,255,.98);backdrop-filter:saturate(140%) blur(12px);box-shadow:0 2px 12px rgba(0,0,0,.08)}
-    .site-header:not(.scrolled) a[href="/"] {display:inline-block;background:var(--warm-mid);padding:0.75rem 1.25rem;border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:all 0.3s ease}
+    .site-header:not(.scrolled) a[href="/"] {display:inline-block;background:var(--warm-mid);padding:0.5rem 0.875rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:all 0.3s ease}
     .site-header:not(.scrolled) a[href="/"] img{background:transparent;padding:0;box-shadow:none}
     .site-header.scrolled a[href="/"] {background:transparent;padding:0;box-shadow:none}
     .site-header.scrolled a[href="/"] img{background:transparent;padding:0;box-shadow:none}
@@ -548,8 +548,8 @@
       }
       
       .site-header:not(.scrolled) a[href="/"] {
-        padding: 0.6rem 1rem;
-        border-radius: 12px;
+        padding: 0.4rem 0.75rem;
+        border-radius: 10px;
       }
       
       .wave-divider {
@@ -1390,7 +1390,7 @@
         <div id="uploadMsg" class="text-sm text-gray-600 hidden"></div>
       </div>
       
-      <div id="actionButtons" class="p-4 border-t bg-gray-50 flex-shrink-0">
+      <div id="actionButtons" class="p-4 border-t bg-gray-50 flex-shrink-0 rounded-b-xl">
         <div class="flex items-center gap-3 mb-3">
           <button id="btnRecord" class="btn-primary px-4 py-2 rounded-lg">Record</button>
           <button id="btnPause"  class="btn-secondary px-4 py-2 rounded-lg hidden">Pause</button>
@@ -1419,7 +1419,7 @@
         </div>
         <button id="loginClose" class="text-gray-400 hover:text-gray-600 text-2xl leading-none" aria-label="Close">&times;</button>
       </div>
-      <div class="p-6 space-y-4 overflow-y-auto flex-1">
+      <div class="p-6 space-y-4 overflow-y-auto flex-1 rounded-b-xl">
         <div id="loginForm">
           <div class="text-center mb-6">
             <h2 class="text-xl font-semibold text-gray-900 mb-2">Welcome Back</h2>
