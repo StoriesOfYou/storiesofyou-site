@@ -65,6 +65,9 @@
     }
     .site-header{position:fixed;top:0;left:0;right:0;z-index:100;background:transparent;backdrop-filter:none;box-shadow:none;transition:all 0.3s ease}
     .site-header.scrolled{background:rgba(255,255,255,.98);backdrop-filter:saturate(140%) blur(12px);box-shadow:0 2px 12px rgba(0,0,0,.08)}
+    .site-header:not(.scrolled) a[href="/"] img{background:var(--warm-mid);padding:0.5rem 1rem;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+    .site-header:not(.scrolled) nav a{color:#3d3528;font-weight:600}
+    .site-header.scrolled a[href="/"] img{background:transparent;padding:0;box-shadow:none}
     .hero-bg{background:radial-gradient(1200px 500px at 50% -200px,#fff7e9 0%,#fce8c8 50%,#e0cba7 100%)}
     .bg-warm-light{background-color:var(--warm-light)}
     .bg-warm-mid{background-color:var(--warm-mid)}
@@ -85,6 +88,58 @@
     .wave-divider img{width:100%;height:auto;display:block;margin:0;padding:0}
     
     .testimonials-section{background-color:var(--warm-light);background-image:url('https://storiesofyou-stories.s3.us-east-2.amazonaws.com/paper-grain.webp');background-size:200px 200px;background-position:center;background-blend-mode:overlay;background-repeat:repeat;position:relative}
+    
+    .testimonial-card-calm{
+      padding:3.5rem 2.5rem;
+      border-radius:1.25rem;
+      box-shadow:0 10px 40px rgba(0,0,0,0.12);
+      text-align:center;
+      transition:all 0.4s cubic-bezier(0.4,0,0.2,1);
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .testimonial-card-calm:hover{
+      transform:translateY(-8px);
+      box-shadow:0 20px 60px rgba(0,0,0,0.18);
+    }
+    
+    .testimonial-card-calm .quote-mark{
+      font-size:6rem;
+      line-height:1;
+      color:rgba(15,44,76,0.15);
+      font-family:Georgia,serif;
+      margin-bottom:1rem;
+    }
+    
+    .testimonial-card-calm .testimonial-quote{
+      font-size:1.25rem;
+      line-height:1.75;
+      color:var(--brand-navy);
+      margin-bottom:2rem;
+      font-weight:500;
+    }
+    
+    .testimonial-card-calm .testimonial-author{
+      font-size:1rem;
+      color:var(--brand-charcoal);
+      font-weight:600;
+      opacity:0.85;
+    }
+    
+    @media (max-width: 768px){
+      .testimonial-card-calm{
+        padding:2.5rem 1.75rem;
+      }
+      
+      .testimonial-card-calm .quote-mark{
+        font-size:4rem;
+      }
+      
+      .testimonial-card-calm .testimonial-quote{
+        font-size:1.125rem;
+      }
+    }
     
     .loading-spinner {
       display: inline-block;
@@ -486,6 +541,24 @@
       .story-card {
         flex: 0 0 280px;
       }
+      
+      .site-header:not(.scrolled) a[href="/"] img {
+        padding: 0.4rem 0.8rem;
+        border-radius: 10px;
+      }
+      
+      .wave-divider {
+        overflow-x: hidden;
+      }
+      
+      .wave-divider svg {
+        min-width: 100%;
+      }
+      
+      .testimonials-section-calm .grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem;
+      }
     }
   </style>
 </head>
@@ -632,10 +705,11 @@
   </section>
 
   <!-- Wave Divider -->
-  <div class="wave-divider">
-    <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="width:100%;height:60px;display:block">
-      <path d="M0,60 C300,90 900,30 1200,60 L1200,120 L0,120 Z" fill="#ffffff" opacity="0.6"></path>
-      <path d="M0,80 C300,50 900,90 1200,80 L1200,120 L0,120 Z" fill="#ffffff"></path>
+  <div class="wave-divider" style="background: linear-gradient(to bottom, rgba(250,243,231,0) 0%, rgba(250,243,231,0.3) 50%, rgba(255,255,255,1) 100%); padding: 3rem 0 0 0;">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="width:100%;height:80px;display:block">
+      <path d="M0,40 C400,80 800,0 1200,40 L1200,120 L0,120 Z" fill="#e0cba7" opacity="0.2"></path>
+      <path d="M0,60 C300,20 900,80 1200,60 L1200,120 L0,120 Z" fill="#fdfaf6" opacity="0.6"></path>
+      <path d="M0,80 C300,60 900,100 1200,80 L1200,120 L0,120 Z" fill="#ffffff"></path>
     </svg>
   </div>
 
@@ -695,23 +769,26 @@
   </div>
 
   <!-- Testimonials -->
-  <section class="testimonials-section" style="padding: 8rem 0;" aria-labelledby="testimonials">
-    <div class="max-w-6xl mx-auto px-6">
+  <section class="testimonials-section-calm" style="padding: 8rem 0; background: var(--warm-light);" aria-labelledby="testimonials">
+    <div class="max-w-7xl mx-auto px-6">
       <h2 id="testimonials" class="text-3xl font-bold text-center mb-6 reveal" style="color:var(--brand-navy)">What Families Are Saying</h2>
       <p class="text-lg text-gray-700 text-center mb-16 max-w-2xl mx-auto reveal">Real stories from families preserving their memories</p>
-      <div class="grid md:grid-cols-3 gap-8">
-        <figure class="reveal rounded-xl border border-black/5 shadow-lg p-8 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-          <blockquote class="text-gray-800 italic leading-relaxed">"I didn't realize how much I missed my dad's laugh until I heard it here. Best gift we've given our kids."</blockquote>
-          <figcaption class="mt-6 text-sm font-medium text-gray-600">— Sarah M., daughter</figcaption>
-        </figure>
-        <figure class="reveal rounded-xl border border-black/5 shadow-lg p-8 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-          <blockquote class="text-gray-800 italic leading-relaxed">"It took five minutes, and now my grandkids will always know my voice and our family stories."</blockquote>
-          <figcaption class="mt-6 text-sm font-medium text-gray-600">— Robert T., grandfather</figcaption>
-        </figure>
-        <figure class="reveal rounded-xl border border-black/5 shadow-lg p-8 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-          <blockquote class="text-gray-800 italic leading-relaxed">"My mom hates being on camera, but this made it easy. She just talked — and it was beautiful."</blockquote>
-          <figcaption class="mt-6 text-sm font-medium text-gray-600">— Jason L., son</figcaption>
-        </figure>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="testimonial-card-calm reveal" style="background: linear-gradient(135deg, #fdfaf6 0%, #f5e6cc 50%, #e0cba7 100%);">
+          <div class="quote-mark">"</div>
+          <blockquote class="testimonial-quote">I didn't realize how much I missed my dad's laugh until I heard it here. Best gift we've given our kids.</blockquote>
+          <p class="testimonial-author">Sarah M., daughter</p>
+        </div>
+        <div class="testimonial-card-calm reveal" style="background: linear-gradient(135deg, #f5e6cc 0%, #e0cba7 50%, #d4b896 100%);">
+          <div class="quote-mark">"</div>
+          <blockquote class="testimonial-quote">It took five minutes, and now my grandkids will always know my voice and our family stories.</blockquote>
+          <p class="testimonial-author">Robert T., grandfather</p>
+        </div>
+        <div class="testimonial-card-calm reveal" style="background: linear-gradient(135deg, #fdfaf6 0%, #e8d4b8 50%, #d4b896 100%);">
+          <div class="quote-mark">"</div>
+          <blockquote class="testimonial-quote">My mom hates being on camera, but this made it easy. She just talked — and it was beautiful.</blockquote>
+          <p class="testimonial-author">Jason L., son</p>
+        </div>
       </div>
     </div>
   </section>
@@ -1182,8 +1259,8 @@
   </footer>
 
   <!-- Recorder Modal -->
-  <div id="recModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[1000] p-4 overflow-y-auto">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[95vh] flex flex-col my-4">
+  <div id="recModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 overflow-y-auto" style="z-index: 9999;">
+    <div class="bg-white shadow-2xl w-full max-w-lg max-h-[95vh] flex flex-col my-4" style="border-radius: 1rem;">
       <div class="flex items-center justify-between p-4 border-b flex-shrink-0">
         <div class="flex items-center gap-2">
           <img src="logo.png" alt="Stories of You" class="h-6 w-auto" />
@@ -1328,8 +1405,8 @@
   </div>
 
   <!-- Login Modal -->
-  <div id="loginModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[1000] p-4 overflow-y-auto">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[95vh] flex flex-col my-4">
+  <div id="loginModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 overflow-y-auto" style="z-index: 9999;">
+    <div class="bg-white shadow-2xl w-full max-w-md max-h-[95vh] flex flex-col my-4" style="border-radius: 1rem;">
       <div class="flex items-center justify-between p-4 border-b flex-shrink-0">
         <div class="flex items-center gap-2">
           <img src="logo.png" alt="Stories of You" class="h-6 w-auto" />
@@ -1342,6 +1419,19 @@
           <div class="text-center mb-6">
             <h2 class="text-xl font-semibold text-gray-900 mb-2">Welcome Back</h2>
             <p class="text-sm text-gray-600">Enter your email to receive a magic link</p>
+          </div>
+          
+          <!-- Session Expiration Warning -->
+          <div id="sessionExpiredWarning" class="hidden mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <div class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+              <div>
+                <p class="text-sm text-amber-800 font-semibold">Your session has expired</p>
+                <p class="text-xs text-amber-700 mt-1">Please log in again to continue accessing your storyboard.</p>
+              </div>
+            </div>
           </div>
           
           <div class="space-y-4">
@@ -1851,6 +1941,34 @@
     
     let currentEmail = '';
 
+    // Check for session expiration on page load
+    (function checkSessionExpiration() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionExpired = urlParams.get('session_expired');
+      
+      if (sessionExpired === 'true') {
+        // Show session expiration warning
+        const warningElement = document.getElementById('sessionExpiredWarning');
+        if (warningElement) {
+          warningElement.classList.remove('hidden');
+        }
+        
+        // Pre-fill email from localStorage if available
+        const savedEmail = localStorage.getItem('storiesofyou_email');
+        if (savedEmail && loginEmail) {
+          loginEmail.value = savedEmail;
+        }
+        
+        // Auto-open the login modal
+        loginModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        
+        // Remove the session_expired parameter from URL without reloading
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+      }
+    })();
+
     function openLogin() {
       loginModal.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
@@ -1869,6 +1987,11 @@
       loginLoading.classList.add('hidden');
       loginSuccess.classList.add('hidden');
       loginError.classList.add('hidden');
+      // Hide session expiration warning on reset (for manual opens)
+      const warningElement = document.getElementById('sessionExpiredWarning');
+      if (warningElement) {
+        warningElement.classList.add('hidden');
+      }
       loginEmail.value = '';
       currentEmail = '';
     }
