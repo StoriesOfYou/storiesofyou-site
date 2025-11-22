@@ -65,9 +65,14 @@
     }
     .site-header{position:fixed;top:0;left:0;right:0;z-index:100;background:transparent;backdrop-filter:none;box-shadow:none;transition:all 0.3s ease}
     .site-header.scrolled{background:rgba(255,255,255,.98);backdrop-filter:saturate(140%) blur(12px);box-shadow:0 2px 12px rgba(0,0,0,.08)}
-    .site-header:not(.scrolled) a[href="/"] img{background:var(--warm-mid);padding:0.5rem 1rem;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
-    .site-header:not(.scrolled) nav a{color:#3d3528;font-weight:600}
+    .site-header:not(.scrolled) a[href="/"] {display:inline-block;background:var(--warm-mid);padding:0.75rem 1.25rem;border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:all 0.3s ease}
+    .site-header:not(.scrolled) a[href="/"] img{background:transparent;padding:0;box-shadow:none}
+    .site-header.scrolled a[href="/"] {background:transparent;padding:0;box-shadow:none}
     .site-header.scrolled a[href="/"] img{background:transparent;padding:0;box-shadow:none}
+    .site-header:not(.scrolled) nav a{color:#ffffff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,0.1)}
+    .site-header.scrolled nav a{color:#4b5563}
+    .site-header:not(.scrolled) #mobileMenuBtn{color:#ffffff}
+    .site-header.scrolled #mobileMenuBtn{color:#4b5563}
     .hero-bg{background:radial-gradient(1200px 500px at 50% -200px,#fff7e9 0%,#fce8c8 50%,#e0cba7 100%)}
     .bg-warm-light{background-color:var(--warm-light)}
     .bg-warm-mid{background-color:var(--warm-mid)}
@@ -542,9 +547,9 @@
         flex: 0 0 280px;
       }
       
-      .site-header:not(.scrolled) a[href="/"] img {
-        padding: 0.4rem 0.8rem;
-        border-radius: 10px;
+      .site-header:not(.scrolled) a[href="/"] {
+        padding: 0.6rem 1rem;
+        border-radius: 12px;
       }
       
       .wave-divider {
@@ -717,7 +722,7 @@
   <section class="bg-white" style="padding: 8rem 0;" aria-labelledby="how-it-works">
     <div class="max-w-6xl mx-auto px-6 text-center">
       <h2 id="how-it-works" class="text-3xl font-bold mb-10 reveal" style="color:var(--brand-navy)">How to Record and Share Your Stories</h2>
-      <p class="text-lg text-gray-700 mb-20 max-w-2xl mx-auto reveal">Three simple steps to preserve your memories</p>
+      <p class="text-lg text-gray-700 mb-24 max-w-2xl mx-auto reveal">Three simple steps to preserve your memories</p>
       <div class="grid md:grid-cols-3" style="gap: 5rem;">
         <div class="reveal">
           <span class="icon">
@@ -772,7 +777,7 @@
   <section class="testimonials-section-calm" style="padding: 8rem 0; background: var(--warm-light);" aria-labelledby="testimonials">
     <div class="max-w-7xl mx-auto px-6">
       <h2 id="testimonials" class="text-3xl font-bold text-center mb-6 reveal" style="color:var(--brand-navy)">What Families Are Saying</h2>
-      <p class="text-lg text-gray-700 text-center mb-16 max-w-2xl mx-auto reveal">Real stories from families preserving their memories</p>
+      <p class="text-lg text-gray-700 text-center mb-20 max-w-2xl mx-auto reveal">Real stories from families preserving their memories</p>
       <div class="grid md:grid-cols-3 gap-6">
         <div class="testimonial-card-calm reveal" style="background: linear-gradient(135deg, #fdfaf6 0%, #f5e6cc 50%, #e0cba7 100%);">
           <div class="quote-mark">"</div>
