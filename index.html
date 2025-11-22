@@ -22,7 +22,9 @@
   <meta name="googlebot" content="index, follow" />
   <link rel="preconnect" href="https://d4al2emvsw1mr.cloudfront.net" />
   <link rel="preconnect" href="https://stories.storiesofyou.ai" />
+  <link rel="preconnect" href="https://storiesofyou-stories.s3.us-east-2.amazonaws.com" />
   <link rel="dns-prefetch" href="https://6117txq5ok.execute-api.us-east-2.amazonaws.com" />
+  <link rel="preload" href="https://storiesofyou-stories.s3.us-east-2.amazonaws.com/hero-journal.webp" as="image" />
   
   <!-- Structured Data for SEO -->
   <script type="application/ld+json">
@@ -61,7 +63,8 @@
       --warm-light:#faf3e7;
       --warm-mid:#e0cba7;
     }
-    .site-header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.82);backdrop-filter:saturate(140%) blur(10px);box-shadow:0 6px 16px rgba(0,0,0,.06)}
+    .site-header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:saturate(140%) blur(12px);box-shadow:0 2px 12px rgba(0,0,0,.08);transition:all 0.3s ease}
+    .site-header.scrolled{background:rgba(255,255,255,.98);box-shadow:0 4px 16px rgba(0,0,0,.12)}
     .hero-bg{background:radial-gradient(1200px 500px at 50% -200px,#fff7e9 0%,#fce8c8 50%,#e0cba7 100%)}
     .bg-warm-light{background-color:var(--warm-light)}
     .bg-warm-mid{background-color:var(--warm-mid)}
@@ -77,6 +80,11 @@
     .btn-secondary:disabled{background:#f9fafb;color:#9ca3af;border-color:#d1d5db;cursor:not-allowed;transform:none}
     .icon{width:52px;height:52px;display:inline-block;color:var(--brand-navy)}
     .icon-accent{color:var(--brand-orange)}
+    
+    .wave-divider{width:100%;max-width:100%;overflow:hidden;line-height:0;margin:0;padding:0}
+    .wave-divider img{width:100%;height:auto;display:block;margin:0;padding:0}
+    
+    .testimonials-section{background-color:var(--warm-light);background-image:url('https://storiesofyou-stories.s3.us-east-2.amazonaws.com/paper-grain.webp');background-size:cover;background-position:center;background-blend-mode:multiply;opacity:1}
     
     .loading-spinner {
       display: inline-block;
@@ -149,8 +157,8 @@
     }
     
     .faq-tab {
-      padding: 8px 16px;
-      border: 2px solid var(--brand-charcoal);
+      padding: 10px 20px;
+      border: 1px solid var(--brand-charcoal);
       background: white;
       color: var(--brand-charcoal);
       border-radius: 8px;
@@ -162,6 +170,8 @@
     .faq-tab:hover {
       background: var(--brand-charcoal);
       color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
     .faq-tab.active {
@@ -177,6 +187,14 @@
       display: block;
     }
     
+    .faq-question {
+      transition: all 0.3s ease;
+    }
+    
+    .faq-question:hover {
+      background: #f9fafb !important;
+    }
+    
     .faq-question:hover .faq-icon {
       color: var(--brand-orange);
     }
@@ -186,17 +204,264 @@
       color: var(--brand-orange);
     }
     
+    .faq-icon {
+      transition: all 0.4s ease;
+    }
+    
     .faq-answer {
-      animation: fadeIn 0.3s ease-in-out;
+      animation: fadeIn 0.4s ease-in-out;
     }
     
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    
+    /* Calm-Inspired Hero Styles */
+    .hero-calm-style {
+      position: relative;
+      min-height: 100vh;
+      background-color: var(--warm-light);
+    }
+    
+    .hero-image-container {
+      position: relative;
+      height: 65vh;
+      width: 100%;
+      overflow: hidden;
+    }
+    
+    .hero-image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    
+    .gradient-fade-to-white {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(to bottom, transparent 0%, rgba(253,250,246,0.1) 20%, rgba(253,250,246,0.4) 40%, rgba(253,250,246,0.7) 60%, rgba(253,250,246,0.9) 80%, #fdfaf6 100%);
+      pointer-events: none;
+    }
+    
+    .hero-content-below {
+      position: relative;
+      background-color: var(--warm-light);
+      padding: 3rem 1.5rem 4rem;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .hero-content-below h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 800;
+      color: var(--brand-navy);
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+    
+    .hero-content-below p {
+      font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+      color: var(--brand-charcoal);
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .btn-hero {
+      padding: 1rem 2rem;
+      font-size: 1.125rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-hero:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Example Stories Section */
+    .examples-section {
+      background: linear-gradient(to bottom, var(--warm-light) 0%, white 100%);
+      padding: 4rem 0 5rem;
+    }
+    
+    .stories-carousel-wrapper {
+      position: relative;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    
+    .stories-carousel {
+      display: flex;
+      gap: 1.5rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 2rem 0;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--brand-orange) var(--warm-light);
+    }
+    
+    .stories-carousel::-webkit-scrollbar {
+      height: 8px;
+    }
+    
+    .stories-carousel::-webkit-scrollbar-track {
+      background: var(--warm-light);
+      border-radius: 4px;
+    }
+    
+    .stories-carousel::-webkit-scrollbar-thumb {
+      background: var(--brand-orange);
+      border-radius: 4px;
+    }
+    
+    .story-card {
+      flex: 0 0 320px;
+      scroll-snap-align: start;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background: white;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    
+    .story-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    
+    .story-card-thumbnail {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      background: var(--warm-mid);
+      overflow: hidden;
+    }
+    
+    .story-card-thumbnail img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .story-card-play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .story-card:hover .story-card-play {
+      background: white;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+    
+    .story-card-play svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--brand-charcoal);
+      margin-left: 3px;
+    }
+    
+    .story-card-content {
+      padding: 1.25rem;
+    }
+    
+    .story-card-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--brand-navy);
+      margin-bottom: 0.5rem;
+    }
+    
+    .story-card-description {
+      font-size: 0.875rem;
+      color: var(--brand-charcoal);
+      opacity: 0.8;
+    }
+    
+    /* Shared Storyboard CTA Section */
+    .shared-storyboard-cta {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      padding: 4rem 1.5rem;
+      text-align: center;
+    }
+    
+    .shared-storyboard-cta h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--brand-navy);
+      margin-bottom: 1rem;
+    }
+    
+    .shared-storyboard-cta p {
+      font-size: 1.125rem;
+      color: var(--brand-charcoal);
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .hero-image-container {
+        height: 50vh;
+      }
+      
+      .hero-content-below {
+        padding: 2rem 1.5rem 3rem;
+      }
+      
+      .hero-buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn-hero {
+        width: 100%;
+        max-width: 320px;
+        margin: 0 auto;
+      }
+      
+      .story-card {
+        flex: 0 0 280px;
+      }
+    }
   </style>
 </head>
-<body class="bg-white text-gray-800 font-sans">
+<body class="bg-white text-gray-800 font-sans" style="padding-top: 0;">
 
   <!-- Header -->
   <header class="site-header" role="banner">
@@ -228,92 +493,202 @@
     </div>
   </header>
 
-  <!-- Hero -->
-  <section class="hero-bg" aria-labelledby="hero-heading">
-    <div class="mx-auto max-w-7xl px-6 py-14 text-center">
-      <h1 id="hero-heading" class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight">Your voice, your story — preserved beautifully.</h1>
-      <p class="mt-5 text-lg text-gray-900/80 max-w-2xl mx-auto">
-        Record and share your family stories in your own voice, creating a legacy your loved ones can treasure for generations.
-      </p>
-
-      <div class="mt-8 max-w-3xl mx-auto reveal">
-        <div class="video-viewport">
-          <video
-            id="introVideo"
-            muted
-            playsinline
-            controls
-            preload="none"
-            poster="og-image.jpg"
-            width="1280"
-            height="720"
-            loading="lazy"
-            aria-label="Stories of You introduction video"
-          >
-            <source src="https://d4al2emvsw1mr.cloudfront.net/StoriesOfYouTest2.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      </div>
-
-      <div class="mt-8 flex items-center justify-center">
-        <button id="openRecorder" class="btn-primary px-8 py-4 text-lg rounded-xl shadow transition">
+  <!-- Hero - Calm Style -->
+  <section class="hero-calm-style" aria-labelledby="hero-heading">
+    <!-- Full-bleed hero image with gradient fade -->
+    <div class="hero-image-container">
+      <img 
+        src="https://storiesofyou-stories.s3.us-east-2.amazonaws.com/hero-journal.webp" 
+        alt="Vintage photo album and journal representing family memories"
+        loading="eager"
+        width="1440"
+        height="810"
+      />
+      <div class="gradient-fade-to-white"></div>
+    </div>
+    
+    <!-- Content below image -->
+    <div class="hero-content-below">
+      <h1 id="hero-heading">Your voice, your story — preserved beautifully.</h1>
+      <p>Record and share your family stories in your own voice</p>
+      
+      <div class="hero-buttons">
+        <button id="openRecorder" class="btn-primary btn-hero">
           Record a Story
+        </button>
+        <button id="openLoginModalHero" class="btn-secondary btn-hero">
+          Login
         </button>
       </div>
     </div>
   </section>
 
+  <!-- Example Stories Section -->
+  <section class="examples-section" aria-labelledby="examples-heading">
+    <div class="stories-carousel-wrapper">
+      <h2 id="examples-heading" class="text-3xl font-bold text-center mb-4 reveal" style="color:var(--brand-navy)">See What You'll Create</h2>
+      <p class="text-center text-lg text-gray-700 mb-8 max-w-2xl mx-auto reveal">
+        Every story becomes a beautifully crafted video with your voice, visuals, and a transcript
+      </p>
+      
+      <div class="stories-carousel">
+        <a href="https://stories.storiesofyou.ai/story-1763705401572-822yexn6y.html" class="story-card" target="_blank" rel="noopener">
+          <div class="story-card-thumbnail">
+            <img src="https://stories.storiesofyou.ai/generated-images/story-1763705401572-822yexn6y-1.png" alt="A Family Memory" loading="lazy" width="320" height="180" />
+            <div class="story-card-play">
+              <svg viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="story-card-content">
+            <h3 class="story-card-title">A Family Memory</h3>
+            <p class="story-card-description">A cherished story preserved forever</p>
+          </div>
+        </a>
+        
+        <a href="https://stories.storiesofyou.ai/story-1763705401572-822yexn6y.html" class="story-card" target="_blank" rel="noopener">
+          <div class="story-card-thumbnail">
+            <img src="https://stories.storiesofyou.ai/generated-images/story-1763705401572-822yexn6y-2.png" alt="Growing Up Stories" loading="lazy" width="320" height="180" />
+            <div class="story-card-play">
+              <svg viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="story-card-content">
+            <h3 class="story-card-title">Growing Up Stories</h3>
+            <p class="story-card-description">Memories from childhood and beyond</p>
+          </div>
+        </a>
+        
+        <a href="https://stories.storiesofyou.ai/story-1763705401572-822yexn6y.html" class="story-card" target="_blank" rel="noopener">
+          <div class="story-card-thumbnail">
+            <img src="https://stories.storiesofyou.ai/generated-images/story-1763705401572-822yexn6y-3.png" alt="My Favorite Recipe" loading="lazy" width="320" height="180" />
+            <div class="story-card-play">
+              <svg viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="story-card-content">
+            <h3 class="story-card-title">My Favorite Recipe</h3>
+            <p class="story-card-description">Family traditions passed down</p>
+          </div>
+        </a>
+        
+        <a href="https://stories.storiesofyou.ai/story-1763705401572-822yexn6y.html" class="story-card" target="_blank" rel="noopener">
+          <div class="story-card-thumbnail">
+            <img src="https://stories.storiesofyou.ai/generated-images/story-1763705401572-822yexn6y-4.png" alt="Life Lessons" loading="lazy" width="320" height="180" />
+            <div class="story-card-play">
+              <svg viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="story-card-content">
+            <h3 class="story-card-title">Life Lessons</h3>
+            <p class="story-card-description">Wisdom and experiences shared</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Wave Divider -->
+  <div class="wave-divider">
+    <img src="https://storiesofyou-stories.s3.us-east-2.amazonaws.com/wave-divider.webp" alt="" role="presentation" loading="lazy" />
+  </div>
+
   <!-- How It Works -->
-  <section class="bg-warm-light py-16" aria-labelledby="how-it-works">
+  <section class="bg-white py-24" aria-labelledby="how-it-works">
     <div class="max-w-6xl mx-auto px-6 text-center">
-      <h2 id="how-it-works" class="text-3xl font-bold mb-10 reveal">How to Record and Share Your Stories</h2>
-      <div class="grid md:grid-cols-3 gap-8">
+      <h2 id="how-it-works" class="text-3xl font-bold mb-6 reveal" style="color:var(--brand-navy)">How to Record and Share Your Stories</h2>
+      <p class="text-lg text-gray-700 mb-16 max-w-2xl mx-auto reveal">Three simple steps to preserve your memories</p>
+      <div class="grid md:grid-cols-3 gap-12">
         <div class="reveal">
           <span class="icon">
-            <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 1 1-10 0H5a7 7 0 0 0 14 0h-2ZM11 19h2v3h-2v-3Z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" x2="12" y1="19" y2="22"/>
+            </svg>
           </span>
-          <h3 class="text-xl font-semibold mt-2">Record</h3>
-          <p class="text-gray-700">Answer a simple prompt and record your voice right from your phone or computer.</p>
+          <h3 class="text-xl font-semibold mt-4 mb-3">Record</h3>
+          <p class="text-gray-700 leading-relaxed">Answer a prompt and record your voice from any device</p>
         </div>
         <div class="reveal">
           <span class="icon icon-accent">
-            <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full"><path d="M12 2l1.8 5.4L19 9l-5.2 1.6L12 16l-1.8-5.4L5 9l5.2-1.6L12 2Zm7 9 1 3-3 1 3 1-1 3 2-2 3 1-2-2 2-2-3 1-2-2Z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+              <path d="M5 3v4"/>
+              <path d="M19 17v4"/>
+              <path d="M3 5h4"/>
+              <path d="M17 19h4"/>
+            </svg>
           </span>
-          <h3 class="text-xl font-semibold mt-2">Review</h3>
-          <p class="text-gray-700">Listen back and make sure it's exactly how you want it before you submit.</p>
+          <h3 class="text-xl font-semibold mt-4 mb-3">We Create</h3>
+          <p class="text-gray-700 leading-relaxed">AI generates visuals and creates a beautiful video</p>
         </div>
         <div class="reveal">
           <span class="icon">
-            <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full"><path d="M20 7h-2.2a3 3 0 1 0-5.8-1c0 .34.07.67.2 1H11.8a3 3 0 1 0-5.8-1 3 3 0 0 0 .2 1H4a1 1 0 0 0-1 1v3h18V8a1 1 0 0 0-1-1Zm-8-2a1 1 0 1 1 2 0 1 1 0 0 1-2 0ZM8 5a1 1 0 1 1 2 0 1 1 0 0 1-2 0ZM3 12v7a2 2 0 0 0 2 2h5v-9H3Zm11 0v9h5a2 2 0 0 0 2-2v-7h-7Z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+              <path d="M20 12v10H4V12"/>
+              <path d="M22 7H2v5h20V7Z"/>
+              <path d="M12 22V7"/>
+              <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+              <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+            </svg>
           </span>
-          <h3 class="text-xl font-semibold mt-2">Share</h3>
-          <p class="text-gray-700">Your story is beautifully packaged and ready to share with loved ones. Download it to keep it safe.</p>
+          <h3 class="text-xl font-semibold mt-4 mb-3">Share</h3>
+          <p class="text-gray-700 leading-relaxed">Download and share your story with loved ones</p>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- Wave Divider -->
+  <div class="wave-divider">
+    <img src="https://storiesofyou-stories.s3.us-east-2.amazonaws.com/wave-divider.webp" alt="" role="presentation" loading="lazy" />
+  </div>
+
   <!-- Testimonials -->
-  <section class="bg-white py-16" aria-labelledby="testimonials">
+  <section class="testimonials-section py-24" aria-labelledby="testimonials">
     <div class="max-w-6xl mx-auto px-6">
-      <h2 id="testimonials" class="text-3xl font-bold text-center mb-10 reveal" style="color:var(--brand-navy)">What Families Are Saying</h2>
-      <div class="grid md:grid-cols-3 gap-6">
-        <figure class="reveal rounded-xl border border-black/5 shadow-sm p-6 bg-warm-light">
-          <blockquote class="text-gray-800 italic">"I didn't realize how much I missed my dad's laugh until I heard it here. Best gift we've given our kids."</blockquote>
-          <figcaption class="mt-4 text-sm text-gray-600">— Sarah M., daughter</figcaption>
+      <h2 id="testimonials" class="text-3xl font-bold text-center mb-6 reveal" style="color:var(--brand-navy)">What Families Are Saying</h2>
+      <p class="text-lg text-gray-700 text-center mb-16 max-w-2xl mx-auto reveal">Real stories from families preserving their memories</p>
+      <div class="grid md:grid-cols-3 gap-8">
+        <figure class="reveal rounded-xl border border-black/5 shadow-lg p-8 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <blockquote class="text-gray-800 italic leading-relaxed">"I didn't realize how much I missed my dad's laugh until I heard it here. Best gift we've given our kids."</blockquote>
+          <figcaption class="mt-6 text-sm font-medium text-gray-600">— Sarah M., daughter</figcaption>
         </figure>
-        <figure class="reveal rounded-xl border border-black/5 shadow-sm p-6 bg-warm-light">
-          <blockquote class="text-gray-800 italic">"It took five minutes, and now my grandkids will always know my voice and our family stories."</blockquote>
-          <figcaption class="mt-4 text-sm text-gray-600">— Robert T., grandfather</figcaption>
+        <figure class="reveal rounded-xl border border-black/5 shadow-lg p-8 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <blockquote class="text-gray-800 italic leading-relaxed">"It took five minutes, and now my grandkids will always know my voice and our family stories."</blockquote>
+          <figcaption class="mt-6 text-sm font-medium text-gray-600">— Robert T., grandfather</figcaption>
         </figure>
-        <figure class="reveal rounded-xl border border-black/5 shadow-sm p-6 bg-warm-light">
-          <blockquote class="text-gray-800 italic">"My mom hates being on camera, but this made it easy. She just talked — and it was beautiful."</blockquote>
-          <figcaption class="mt-4 text-sm text-gray-600">— Jason L., son</figcaption>
+        <figure class="reveal rounded-xl border border-black/5 shadow-lg p-8 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+          <blockquote class="text-gray-800 italic leading-relaxed">"My mom hates being on camera, but this made it easy. She just talked — and it was beautiful."</blockquote>
+          <figcaption class="mt-6 text-sm font-medium text-gray-600">— Jason L., son</figcaption>
         </figure>
       </div>
     </div>
   </section>
+  
+  <!-- Shared Storyboard CTA -->
+  <section class="shared-storyboard-cta" aria-labelledby="shared-storyboard-heading">
+    <div class="max-w-4xl mx-auto">
+      <h2 id="shared-storyboard-heading" class="reveal">View a Shared Storyboard?</h2>
+      <p class="reveal">If someone shared their stories with you, login to access them</p>
+      <button id="openLoginModalShared" class="btn-secondary btn-hero reveal">
+        Login to View Stories
+      </button>
+    </div>
+  </section>
+
+  <!-- Wave Divider -->
+  <div class="wave-divider">
+    <img src="https://storiesofyou-stories.s3.us-east-2.amazonaws.com/wave-divider.webp" alt="" role="presentation" loading="lazy" />
+  </div>
 
   <!-- FAQ Section -->
   <section class="bg-warm-light py-16" id="faq" aria-labelledby="faq-heading">
@@ -1001,6 +1376,19 @@
       entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }});
     },{threshold:.15});
     revealEls.forEach(el=>io.observe(el));
+    
+    // Header scroll behavior
+    const header = document.querySelector('.site-header');
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+      if (currentScroll > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+      lastScroll = currentScroll;
+    });
 
     const recModal = document.getElementById('recModal');
     function openRecorderModal() {
@@ -1531,6 +1919,8 @@
     
     openLoginModal?.addEventListener('click', openLogin);
     openLoginMobile?.addEventListener('click', openLogin);
+    document.getElementById('openLoginModalHero')?.addEventListener('click', openLogin);
+    document.getElementById('openLoginModalShared')?.addEventListener('click', openLogin);
     loginClose?.addEventListener('click', closeLogin);
     sendLoginCode?.addEventListener('click', sendMagicLink);
     resendMagicLinkBtn?.addEventListener('click', resendMagicLink);
