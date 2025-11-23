@@ -69,8 +69,9 @@
     .site-header:not(.scrolled) a[href="/"] img{background:transparent;padding:0;box-shadow:none;height:40px;width:auto}
     .site-header.scrolled a[href="/"] {background:transparent;padding:0;box-shadow:none}
     .site-header.scrolled a[href="/"] img{background:transparent;padding:0;box-shadow:none;height:40px;width:auto}
-    .site-header:not(.scrolled) nav a{color:#ffffff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,0.1)}
+    .site-header:not(.scrolled) nav a{color:#ffffff;font-weight:600;text-shadow:0 2px 4px rgba(0,0,0,0.3)}
     .site-header.scrolled nav a{color:#4b5563;font-weight:600}
+    .site-header nav a:hover{color:var(--brand-charcoal)}
     .site-header:not(.scrolled) #mobileMenuBtn{color:#ffffff;background:var(--warm-mid);padding:0.5rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);text-shadow:0 1px 2px rgba(0,0,0,0.1)}
     .site-header.scrolled #mobileMenuBtn{color:#4b5563;background:transparent;box-shadow:none;text-shadow:none}
     .hero-bg{background:radial-gradient(1200px 500px at 50% -200px,#fff7e9 0%,#fce8c8 50%,#e0cba7 100%)}
@@ -1437,7 +1438,7 @@
 
   <!-- Recorder Modal -->
   <div id="recModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 overflow-y-auto" style="z-index: 9999;">
-    <div class="bg-white shadow-2xl w-full max-w-lg max-h-[95vh] flex flex-col my-4" style="border-radius: 1rem;">
+    <div class="bg-white shadow-2xl w-full max-w-lg max-h-[95vh] flex flex-col my-4 overflow-hidden" style="border-radius: 1rem;">
       <div class="flex items-center justify-between p-4 border-b flex-shrink-0">
         <div class="flex items-center gap-2">
           <img src="logo.png" alt="Stories of You" class="h-6 w-auto" />
@@ -1583,7 +1584,7 @@
 
   <!-- Login Modal -->
   <div id="loginModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 overflow-y-auto" style="z-index: 9999;">
-    <div class="bg-white shadow-2xl w-full max-w-md max-h-[95vh] flex flex-col my-4" style="border-radius: 1rem;">
+    <div class="bg-white shadow-2xl w-full max-w-md max-h-[95vh] flex flex-col my-4 overflow-hidden" style="border-radius: 1rem;">
       <div class="flex items-center justify-between p-4 border-b flex-shrink-0">
         <div class="flex items-center gap-2">
           <img src="logo.png" alt="Stories of You" class="h-6 w-auto" />

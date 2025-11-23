@@ -30,8 +30,9 @@
     .site-header:not(.scrolled) a[href="/"] img{background:transparent;padding:0;box-shadow:none;height:40px;width:auto}
     .site-header.scrolled a[href="/"] {background:transparent;padding:0;box-shadow:none}
     .site-header.scrolled a[href="/"] img{background:transparent;padding:0;box-shadow:none;height:40px;width:auto}
-    .site-header:not(.scrolled) nav a{color:#ffffff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,0.1)}
+    .site-header:not(.scrolled) nav a{color:#ffffff;font-weight:600;text-shadow:0 2px 4px rgba(0,0,0,0.3)}
     .site-header.scrolled nav a{color:#4b5563;font-weight:600}
+    .site-header nav a:hover{color:var(--brand-charcoal)}
     .site-header:not(.scrolled) #mobileMenuBtn{color:#ffffff;background:var(--warm-mid);padding:0.5rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);text-shadow:0 1px 2px rgba(0,0,0,0.1)}
     .site-header.scrolled #mobileMenuBtn{color:#4b5563;background:transparent;box-shadow:none;text-shadow:none}
     .hero-bg{background:radial-gradient(1200px 500px at 50% -200px,#fff7e9 0%,#fce8c8 50%,#e0cba7 100%)}
@@ -100,7 +101,7 @@
   <header class="site-header">
     <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
       <a href="/">
-        <img src="logo.png" alt="Stories of You logo" class="h-8 w-auto rounded-sm" />
+        <img src="logo.png" alt="Stories of You logo" class="w-auto rounded-sm" />
       </a>
       <nav class="hidden md:flex items-center space-x-6">
         <a href="/#faq" class="text-sm hover:text-gray-900 transition-colors">FAQ</a>
@@ -204,7 +205,7 @@
       <p class="mt-4 text-lg text-gray-800 reveal">Start your first story session or learn more about how Stories of You works.</p>
       <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 reveal">
         <button id="openRecorderBottom" class="btn-primary px-8 py-4 text-lg rounded-xl shadow transition">
-          Record a Story (beta)
+          Record a Story
         </button>
         <a href="/" class="btn-secondary px-8 py-4 text-lg rounded-xl shadow transition">
           Learn How It Works
@@ -236,7 +237,7 @@
 
   <!-- Recorder Modal (same as index.html) -->
   <div id="recModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[9999] p-4">
-    <div class="bg-white rounded-xl rounded-b-xl shadow-2xl w-full max-w-lg max-h-[95vh] flex flex-col">
+    <div class="bg-white rounded-xl overflow-hidden shadow-2xl w-full max-w-lg max-h-[95vh] flex flex-col">
       <div class="flex items-center justify-between p-4 border-b flex-shrink-0">
         <div class="flex items-center gap-2">
           <img src="logo.png" alt="Stories of You" class="h-6 w-auto" />
@@ -325,7 +326,7 @@
 
   <!-- Login Modal -->
   <div id="loginModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[9999] p-4 overflow-y-auto">
-    <div class="bg-white rounded-xl rounded-b-xl shadow-2xl w-full max-w-md max-h-[95vh] flex flex-col my-4">
+    <div class="bg-white rounded-xl overflow-hidden shadow-2xl w-full max-w-md max-h-[95vh] flex flex-col my-4">
       <div class="flex items-center justify-between p-4 border-b flex-shrink-0">
         <div class="flex items-center gap-2">
           <img src="logo.png" alt="Stories of You" class="h-6 w-auto" />
