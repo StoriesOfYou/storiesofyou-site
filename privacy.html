@@ -15,26 +15,10 @@
       --warm-light:#faf3e7;
       --warm-mid:#e0cba7;
     }
-    .site-header{position:fixed;top:0;left:0;right:0;z-index:100;background:transparent;backdrop-filter:none;box-shadow:none;transition:all 0.3s ease}
-    .site-header.scrolled{background:rgba(255,255,255,.98);backdrop-filter:saturate(140%) blur(12px);box-shadow:0 2px 12px rgba(0,0,0,.08)}
-    .site-header:not(.scrolled) a[href="index.html"] {display:inline-block;background:var(--warm-mid);padding:0.5rem 0.85rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:all 0.3s ease}
-    .site-header:not(.scrolled) a[href="index.html"] img{background:transparent;padding:0;box-shadow:none;height:40px;width:auto}
-    .site-header.scrolled a[href="index.html"] {background:transparent;padding:0;box-shadow:none}
-    .site-header.scrolled a[href="index.html"] img{background:transparent;padding:0;box-shadow:none;height:40px;width:auto}
-    .site-header:not(.scrolled) nav a,
-    .site-header:not(.scrolled) a{color:#ffffff;font-weight:600;text-shadow:0 2px 4px rgba(0,0,0,0.3)}
-    .site-header.scrolled nav a,
-    .site-header.scrolled a{color:#4b5563;font-weight:600}
-    .site-header a:hover{color:var(--brand-charcoal)}
+    .site-header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.98);backdrop-filter:saturate(140%) blur(12px);box-shadow:0 2px 12px rgba(0,0,0,.08);transition:all 0.3s ease}
+    .site-header a[href="index.html"] img{height:40px;width:auto}
     .btn-primary{background-color:var(--brand-charcoal);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;transition:background-color 0.3s ease}
     .btn-primary:hover{background-color:#5a4d3a}
-    
-    @media (max-width: 768px) {
-      .site-header:not(.scrolled) a[href="index.html"] {
-        padding: 0.3rem 0.55rem;
-        border-radius: 10px;
-      }
-    }
   </style>
 </head>
 <body class="bg-white text-gray-800 font-sans" style="padding-top: 0;">
@@ -210,11 +194,11 @@
         <div class="bg-gray-50 p-6 rounded-lg">
           <p class="mb-4">If you have any questions about this Privacy Policy or our data practices, please contact us:</p>
           <ul class="space-y-2">
-            <li><strong>Email:</strong> privacy@storiesofyou.ai</li>
+            <li><strong>Email:</strong> support@storiesofyou.ai</li>
             <li><strong>Support:</strong> support@storiesofyou.ai</li>
             <li><strong>Mail:</strong> Stories of You Privacy Team<br>
-                PO Box 4318<br>
-                Bothell, WA, 98021</li>
+                PO Box 2450<br>
+                Woodinville, WA 98072</li>
           </ul>
           <p class="mt-4 text-sm text-gray-600">
             We will respond to all privacy-related inquiries within 30 days.
@@ -260,18 +244,6 @@
     // Footer year
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // Header scroll effect
-    const header = document.querySelector('.site-header');
-    let lastScroll = 0;
-    window.addEventListener('scroll', () => {
-      const currentScroll = window.pageYOffset;
-      if (currentScroll > 50) {
-        header.classList.add('scrolled');
-      } else {
-        header.classList.remove('scrolled');
-      }
-      lastScroll = currentScroll;
-    });
   </script>
 
 </body>

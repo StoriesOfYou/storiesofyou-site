@@ -24,17 +24,8 @@
       --warm-light:#faf3e7;
       --warm-mid:#e0cba7;
     }
-    .site-header{position:fixed;top:0;left:0;right:0;z-index:100;background:transparent;backdrop-filter:none;box-shadow:none;transition:all 0.3s ease}
-    .site-header.scrolled{background:rgba(255,255,255,.98);backdrop-filter:saturate(140%) blur(12px);box-shadow:0 2px 12px rgba(0,0,0,.08)}
-    .site-header:not(.scrolled) a[href="/"] {display:inline-block;background:var(--warm-mid);padding:0.5rem 0.85rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:all 0.3s ease}
-    .site-header:not(.scrolled) a[href="/"] img{background:transparent;padding:0;box-shadow:none;height:40px;width:auto}
-    .site-header.scrolled a[href="/"] {background:transparent;padding:0;box-shadow:none}
-    .site-header.scrolled a[href="/"] img{background:transparent;padding:0;box-shadow:none;height:40px;width:auto}
-    .site-header:not(.scrolled) nav a{color:#ffffff;font-weight:600;text-shadow:0 2px 4px rgba(0,0,0,0.3)}
-    .site-header.scrolled nav a{color:#4b5563;font-weight:600}
-    .site-header nav a:hover{color:var(--brand-charcoal)}
-    .site-header:not(.scrolled) #mobileMenuBtn{color:#ffffff;background:var(--warm-mid);padding:0.5rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);text-shadow:0 1px 2px rgba(0,0,0,0.1)}
-    .site-header.scrolled #mobileMenuBtn{color:#4b5563;background:transparent;box-shadow:none;text-shadow:none}
+    .site-header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.98);backdrop-filter:saturate(140%) blur(12px);box-shadow:0 2px 12px rgba(0,0,0,.08);transition:all 0.3s ease}
+    .site-header a[href="/"] img{height:40px;width:auto}
     .hero-bg{background:radial-gradient(1200px 500px at 50% -200px,#fff7e9 0%,#fce8c8 50%,#e0cba7 100%)}
     .bg-warm-light{background-color:var(--warm-light)}
     .bg-warm-mid{background-color:var(--warm-mid)}
@@ -87,12 +78,6 @@
       text-decoration: underline;
     }
     
-    @media (max-width: 768px) {
-      .site-header:not(.scrolled) a[href="/"] {
-        padding: 0.3rem 0.55rem;
-        border-radius: 10px;
-      }
-    }
   </style>
 </head>
 <body class="bg-white text-gray-800 font-sans" style="padding-top: 0;">
@@ -429,19 +414,6 @@
   <script>
     // Footer year
     document.getElementById("year").textContent = new Date().getFullYear();
-
-    // Header scroll effect
-    const header = document.querySelector('.site-header');
-    let lastScroll = 0;
-    window.addEventListener('scroll', () => {
-      const currentScroll = window.pageYOffset;
-      if (currentScroll > 50) {
-        header.classList.add('scrolled');
-      } else {
-        header.classList.remove('scrolled');
-      }
-      lastScroll = currentScroll;
-    });
 
     // Scroll-in animations
     const revealEls=document.querySelectorAll('.reveal');
