@@ -392,14 +392,17 @@
     .faq-container-simple .faq-answer {
       max-height:0;
       overflow:hidden;
-      transition:max-height 0.3s ease, padding 0.3s ease;
+      transition:max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
       color:#4b5563;
       line-height:1.7;
+      padding:0;
+      opacity:0;
     }
     
     .faq-container-simple .faq-item.active .faq-answer {
       max-height:500px;
       padding-bottom:1.5rem;
+      opacity:1;
     }
     
     .faq-question {
@@ -427,7 +430,6 @@
     
     .faq-answer {
       animation: fadeIn 0.4s ease-in-out;
-      padding: 1.25rem 1.5rem;
       line-height: 1.7;
     }
     
