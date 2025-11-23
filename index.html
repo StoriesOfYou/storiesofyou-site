@@ -65,12 +65,12 @@
     }
     .site-header{position:fixed;top:0;left:0;right:0;z-index:100;background:transparent;backdrop-filter:none;box-shadow:none;transition:all 0.3s ease}
     .site-header.scrolled{background:rgba(255,255,255,.98);backdrop-filter:saturate(140%) blur(12px);box-shadow:0 2px 12px rgba(0,0,0,.08)}
-    .site-header:not(.scrolled) a[href="/"] {display:inline-block;background:var(--warm-mid);padding:0.35rem 0.65rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:all 0.3s ease}
-    .site-header:not(.scrolled) a[href="/"] img{background:transparent;padding:0;box-shadow:none}
+    .site-header:not(.scrolled) a[href="/"] {display:inline-block;background:var(--warm-mid);padding:0.5rem 0.85rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:all 0.3s ease}
+    .site-header:not(.scrolled) a[href="/"] img{background:transparent;padding:0;box-shadow:none;height:32px;width:120px}
     .site-header.scrolled a[href="/"] {background:transparent;padding:0;box-shadow:none}
-    .site-header.scrolled a[href="/"] img{background:transparent;padding:0;box-shadow:none}
+    .site-header.scrolled a[href="/"] img{background:transparent;padding:0;box-shadow:none;height:32px;width:120px}
     .site-header:not(.scrolled) nav a{color:#ffffff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,0.1)}
-    .site-header.scrolled nav a{color:#4b5563}
+    .site-header.scrolled nav a{color:#4b5563;font-weight:600}
     .site-header:not(.scrolled) #mobileMenuBtn{color:#ffffff;background:var(--warm-mid);padding:0.5rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);text-shadow:0 1px 2px rgba(0,0,0,0.1)}
     .site-header.scrolled #mobileMenuBtn{color:#4b5563;background:transparent;box-shadow:none;text-shadow:none}
     .hero-bg{background:radial-gradient(1200px 500px at 50% -200px,#fff7e9 0%,#fce8c8 50%,#e0cba7 100%)}
@@ -335,7 +335,7 @@
       background:transparent;
       border:none;
       display:flex;
-      justify-between:between;
+      justify-content:space-between;
       align-items:center;
       gap:1rem;
       cursor:pointer;
@@ -704,9 +704,9 @@
         <img src="logo.png" alt="Stories of You - Preserve family memories through voice recordings" width="120" height="32" class="h-8 w-auto rounded-sm" />
       </a>
       <nav class="hidden md:flex items-center space-x-6" aria-label="Main navigation">
-        <a href="#faq" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
-        <a href="about.html" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">About</a>
-        <a href="privacy.html" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Privacy</a>
+        <a href="#faq" class="text-sm hover:text-gray-900 transition-colors">FAQ</a>
+        <a href="about.html" class="text-sm hover:text-gray-900 transition-colors">About</a>
+        <a href="privacy.html" class="text-sm hover:text-gray-900 transition-colors">Privacy</a>
         <button id="openLoginModal" class="btn-secondary px-4 py-2 text-sm rounded-lg">Login</button>
         <button id="openRecorderNav" class="btn-primary px-4 py-2 text-sm rounded-lg">Record Story</button>
       </nav>
@@ -850,7 +850,7 @@
   <section class="bg-white" style="padding: 8rem 0;" aria-labelledby="how-it-works">
     <div class="max-w-6xl mx-auto px-6 text-center">
       <h2 id="how-it-works" class="text-3xl font-bold mb-10 reveal" style="color:var(--brand-navy)">How to Record and Share Your Stories</h2>
-      <p class="text-lg text-gray-700 mb-24 max-w-2xl mx-auto reveal">Three simple steps to preserve your memories</p>
+      <p class="text-lg text-gray-700 mb-32 max-w-2xl mx-auto reveal">Three simple steps to preserve your memories</p>
       <div class="grid md:grid-cols-3" style="gap: 5rem;">
         <div class="reveal">
           <span class="icon">
@@ -905,25 +905,55 @@
   <section class="testimonials-section-calm" style="padding: 8rem 0; background: var(--warm-light);" aria-labelledby="testimonials">
     <div class="stories-carousel-wrapper">
       <h2 id="testimonials" class="text-3xl font-bold text-center mb-6 reveal" style="color:var(--brand-navy)">What Families Are Saying</h2>
-      <p class="text-lg text-gray-700 text-center mb-8 max-w-2xl mx-auto reveal">Real stories from families preserving their memories</p>
+      <p class="text-lg text-gray-700 text-center mb-16 max-w-2xl mx-auto reveal">Real stories from families preserving their memories</p>
       
       <div class="testimonials-carousel">
         <div class="testimonial-tile" style="background: linear-gradient(135deg, #fdfaf6 0%, #f5e6cc 50%, #e0cba7 100%);">
           <div class="quote-mark">"</div>
-          <blockquote class="testimonial-quote">I didn't realize how much I missed my dad's laugh until I heard it here. Best gift we've given our kids.</blockquote>
-          <p class="testimonial-author">Sarah M., daughter</p>
+          <blockquote class="testimonial-quote">It took five minutes, and now my grandkids will always know my voice and several of our family stories.</blockquote>
+          <p class="testimonial-author">Robert T., grandfather</p>
         </div>
         
         <div class="testimonial-tile" style="background: linear-gradient(135deg, #f5e6cc 0%, #e0cba7 50%, #d4b896 100%);">
           <div class="quote-mark">"</div>
-          <blockquote class="testimonial-quote">It took five minutes, and now my grandkids will always know my voice and our family stories.</blockquote>
-          <p class="testimonial-author">Robert T., grandfather</p>
+          <blockquote class="testimonial-quote">I thought this would be complicated, but it was just like leaving a voicemail. Even I can do it!</blockquote>
+          <p class="testimonial-author">Margaret S., mother</p>
         </div>
         
         <div class="testimonial-tile" style="background: linear-gradient(135deg, #fdfaf6 0%, #e8d4b8 50%, #d4b896 100%);">
           <div class="quote-mark">"</div>
-          <blockquote class="testimonial-quote">My mom hates being on camera, but this made it easy. She just talked — and it was beautiful.</blockquote>
+          <blockquote class="testimonial-quote">I hadn't thought about these stories in decades. Talking through them brought back the best memories of my life.</blockquote>
+          <p class="testimonial-author">James W., grandfather</p>
+        </div>
+        
+        <div class="testimonial-tile" style="background: linear-gradient(135deg, #f5e6cc 0%, #d4b896 50%, #c9a882 100%);">
+          <div class="quote-mark">"</div>
+          <blockquote class="testimonial-quote">Mom hates being on camera, but this made it easy. She just talked — and it was beautiful.</blockquote>
           <p class="testimonial-author">Jason L., son</p>
+        </div>
+        
+        <div class="testimonial-tile" style="background: linear-gradient(135deg, #fdfaf6 0%, #f5e6cc 50%, #e0cba7 100%);">
+          <div class="quote-mark">"</div>
+          <blockquote class="testimonial-quote">Hearing Grandma tell stories from when she was my age makes me feel so connected to her, I'm so glad she recorded them.</blockquote>
+          <p class="testimonial-author">Emily C., granddaughter</p>
+        </div>
+        
+        <div class="testimonial-tile" style="background: linear-gradient(135deg, #e8d4b8 0%, #d4b896 50%, #c9a882 100%);">
+          <div class="quote-mark">"</div>
+          <blockquote class="testimonial-quote">I sent my uncle the link and he recorded 8 stories in one weekend. I've never felt closer to our family history.</blockquote>
+          <p class="testimonial-author">Carlos M., nephew</p>
+        </div>
+        
+        <div class="testimonial-tile" style="background: linear-gradient(135deg, #fdfaf6 0%, #e0cba7 50%, #d4b896 100%);">
+          <div class="quote-mark">"</div>
+          <blockquote class="testimonial-quote">My mom lives 2,000 miles away. Now I can hear her voice tell stories I never knew, even when we can't talk.</blockquote>
+          <p class="testimonial-author">Michael T., son</p>
+        </div>
+        
+        <div class="testimonial-tile" style="background: linear-gradient(135deg, #f5e6cc 0%, #e0cba7 50%, #c9a882 100%);">
+          <div class="quote-mark">"</div>
+          <blockquote class="testimonial-quote">My mom's immigration story is really amazing. This gift will be passed down for generations.</blockquote>
+          <p class="testimonial-author">David K., son</p>
         </div>
       </div>
     </div>
